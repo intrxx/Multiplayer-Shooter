@@ -92,13 +92,10 @@ Build/Android/res/*/*
 Plugins/**/Binaries/*
 Plugins/**/Intermediate/*
 
-Content/DATA
-Content/Characters
+Content/ThirdPartyAssets
 Content/StarterContent
-Content/ParagonKwang
-Content/GothicTemple
-Content/QuadrapedCreatures
-Content/UIAssets
+Content/ParagonRevenant
+Content/Bazaar_Meshingun
 
 .idea
 Plugins/Developer/Riderlink
