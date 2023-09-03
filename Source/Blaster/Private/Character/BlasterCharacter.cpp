@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Player/BPlayerController.h"
 
@@ -22,6 +23,9 @@ ABlasterCharacter::ABlasterCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 }
 
