@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "BlasterCharacter.generated.h"
 
+class UWidgetComponent;
 class UBInputConfig;
 class USpringArmComponent;
 class UCameraComponent;
@@ -45,5 +46,8 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
 	UCameraComponent* CameraComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|UI")
+	UWidgetComponent* OverheadWidget;
 	
 };

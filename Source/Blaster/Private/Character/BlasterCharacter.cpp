@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Player/BPlayerController.h"
@@ -26,6 +27,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadComponent"));
+	OverheadWidget->SetupAttachment(RootComponent);
 	
 }
 
