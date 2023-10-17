@@ -36,10 +36,7 @@ ABlasterCharacter::ABlasterCharacter()
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Hiding the Revenant weapon which is attached to the mesh
-	GetMesh()->HideBoneByName(TEXT("weapon_l"), PBO_None);
-
+	
 	if (ABPlayerController* PC = Cast<ABPlayerController>(GetController()))
 	{
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
