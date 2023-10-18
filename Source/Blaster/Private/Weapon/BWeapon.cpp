@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
+#include "PhysicsEngine/ShapeElem.h"
 
 ABWeapon::ABWeapon()
 {
@@ -38,6 +39,7 @@ void ABWeapon::BeginPlay()
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+		SphereComp->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
 	}
 
 	if(PickUpWidgetComp)
@@ -46,19 +48,37 @@ void ABWeapon::BeginPlay()
 	}
 }
 
-void ABWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
-	if(BlasterCharacter && PickUpWidgetComp)
-	{
-		PickUpWidgetComp->SetVisibility(true);
-	}
-}
-
 void ABWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->SetOverlappingWeapon(this);
+	}
+}
+
+void ABWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->SetOverlappingWeapon(nullptr);
+	}
+}
+
+void ABWeapon::ShowPickUpWidget(bool bShowWidget)
+{
+	if(PickUpWidgetComp)
+	{
+		PickUpWidgetComp->SetVisibility(bShowWidget);
+	}
 }
 

@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "BlasterCharacter.generated.h"
 
+class ABWeapon;
 class UWidgetComponent;
 class UBInputConfig;
 class USpringArmComponent;
@@ -24,6 +25,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SetOverlappingWeapon(ABWeapon* Weapon);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -32,22 +37,26 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	UBInputConfig* InputConfig;
+	TObjectPtr<UBInputConfig> InputConfig;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	UInputMappingContext* DefaultMappingContext;
-
-public:	
-	
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
-	USpringArmComponent* SpringArmComponent;
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
-	UCameraComponent* CameraComponent;
+	TObjectPtr<UCameraComponent> CameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|UI")
-	UWidgetComponent* OverheadWidget;
+	TObjectPtr<UWidgetComponent> OverheadWidget;
+
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	TObjectPtr<ABWeapon> OverlappingWeapon;
+
+private:
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
 	
 };
