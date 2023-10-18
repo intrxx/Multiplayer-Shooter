@@ -4,6 +4,8 @@
 #include "Weapon/BWeapon.h"
 
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Character/BlasterCharacter.h"
 
 ABWeapon::ABWeapon()
 {
@@ -11,7 +13,6 @@ ABWeapon::ABWeapon()
 	bReplicates = true;
 
 	WeaponMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMeshComponent"));
-	WeaponMeshComp->SetupAttachment(RootComponent);
 	SetRootComponent(WeaponMeshComp);
 	
 	WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
@@ -22,6 +23,10 @@ ABWeapon::ABWeapon()
 	SphereComp->SetupAttachment(RootComponent);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	PickUpWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
+	PickUpWidgetComp->SetupAttachment(RootComponent);
+	
 }
 
 void ABWeapon::BeginPlay()
@@ -32,6 +37,22 @@ void ABWeapon::BeginPlay()
 	{
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+	}
+
+	if(PickUpWidgetComp)
+	{
+		PickUpWidgetComp->SetVisibility(false);
+	}
+}
+
+void ABWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if(BlasterCharacter && PickUpWidgetComp)
+	{
+		PickUpWidgetComp->SetVisibility(true);
 	}
 }
 
