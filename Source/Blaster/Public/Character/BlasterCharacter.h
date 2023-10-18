@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "BlasterCharacter.generated.h"
 
+class UCombatComponent;
 class ABWeapon;
 class UWidgetComponent;
 class UBInputConfig;
@@ -27,6 +28,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void PostInitializeComponents() override;
+
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 
 protected:
@@ -34,6 +37,7 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Equip();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
@@ -55,8 +59,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
+	TObjectPtr<UCombatComponent> CombatComp;
+
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
-	
+
+	UFUNCTION(Server, Reliable)
+	void ServerEquip();
 };

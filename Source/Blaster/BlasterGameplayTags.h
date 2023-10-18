@@ -16,6 +16,7 @@ public:
 	FGameplayTag Input_Move;
 	FGameplayTag Input_Look;
 	FGameplayTag Input_Jump;
+	FGameplayTag Input_EquipWeapon;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);

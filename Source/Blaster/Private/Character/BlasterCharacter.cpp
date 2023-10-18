@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
+#include "BlasterComponents/CombatComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Input/BlasterEnhancedInputComponent.h"
@@ -32,7 +33,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadComponent"));
 	OverheadWidget->SetupAttachment(RootComponent);
-	
+
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponen"));
+	CombatComp->SetIsReplicated(true);
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -40,6 +43,15 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void ABlasterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(CombatComp)
+	{
+		CombatComp->BlasterCharacter = this;
+	}
 }
 
 void ABlasterCharacter::BeginPlay()
@@ -74,7 +86,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::Look);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Jump, ETriggerEvent::Triggered, this,
 		&ACharacter::Jump);
-
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_EquipWeapon, ETriggerEvent::Triggered, this,
+		&ThisClass::Equip);
 }
 
 void ABlasterCharacter::Move(const FInputActionValue& Value)
@@ -111,6 +124,21 @@ void ABlasterCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ABlasterCharacter::Equip()
+{
+	if(CombatComp)
+	{
+		if(HasAuthority())
+		{
+			CombatComp->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquip();
+		}
+	}
+}
+
 void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)
 {
 	if(OverlappingWeapon)
@@ -138,6 +166,14 @@ void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 	if(LastWeapon)
 	{
 		LastWeapon->ShowPickUpWidget(false);	
+	}
+}
+
+void ABlasterCharacter::ServerEquip_Implementation()
+{
+	if(CombatComp)
+	{
+		CombatComp->EquipWeapon(OverlappingWeapon);
 	}
 }
 

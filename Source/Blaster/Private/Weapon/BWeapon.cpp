@@ -6,7 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
-#include "PhysicsEngine/ShapeElem.h"
+#include "Net/UnrealNetwork.h"
 
 ABWeapon::ABWeapon()
 {
@@ -48,6 +48,13 @@ void ABWeapon::BeginPlay()
 	}
 }
 
+void ABWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABWeapon, WeaponState);
+}
+
 void ABWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -79,6 +86,33 @@ void ABWeapon::ShowPickUpWidget(bool bShowWidget)
 	if(PickUpWidgetComp)
 	{
 		PickUpWidgetComp->SetVisibility(bShowWidget);
+	}
+}
+
+void ABWeapon::SetWeaponState(EBWeaponState State)
+{
+	WeaponState = State;
+	
+	switch(WeaponState)
+	{
+	case EBWeaponState::EWS_Equipped:
+		ShowPickUpWidget(false);
+		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	default:
+		break;
+	}
+}
+
+void ABWeapon::OnRep_WeaponState()
+{
+	switch(WeaponState)
+	{
+	case EBWeaponState::EWS_Equipped:
+		ShowPickUpWidget(false);
+		break;
+	default:
+		break;
 	}
 }
 
