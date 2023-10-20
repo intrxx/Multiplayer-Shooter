@@ -93,6 +93,10 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
 		&ThisClass::CrouchButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
+		&ThisClass::AimButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Completed, this,
+		&ThisClass::AimButtonReleased);
 }
 
 void ABlasterCharacter::Move(const FInputActionValue& Value)
@@ -156,9 +160,30 @@ void ABlasterCharacter::CrouchButtonPressed()
 	}
 }
 
-bool ABlasterCharacter::IsWepaonEquipped()
+void ABlasterCharacter::AimButtonPressed()
+{
+	if(CombatComp)
+	{
+		CombatComp->SetAiming(true);
+	}
+}
+
+void ABlasterCharacter::AimButtonReleased()
+{
+	if(CombatComp)
+	{
+		CombatComp->SetAiming(false);
+	}
+}
+
+bool ABlasterCharacter::IsWeaponEquipped()
 {
 	return (CombatComp && CombatComp->EquippedWeapon);
+}
+
+bool ABlasterCharacter::IsAiming()
+{
+	return (CombatComp && CombatComp->bAiming);
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)

@@ -16,6 +16,7 @@ class BLASTER_API UCombatComponent : public UActorComponent
 
 public:	
 	UCombatComponent();
+	friend ABlasterCharacter;
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -24,16 +25,25 @@ public:
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	
 public:
-	friend ABlasterCharacter;
+	
+protected:
+	virtual void BeginPlay() override;
+
+	void SetAiming(bool bIsAiming);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool bIsAiming);
 
 private:
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ABWeapon> EquippedWeapon;
+
+	UPROPERTY(Replicated)
+	bool bAiming;
 	
-protected:
-	virtual void BeginPlay() override;
+
 
 		
 };

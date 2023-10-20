@@ -30,6 +30,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, bAiming);
 }
 
 void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
@@ -50,5 +51,20 @@ void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	}
 	EquippedWeapon->SetOwner(BlasterCharacter);
 	
+}
+
+void UCombatComponent::SetAiming(bool bIsAiming)
+{
+	// Leaving it here because if we call it on the client we don't need to wait for the ServerRPC to execute the function
+	// so we see the result of clicking the aim button faster on the client and it then runs on the server replicating
+	// to all clients so they can see the result too
+	bAiming = bIsAiming;
+	
+	ServerSetAiming(bIsAiming);
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+{
+	bAiming = bIsAiming;
 }
 
