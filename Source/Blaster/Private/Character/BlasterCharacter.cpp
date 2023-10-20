@@ -36,6 +36,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponen"));
 	CombatComp->SetIsReplicated(true);
+
+	// Movement
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -87,7 +90,9 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Jump, ETriggerEvent::Triggered, this,
 		&ACharacter::Jump);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_EquipWeapon, ETriggerEvent::Triggered, this,
-		&ThisClass::Equip);
+		&ThisClass::EquipButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
+		&ThisClass::CrouchButtonPressed);
 }
 
 void ABlasterCharacter::Move(const FInputActionValue& Value)
@@ -124,7 +129,7 @@ void ABlasterCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ABlasterCharacter::Equip()
+void ABlasterCharacter::EquipButtonPressed()
 {
 	if(CombatComp)
 	{
@@ -136,6 +141,18 @@ void ABlasterCharacter::Equip()
 		{
 			ServerEquip();
 		}
+	}
+}
+
+void ABlasterCharacter::CrouchButtonPressed()
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
 	}
 }
 
