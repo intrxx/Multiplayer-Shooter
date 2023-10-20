@@ -32,6 +32,8 @@ public:
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 
+	bool IsWepaonEquipped();
+
 protected:
 	virtual void BeginPlay() override;
 

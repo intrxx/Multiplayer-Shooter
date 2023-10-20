@@ -132,11 +132,16 @@ void ABlasterCharacter::Equip()
 		{
 			CombatComp->EquipWeapon(OverlappingWeapon);
 		}
-		else
+		else // We don't have authority so we call ServerRPC (A function that is called on client and executed on server)
 		{
 			ServerEquip();
 		}
 	}
+}
+
+bool ABlasterCharacter::IsWepaonEquipped()
+{
+	return (CombatComp && CombatComp->EquippedWeapon);
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)
