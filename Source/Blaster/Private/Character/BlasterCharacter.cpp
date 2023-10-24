@@ -218,6 +218,15 @@ void ABlasterCharacter::AimButtonReleased()
 	}
 }
 
+ABWeapon* ABlasterCharacter::GetEquippedWeapon()
+{
+	if(CombatComp == nullptr)
+	{
+		return nullptr;
+	}
+	return CombatComp->EquippedWeapon;
+}
+
 bool ABlasterCharacter::IsWeaponEquipped()
 {
 	return (CombatComp && CombatComp->EquippedWeapon);

@@ -36,6 +36,7 @@ public:
 	void SetWeaponState(EBWeaponState State);
 	
 	FORCEINLINE USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
 	
 public:
 	
