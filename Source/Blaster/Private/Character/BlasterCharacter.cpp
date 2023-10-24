@@ -43,6 +43,11 @@ ABlasterCharacter::ABlasterCharacter()
 
 	// Movement
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 750.f, 0.f);
+
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -93,12 +98,18 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	float Speed = Velocity.Size();
 	bool bIsInAir = GetCharacterMovement()->IsFalling();
 	
-	if(!bIsInAir && Speed == 0.0f)
+	if(!bIsInAir && Speed == 0.0f) // Standing still
 	{
 		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.0f);
 		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
-		bUseControllerRotationYaw = false;
+		bUseControllerRotationYaw = true;
+
+		if(TurningInPlace == EBTurningInPlace::ETIP_NotTurning)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		TurnInPlace(DeltaTime);
 	}
 	
 	if(bIsInAir || Speed > 0.0f)
@@ -106,6 +117,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.0f);
 		AO_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
+		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 	}
 
 	AO_Pitch = GetBaseAimRotation().Pitch;
@@ -115,6 +127,32 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		const FVector2D InRange(270.f, 360.f);
 		const FVector2D OutRange(-90.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
+}
+
+void ABlasterCharacter::TurnInPlace(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("EO Yaw: %f"), AO_Yaw);
+	
+	if(AO_Yaw > 90.f) // Turning right
+	{
+		TurningInPlace = EBTurningInPlace::ETIP_Right;
+	}
+	else if(AO_Yaw < -90.f) // Turning left
+	{
+		TurningInPlace = EBTurningInPlace::ETIP_Left;
+	}
+	
+	if(TurningInPlace != EBTurningInPlace::ETIP_NotTurning)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw, 0.f, DeltaTime, 4.f);
+		AO_Yaw = InterpAO_Yaw;
+		
+		if(FMath::Abs(AO_Yaw) < 15.f)
+		{
+			TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.0f);
+		}
 	}
 }
 
@@ -130,7 +168,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Look, ETriggerEvent::Triggered, this,
 		&ThisClass::Look);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Jump, ETriggerEvent::Triggered, this,
-		&ACharacter::Jump);
+		&ThisClass::Jump);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_EquipWeapon, ETriggerEvent::Triggered, this,
 		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
@@ -215,6 +253,19 @@ void ABlasterCharacter::AimButtonReleased()
 	if(CombatComp)
 	{
 		CombatComp->SetAiming(false);
+	}
+}
+
+void ABlasterCharacter::Jump()
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+		Super::Jump();
+	}
+	else
+	{
+		Super::Jump();
 	}
 }
 

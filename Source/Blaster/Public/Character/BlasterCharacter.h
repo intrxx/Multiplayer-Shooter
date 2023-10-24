@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "BlasterTypes/BTurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
 class UCombatComponent;
@@ -34,6 +35,7 @@ public:
 
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch() const {return AO_Pitch;}
+	FORCEINLINE EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
 	ABWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -47,8 +49,10 @@ protected:
 	void CrouchButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
+	virtual void Jump() override;
 
 	void AimOffset(float DeltaTime);
+	void TurnInPlace(float DeltaTime);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
@@ -74,8 +78,11 @@ private:
 	TObjectPtr<UCombatComponent> CombatComp;
 
 	float AO_Yaw;
+	float InterpAO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+
+	EBTurningInPlace TurningInPlace;
 
 private:
 	UFUNCTION()
