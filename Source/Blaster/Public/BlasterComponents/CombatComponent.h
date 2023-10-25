@@ -37,7 +37,10 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void FireButtonPressed(bool bPressed);
+
 private:
+	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
@@ -51,5 +54,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat|Movement")
 	float AimWalkSpeed;
-	
+
+	bool bFireButtonPressed;
 };

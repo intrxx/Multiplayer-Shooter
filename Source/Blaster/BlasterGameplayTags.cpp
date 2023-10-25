@@ -20,6 +20,7 @@ void FBlasterGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Input_EquipWeapon, "Input.EquipWeapon", "Tag used for equip input");
 	AddTag(Input_Crouch, "Input.Crouch", "Tag used for crouch input");
 	AddTag(Input_Aim, "Input.Aim", "Tag used for aim input");
+	AddTag(Input_Fire, "Input.Fire", "Tag used for fire input");
 }
 
 void FBlasterGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

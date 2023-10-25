@@ -94,5 +94,14 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UCombatComponent::FireButtonPressed(bool bPressed)
+{
+	bFireButtonPressed = bPressed;
+	if(BlasterCharacter && bFireButtonPressed)
+	{
+		BlasterCharacter->PlayFireMontage(bAiming);
+	}
+}
+
 
 

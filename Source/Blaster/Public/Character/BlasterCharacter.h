@@ -15,6 +15,7 @@ class UBInputConfig;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
+class UAnimMontage;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
@@ -33,6 +34,8 @@ public:
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 
+	void PlayFireMontage(bool bAiming);
+
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch() const {return AO_Pitch;}
 	FORCEINLINE EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
@@ -50,6 +53,8 @@ protected:
 	void AimButtonPressed();
 	void AimButtonReleased();
 	virtual void Jump() override;
+	void FireWeaponPressed();
+	void FireWeaponReleased();
 
 	void AimOffset(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
@@ -74,8 +79,11 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UCombatComponent> CombatComp;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UAnimMontage> FireWeaponMontage;
 
 	float AO_Yaw;
 	float InterpAO_Yaw;

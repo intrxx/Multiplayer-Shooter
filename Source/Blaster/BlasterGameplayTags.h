@@ -19,6 +19,7 @@ public:
 	FGameplayTag Input_EquipWeapon;
 	FGameplayTag Input_Crouch;
 	FGameplayTag Input_Aim;
+	FGameplayTag Input_Fire;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);

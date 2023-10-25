@@ -8,6 +8,7 @@
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "BlasterComponents/CombatComponent.h"
+#include "Character/BlasterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -40,8 +41,7 @@ ABlasterCharacter::ABlasterCharacter()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponen"));
 	CombatComp->SetIsReplicated(true);
-
-	// Movement
+	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 750.f, 0.f);
@@ -132,8 +132,6 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("EO Yaw: %f"), AO_Yaw);
-	
 	if(AO_Yaw > 90.f) // Turning right
 	{
 		TurningInPlace = EBTurningInPlace::ETIP_Right;
@@ -173,10 +171,16 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
 		&ThisClass::CrouchButtonPressed);
+	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Completed, this,
 		&ThisClass::AimButtonReleased);
+	
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Fire, ETriggerEvent::Started, this,
+		&ThisClass::FireWeaponPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Fire, ETriggerEvent::Completed, this,
+		&ThisClass::FireWeaponReleased);
 }
 
 void ABlasterCharacter::Move(const FInputActionValue& Value)
@@ -269,6 +273,24 @@ void ABlasterCharacter::Jump()
 	}
 }
 
+void ABlasterCharacter::FireWeaponPressed()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, FString::Printf(TEXT("Fire pressed")));
+	if(CombatComp)
+	{
+		CombatComp->FireButtonPressed(true);
+	}
+}
+
+void ABlasterCharacter::FireWeaponReleased()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Fire released")));
+	if(CombatComp)
+	{
+		CombatComp->FireButtonPressed(false);
+	}
+}
+
 ABWeapon* ABlasterCharacter::GetEquippedWeapon()
 {
 	if(CombatComp == nullptr)
@@ -302,6 +324,22 @@ void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)
 		{
 			OverlappingWeapon->ShowPickUpWidget(true);
 		}
+	}
+}
+
+void ABlasterCharacter::PlayFireMontage(bool bAiming)
+{
+	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && FireWeaponMontage)
+	{
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName = bAiming ? FName("FireRifleAim") : FName("FireRifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
 
