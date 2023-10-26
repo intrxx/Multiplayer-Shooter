@@ -4,13 +4,15 @@
 #include "BlasterComponents/CombatComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/BWeapon.h"
 
 UCombatComponent::UCombatComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	BaseWalkSpeed = 600.f;
 	AimWalkSpeed = 425.f;
@@ -37,7 +39,9 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
+	FHitResult HitResult;
+	TraceUnderCrosshair(HitResult);
 }
 
 void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
@@ -124,6 +128,44 @@ void UCombatComponent::MulticastFire_Implementation()
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();
 	}
+}
+
+void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
+{
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	// "UGameplayStatics::GetPlayerController(this, 0)" Even if this is a multiplayer game we can get the player with
+	// index 0 as it is the player that plays the game on current machine
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+
+	if(bScreenToWorld)
+	{
+		FVector Start = CrosshairWorldPosition;
+		FVector End = CrosshairWorldDirection * TRACE_LENGTH;
+
+		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECC_Visibility);
+
+		if(!OutHitResult.bBlockingHit)
+		{
+			OutHitResult.ImpactPoint = End;
+		}
+		else
+		{
+			DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 16.f, 16.f, FColor::Red);
+		}
+	}
+	
 }
 
 

@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+#define TRACE_LENGTH 80000.f;
+
 class ABlasterCharacter;
 class ABWeapon;
 
@@ -46,6 +48,8 @@ protected:
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire();
+
+	void TraceUnderCrosshair(FHitResult& OutHitResult);
 
 private:
 	UPROPERTY()
