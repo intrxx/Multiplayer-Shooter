@@ -39,6 +39,14 @@ protected:
 
 	void FireButtonPressed(bool bPressed);
 
+	// Server RPC, when called on client will execute on server
+	UFUNCTION(Server, Reliable)
+	void ServerFire();
+
+	// When called on server it will run on all clients and server
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire();
+
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;

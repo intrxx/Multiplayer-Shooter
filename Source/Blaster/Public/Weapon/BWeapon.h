@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UWidgetComponent;
+class UAnimationAsset;
 
 UENUM(BlueprintType)
 enum class EBWeaponState : uint8
@@ -34,6 +35,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SetWeaponState(EBWeaponState State);
+
+	void Fire();
 	
 	FORCEINLINE USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
@@ -63,6 +66,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon|Properties")
 	TObjectPtr<UWidgetComponent> PickUpWidgetComp;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon|Properties")
+	TObjectPtr<UAnimationAsset> FireAnimation;
 
 private:
 	UFUNCTION()

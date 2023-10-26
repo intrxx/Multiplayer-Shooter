@@ -275,7 +275,6 @@ void ABlasterCharacter::Jump()
 
 void ABlasterCharacter::FireWeaponPressed()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, FString::Printf(TEXT("Fire pressed")));
 	if(CombatComp)
 	{
 		CombatComp->FireButtonPressed(true);
@@ -284,7 +283,6 @@ void ABlasterCharacter::FireWeaponPressed()
 
 void ABlasterCharacter::FireWeaponReleased()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Fire released")));
 	if(CombatComp)
 	{
 		CombatComp->FireButtonPressed(false);
