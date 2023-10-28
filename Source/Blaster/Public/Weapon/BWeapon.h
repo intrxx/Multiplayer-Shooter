@@ -36,7 +36,7 @@ public:
 
 	void SetWeaponState(EBWeaponState State);
 
-	void Fire();
+	virtual void Fire(const FVector& OutHitTarget);
 	
 	FORCEINLINE USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
@@ -55,19 +55,19 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon|Properties")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon|Properties")
 	TObjectPtr<USphereComponent> SphereComp;
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Blaster|Weapon|Properties")
 	EBWeaponState WeaponState;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon|Properties")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Properties")
 	TObjectPtr<UWidgetComponent> PickUpWidgetComp;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon|Properties")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Properties")
 	TObjectPtr<UAnimationAsset> FireAnimation;
 
 private:

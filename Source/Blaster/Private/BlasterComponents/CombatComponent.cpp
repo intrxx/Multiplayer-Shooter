@@ -126,7 +126,7 @@ void UCombatComponent::MulticastFire_Implementation()
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire();
+		EquippedWeapon->Fire(HitTarget);
 	}
 }
 
@@ -159,9 +159,11 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
 		if(!OutHitResult.bBlockingHit)
 		{
 			OutHitResult.ImpactPoint = End;
+			HitTarget = End;
 		}
 		else
 		{
+			HitTarget = OutHitResult.ImpactPoint;
 			DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 16.f, 16.f, FColor::Red);
 		}
 	}

@@ -116,7 +116,7 @@ void ABWeapon::OnRep_WeaponState()
 	}
 }
 
-void ABWeapon::Fire()
+void ABWeapon::Fire(const FVector& OutHitTarget)
 {
 	if(FireAnimation)
 	{
