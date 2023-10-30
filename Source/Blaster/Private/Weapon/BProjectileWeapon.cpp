@@ -14,6 +14,13 @@ void ABProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);
 
+	// The weapon class has Authority only on the server because it is set to Replicated in the base class
+	// If a class is not set to be replicated it has Authority on both server and client
+	if(!HasAuthority())
+	{
+		return;
+	}
+	
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 	
 	const USkeletalMeshSocket* ProjSpawnSocket = GetWeaponMesh()->GetSocketByName(FName("ProjectileSpawnSocket"));
@@ -23,8 +30,6 @@ void ABProjectileWeapon::Fire(const FVector& HitTarget)
 		
 		// From ProjSpawnSocket to Hit location from TraceUnderCrosshair
 		FVector ToTarget = HitTarget - SocketTransform.GetLocation();
-
-		UBlasterGameplayStatics::BlasterDrawVectorDebugMessage(ToTarget, 5, FColor::Blue, FString("To Target"));
 		
 		FRotator TargetRotation = ToTarget.Rotation();
 		
