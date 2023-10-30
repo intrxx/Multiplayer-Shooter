@@ -36,7 +36,7 @@ public:
 
 	void SetWeaponState(EBWeaponState State);
 
-	virtual void Fire(const FVector& OutHitTarget);
+	virtual void Fire(const FVector& HitTarget);
 	
 	FORCEINLINE USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}

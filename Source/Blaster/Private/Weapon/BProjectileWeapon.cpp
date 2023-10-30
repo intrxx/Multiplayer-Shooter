@@ -4,7 +4,6 @@
 #include "Weapon/BProjectileWeapon.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Weapon/BProjectile.h"
-#include "BlasterGameplayStatics.h"
 
 ABProjectileWeapon::ABProjectileWeapon()
 {

@@ -4,7 +4,6 @@
 #include "BlasterComponents/CombatComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -39,9 +38,6 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	FHitResult HitResult;
-	TraceUnderCrosshair(HitResult);
 }
 
 void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
@@ -105,18 +101,21 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if(bFireButtonPressed)
 	{
+		FHitResult HitResult;
+		TraceUnderCrosshair(HitResult, true);
+		
 		// Called on client to run on server
-		ServerFire();
+		ServerFire(HitResult.ImpactPoint);
 	}
 }
 
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	// Called on server
-	MulticastFire();
+	MulticastFire(TraceHitTarget);
 }
 
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if(EquippedWeapon == nullptr)
 	{
@@ -126,11 +125,11 @@ void UCombatComponent::MulticastFire_Implementation()
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(HitTarget);
+		EquippedWeapon->Fire(TraceHitTarget);
 	}
 }
 
-void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
+void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug)
 {
 	FVector2D ViewportSize;
 	if(GEngine && GEngine->GameViewport)
@@ -159,15 +158,17 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
 		if(!OutHitResult.bBlockingHit)
 		{
 			OutHitResult.ImpactPoint = End;
-			HitTarget = End;
 		}
-		else
+
+#if ENABLE_DRAW_DEBUG
+		if(bUseDebug)
 		{
-			HitTarget = OutHitResult.ImpactPoint;
-			DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 16.f, 16.f, FColor::Red);
+			FColor DebugColor = OutHitResult.bBlockingHit ? FColor::Red : FColor::Green;
+			
+			DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 16.f, 16.f, DebugColor);
 		}
 	}
-	
+#endif	// ENABLE_DRAW_DEBUG
 }
 
 
