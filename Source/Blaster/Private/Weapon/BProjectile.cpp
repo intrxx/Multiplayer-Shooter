@@ -2,10 +2,10 @@
 
 
 #include "Weapon/BProjectile.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "BlasterComponents/BProjectileMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 ABProjectile::ABProjectile()
 {
@@ -30,16 +30,42 @@ void ABProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(Tracer)
+	if(TracerParticle)
 	{
-		ParticleSystemComp = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None,
+		ParticleSystemComp = UGameplayStatics::SpawnEmitterAttached(TracerParticle, CollisionBox, NAME_None,
 			GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition);
 	}
+
+	if(HasAuthority())
+	{
+		CollisionBox->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	}
+}
+
+void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	Destroy();
 }
 
 void ABProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABProjectile::Destroyed()
+{
+	Super::Destroyed();
+
+	if(ImpactParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, GetActorTransform());
+	}
+
+	if(ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
+	}
 }
 

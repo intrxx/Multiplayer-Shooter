@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BProjectile.generated.h"
 
+class USoundCue;
 class UBoxComponent;
 class UBProjectileMovementComponent;
 class UParticleSystem;
@@ -21,10 +22,17 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
+	// We can put the Hit logic here like playing sound and spawning particles, because we call Destroy() from OnHit
+	virtual void Destroyed() override;
+
 public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -32,9 +40,15 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBProjectileMovementComponent> ProjectileMoveComp;
+	
+	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UParticleSystem> Tracer;
+	TObjectPtr<UParticleSystem> TracerParticle;
 
-	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UParticleSystem> ImpactParticle;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USoundCue> ImpactSound;
 };

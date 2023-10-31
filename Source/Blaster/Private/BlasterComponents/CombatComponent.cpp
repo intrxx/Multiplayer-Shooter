@@ -102,7 +102,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	if(bFireButtonPressed)
 	{
 		FHitResult HitResult;
-		TraceUnderCrosshair(HitResult, true);
+		TraceUnderCrosshair(HitResult, false);
 		
 		// Called on client to run on server
 		ServerFire(HitResult.ImpactPoint);
