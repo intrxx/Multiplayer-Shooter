@@ -35,7 +35,7 @@ protected:
 		FVector NormalImpulse, const FHitResult& Hit);
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UBoxComponent> CollisionBox;
 
 	UPROPERTY(VisibleAnywhere)
@@ -43,12 +43,12 @@ private:
 	
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UParticleSystem> TracerParticle;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UParticleSystem> ImpactParticle;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<USoundCue> ImpactSound;
 };

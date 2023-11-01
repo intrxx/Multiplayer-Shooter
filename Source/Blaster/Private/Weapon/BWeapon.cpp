@@ -6,6 +6,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Weapon/BBulletShell.h"
 #include "Net/UnrealNetwork.h"
 
 ABWeapon::ABWeapon()
@@ -121,6 +123,22 @@ void ABWeapon::Fire(const FVector& HitTarget)
 	if(FireAnimation)
 	{
 		WeaponMeshComp->PlayAnimation(FireAnimation, false);
+	}
+
+	if(BulletShell)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket = WeaponMeshComp->GetSocketByName(FName("AmmoEject"));
+		if(AmmoEjectSocket)
+		{
+			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMeshComp);
+			
+			UWorld* World = GetWorld();
+			if(World)
+			{
+				World->SpawnActor<ABBulletShell>(BulletShell, SocketTransform.GetLocation(),
+					SocketTransform.GetRotation().Rotator());
+			}
+		}
 	}
 }
 

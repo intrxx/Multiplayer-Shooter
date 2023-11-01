@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BWeapon.generated.h"
 
+class ABBulletShell;
 class USphereComponent;
 class UWidgetComponent;
 class UAnimationAsset;
@@ -55,20 +56,23 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USphereComponent> SphereComp;
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Blaster|Weapon|Properties")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Blaster|Weapon")
 	EBWeaponState WeaponState;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Properties")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<UWidgetComponent> PickUpWidgetComp;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Properties")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<UAnimationAsset> FireAnimation;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	TSubclassOf<ABBulletShell> BulletShell;
 
 private:
 	UFUNCTION()
