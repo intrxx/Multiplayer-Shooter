@@ -74,6 +74,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
 	TSubclassOf<ABBulletShell> BulletShell;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	float RandomRotationConstant;
+
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();

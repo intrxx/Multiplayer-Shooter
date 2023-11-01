@@ -29,7 +29,8 @@ ABWeapon::ABWeapon()
 
 	PickUpWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
 	PickUpWidgetComp->SetupAttachment(RootComponent);
-	
+
+	RandomRotationConstant = 30.f;
 }
 
 void ABWeapon::BeginPlay()
@@ -135,8 +136,15 @@ void ABWeapon::Fire(const FVector& HitTarget)
 			UWorld* World = GetWorld();
 			if(World)
 			{
-				World->SpawnActor<ABBulletShell>(BulletShell, SocketTransform.GetLocation(),
-					SocketTransform.GetRotation().Rotator());
+				FRotator RandomRotation = SocketTransform.GetRotation().Rotator();
+				
+				RandomRotation = FRotator(
+					FMath::RandRange(RandomRotation.Pitch - RandomRotationConstant, RandomRotation.Pitch + RandomRotationConstant),
+					RandomRotation.Yaw,
+					FMath::RandRange(RandomRotation.Roll - RandomRotationConstant, RandomRotation.Roll + RandomRotationConstant)
+					);
+				
+				World->SpawnActor<ABBulletShell>(BulletShell, SocketTransform.GetLocation(), RandomRotation);
 			}
 		}
 	}
