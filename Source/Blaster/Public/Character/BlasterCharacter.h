@@ -36,9 +36,9 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 
-	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
-	FORCEINLINE float GetAO_Pitch() const {return AO_Pitch;}
-	FORCEINLINE EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
+	float GetAO_Yaw() const {return AO_Yaw;}
+	float GetAO_Pitch() const {return AO_Pitch;}
+	EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
 	ABWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
 	bool IsAiming();

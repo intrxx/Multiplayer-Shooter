@@ -8,6 +8,8 @@
 
 #define TRACE_LENGTH 80000.f;
 
+class ABlasterHUD;
+class ABPlayerController;
 class ABlasterCharacter;
 class ABWeapon;
 
@@ -22,7 +24,7 @@ public:
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	
@@ -51,10 +53,13 @@ protected:
 
 	void TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug);
 
-private:
-	UPROPERTY()
-	TObjectPtr<ABlasterCharacter> BlasterCharacter;
+	void SetHUDCrosshair(float DeltaTime);
 
+private:
+	TObjectPtr<ABlasterCharacter> BlasterCharacter;
+	TObjectPtr<ABPlayerController> BlasterPC;
+	TObjectPtr<ABlasterHUD> BlasterHUD;
+	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;
 

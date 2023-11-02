@@ -10,6 +10,7 @@ class ABBulletShell;
 class USphereComponent;
 class UWidgetComponent;
 class UAnimationAsset;
+class UTexture2D;
 
 UENUM(BlueprintType)
 enum class EBWeaponState : uint8
@@ -18,7 +19,7 @@ enum class EBWeaponState : uint8
 	EWS_Equipped UMETA(DisplayName = "Equpped"),
 	EWS_Dropped UMETA(DisplayName = "Dropped"),
 
-	EWS_MAX UMETA(DisplayName = "DefaultMAX")
+	EWS_MAX UMETA(DisplayName = "Default MAX")
 };
 
 UCLASS()
@@ -39,10 +40,32 @@ public:
 
 	virtual void Fire(const FVector& HitTarget);
 	
-	FORCEINLINE USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
-	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
+	 USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
+	 USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
 	
 public:
+	/**
+	 * Textures for the weapon crosshair
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
+	TObjectPtr<UTexture2D> CrosshairDot;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
+	TObjectPtr<UTexture2D> CrosshairLeft;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
+	TObjectPtr<UTexture2D> CrosshairRight;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
+	TObjectPtr<UTexture2D> CrosshairTop;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
+	TObjectPtr<UTexture2D> CrosshairBottom;
+
+	/**
+	 * 
+	 */
 	
 protected:
 	virtual void BeginPlay() override;
