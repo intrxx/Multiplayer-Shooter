@@ -63,7 +63,9 @@ public:
 
 	 void SetHUDPackage(const FHUDPackage& Package){HUDPackage = Package;}
 	 FCrosshairInfo GetCrosshairInfo() const {return CrosshairInfo;}
-	
+
+private:
+	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter);
 private:
 	FHUDPackage HUDPackage;
 	FCrosshairInfo CrosshairInfo;
