@@ -75,6 +75,45 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 				HUDPackage.CrosshairLeft = nullptr;
 				HUDPackage.CrosshairRight = nullptr;
 			}
+			// Calculate crosshair spread
+			FCrosshairInfo CrosshairInfo = BlasterHUD->GetCrosshairInfo();
+
+			// [0, 600] -> [0, 1]
+			FVector2D WalkSpeedRange(0.f, BlasterCharacter->GetMovementComponent()->GetMaxSpeed());
+			FVector2D VelocityMultiplierRange(0.f, 1.f);
+			FVector Velocity = BlasterCharacter->GetVelocity();
+			Velocity.Z = 0.f;
+			
+			CrosshairMovementFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange,
+				VelocityMultiplierRange,Velocity.Size());
+
+			if(BlasterCharacter->GetCharacterMovement()->IsFalling())
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.2f, DeltaTime,
+					2.25f);
+			}
+			else
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime,
+					25.f);
+			}
+			
+			if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Static)
+			{
+				HUDPackage.CrosshairSpread = 0.f;
+			} // Static crosshair
+			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Dynamic)
+			{
+				HUDPackage.CrosshairSpread = CrosshairMovementFactor + CrosshairInAirFactor;
+			} // Dynamic crosshair (Both Movement and Firing)
+			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyMovement)
+			{
+				HUDPackage.CrosshairSpread = CrosshairMovementFactor + CrosshairInAirFactor;
+			} // Only Movement crosshair
+			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyShooting)
+			{
+				
+			} // Only Shooting crosshair
 			
 			BlasterHUD->SetHUDPackage(HUDPackage);
 		}

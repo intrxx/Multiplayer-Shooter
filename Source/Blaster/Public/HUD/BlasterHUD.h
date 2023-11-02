@@ -24,6 +24,7 @@ USTRUCT(BlueprintType)
 struct FHUDPackage
 {
 	GENERATED_BODY()
+	
 public:
 	UPROPERTY()
 	TObjectPtr<UTexture2D> CrosshairDot;
@@ -39,12 +40,15 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UTexture2D> CrosshairBottom;
+
+	float CrosshairSpread;
 };
 
 USTRUCT(BlueprintType)
 struct FCrosshairInfo
 {
 	GENERATED_BODY()
+	
 public:
 	EB_CrosshairType CrosshairType = EB_CrosshairType::ECT_Dynamic;
 	bool bDrawCrosshairDot = true;
@@ -65,8 +69,12 @@ public:
 	 FCrosshairInfo GetCrosshairInfo() const {return CrosshairInfo;}
 
 private:
-	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter);
+	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread);
+	
 private:
 	FHUDPackage HUDPackage;
 	FCrosshairInfo CrosshairInfo;
+
+	UPROPERTY(EditAnywhere)
+	float CrosshairSpreadMax = 16.f;
 };
