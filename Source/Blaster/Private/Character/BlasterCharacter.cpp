@@ -121,22 +121,22 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	}
 
 	AO_Pitch = GetBaseAimRotation().Pitch;
-	if(AO_Pitch > 90.f && !IsLocallyControlled())
+	if(AO_Pitch > 45.f && !IsLocallyControlled())
 	{
-		// Map pitch from the range [270, 360) to [-90, 0)
-		const FVector2D InRange(270.f, 360.f);
-		const FVector2D OutRange(-90.f, 0.f);
+		// Map pitch from the range [315, 360) to [-45, 0)
+		const FVector2D InRange(315.f, 360.f);
+		const FVector2D OutRange(-45.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
-	if(AO_Yaw > 90.f) // Turning right
+	if(AO_Yaw > 45.f) // Turning right
 	{
 		TurningInPlace = EBTurningInPlace::ETIP_Right;
 	}
-	else if(AO_Yaw < -90.f) // Turning left
+	else if(AO_Yaw < -45.f) // Turning left
 	{
 		TurningInPlace = EBTurningInPlace::ETIP_Left;
 	}
