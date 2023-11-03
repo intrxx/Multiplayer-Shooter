@@ -2,6 +2,7 @@
 
 
 #include "BlasterComponents/CombatComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Player/BPlayerController.h"
 #include "HUD/BlasterHUD.h"
@@ -34,14 +35,24 @@ void UCombatComponent::BeginPlay()
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+
+		if(BlasterCharacter->GetFollowCamera())
+		{
+			DefaultFOV = BlasterCharacter->GetFollowCamera()->FieldOfView;
+			CurrentFOV = DefaultFOV;
+		}
 	}
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	SetHUDCrosshair(DeltaTime);
+	
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
+	{
+		SetHUDCrosshair(DeltaTime);
+		InterpFOV(DeltaTime);
+	}
 }
 
 void UCombatComponent::SetHUDCrosshair(float DeltaTime)
@@ -97,6 +108,17 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime,
 					25.f);
 			}
+
+			if(bAiming)
+			{
+				CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, -Combat::AimShrinkFactor, DeltaTime, 30.f);
+			}
+			else
+			{
+				CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f);
+			}
+
+			CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 7.5f);
 			
 			if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Static)
 			{
@@ -104,19 +126,52 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 			} // Static crosshair
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Dynamic)
 			{
-				HUDPackage.CrosshairSpread = CrosshairMovementFactor + CrosshairInAirFactor;
+				HUDPackage.CrosshairSpread =
+					Combat::AimShrinkFactor +
+					CrosshairMovementFactor +
+					CrosshairInAirFactor +
+					CrosshairAimFactor +
+					CrosshairShootingFactor;
 			} // Dynamic crosshair (Both Movement and Firing)
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyMovement)
 			{
-				HUDPackage.CrosshairSpread = CrosshairMovementFactor + CrosshairInAirFactor;
+				HUDPackage.CrosshairSpread =
+					CrosshairMovementFactor +
+					CrosshairInAirFactor;
 			} // Only Movement crosshair
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyShooting)
 			{
-				
+				HUDPackage.CrosshairSpread =
+					Combat::AimShrinkFactor +
+					CrosshairAimFactor +
+					CrosshairShootingFactor;
 			} // Only Shooting crosshair
 			
 			BlasterHUD->SetHUDPackage(HUDPackage);
 		}
+	}
+}
+
+void UCombatComponent::InterpFOV(float DeltaTime)
+{
+	if(EquippedWeapon == nullptr)
+	{
+		return;
+	}
+
+	if(bAiming)
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, EquippedWeapon->GetZoomedFOV(), DeltaTime,
+			EquippedWeapon->GetZoomInterpSpeed());
+	}
+	else
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, DefaultFOV, DeltaTime, UnZoomInterpSpeed);
+	}
+
+	if(BlasterCharacter && BlasterCharacter->GetFollowCamera())
+	{
+		BlasterCharacter->GetFollowCamera()->SetFieldOfView(CurrentFOV);
 	}
 }
 
@@ -186,6 +241,13 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 		
 		// Called on client to run on server
 		ServerFire(HitResult.ImpactPoint);
+
+		if(EquippedWeapon)
+		{
+			CrosshairShootingFactor += CrosshairShootingFactor + EquippedWeapon->GetShootingError(); 
+			CrosshairShootingFactor = FMath::Clamp(CrosshairShootingFactor, EquippedWeapon->GetShootingError(),
+				3.f);
+		}
 	}
 }
 
@@ -231,7 +293,7 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDe
 	if(bScreenToWorld)
 	{
 		FVector Start = CrosshairWorldPosition;
-		FVector End = CrosshairWorldDirection * TRACE_LENGTH;
+		FVector End = CrosshairWorldDirection * Combat::TraceLength;
 
 		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECC_Visibility);
 
@@ -247,8 +309,8 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDe
 			
 			DrawDebugSphere(GetWorld(), OutHitResult.ImpactPoint, 16.f, 16.f, DebugColor);
 		}
-	}
 #endif	// ENABLE_DRAW_DEBUG
+	}
 }
 
 

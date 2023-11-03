@@ -40,6 +40,8 @@ public:
 	float GetAO_Pitch() const {return AO_Pitch;}
 	EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
 	ABWeapon* GetEquippedWeapon();
+	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
+	
 	bool IsWeaponEquipped();
 	bool IsAiming();
 

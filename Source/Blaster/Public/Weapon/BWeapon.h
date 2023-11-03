@@ -40,8 +40,11 @@ public:
 
 	virtual void Fire(const FVector& HitTarget);
 	
-	 USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
-	 USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
+	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
+	USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
+	float GetZoomedFOV() const {return ZoomedFOV;}
+	float GetZoomInterpSpeed() const {return ZoomedInterpSpeed;}
+	float GetShootingError() const {return FiringCrosshairErrorValue;}
 	
 public:
 	/**
@@ -64,7 +67,17 @@ public:
 	TObjectPtr<UTexture2D> CrosshairBottom;
 
 	/**
-	 * 
+	 *  Zoomed FOV while aiming
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Aiming")
+	float ZoomedFOV = 30.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Aiming")
+	float ZoomedInterpSpeed = 20.f;
+	
+	/**
+	 *
 	 */
 	
 protected:
@@ -94,10 +107,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<UAnimationAsset> FireAnimation;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
+	float FiringCrosshairErrorValue;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	TSubclassOf<ABBulletShell> BulletShell;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	float RandomRotationConstant;
 
 private:

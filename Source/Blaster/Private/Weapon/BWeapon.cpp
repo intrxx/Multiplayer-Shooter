@@ -31,6 +31,7 @@ ABWeapon::ABWeapon()
 	PickUpWidgetComp->SetupAttachment(RootComponent);
 
 	RandomRotationConstant = 30.f;
+	FiringCrosshairErrorValue = 0.75f;
 }
 
 void ABWeapon::BeginPlay()

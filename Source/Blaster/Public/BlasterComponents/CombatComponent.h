@@ -6,12 +6,16 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE_LENGTH 80000.f;
-
 class ABlasterHUD;
 class ABPlayerController;
 class ABlasterCharacter;
 class ABWeapon;
+
+namespace Combat
+{
+	static constexpr float TraceLength = 80000.0f;
+	static constexpr float AimShrinkFactor = 0.55f;
+}
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UCombatComponent : public UActorComponent
@@ -55,6 +59,8 @@ protected:
 
 	void SetHUDCrosshair(float DeltaTime);
 
+	void InterpFOV(float DeltaTime);
+
 private:
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
 	TObjectPtr<ABPlayerController> BlasterPC;
@@ -66,10 +72,10 @@ private:
 	UPROPERTY(Replicated)
 	bool bAiming;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Movement")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
 	float BaseWalkSpeed;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Movement")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
@@ -80,4 +86,20 @@ private:
 
 	float CrosshairMovementFactor;
 	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
+
+	/**
+	 *	Aiming and FOV
+	 */
+
+	// FOV when not aiming set to camera's base FOV in BeginPlay
+	float DefaultFOV;
+	float CurrentFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Aiming")
+	float ZoomedFOV = 30.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Aiming")
+	float UnZoomInterpSpeed = 20.f;
 };
