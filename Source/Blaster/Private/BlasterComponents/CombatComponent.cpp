@@ -5,7 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Player/BPlayerController.h"
-#include "HUD/BlasterHUD.h"
+//#include "HUD/BlasterHUD.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -41,6 +41,8 @@ void UCombatComponent::BeginPlay()
 			DefaultFOV = BlasterCharacter->GetFollowCamera()->FieldOfView;
 			CurrentFOV = DefaultFOV;
 		}
+
+		CrosshairColor = CrosshairInfo.CrosshairColor;
 	}
 }
 
@@ -50,6 +52,10 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	
 	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
 	{
+		FHitResult HitResult;
+		TraceUnderCrosshair(HitResult, true);
+		HitTarget = HitResult.ImpactPoint;
+		
 		SetHUDCrosshair(DeltaTime);
 		InterpFOV(DeltaTime);
 	}
@@ -68,27 +74,24 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(BlasterPC->GetHUD()) : BlasterHUD;
 		if(BlasterHUD)
 		{
-			FHUDPackage HUDPackage;
-			
 			if(EquippedWeapon)
 			{
-				HUDPackage.CrosshairDot = EquippedWeapon->CrosshairDot;
-				HUDPackage.CrosshairBottom = EquippedWeapon->CrosshairBottom;
-				HUDPackage.CrosshairTop = EquippedWeapon->CrosshairTop;
-				HUDPackage.CrosshairLeft = EquippedWeapon->CrosshairLeft;
-				HUDPackage.CrosshairRight = EquippedWeapon->CrosshairRight;
+				CrosshairInfo.CrosshairDot = EquippedWeapon->CrosshairDot;
+				CrosshairInfo.CrosshairBottom = EquippedWeapon->CrosshairBottom;
+				CrosshairInfo.CrosshairTop = EquippedWeapon->CrosshairTop;
+				CrosshairInfo.CrosshairLeft = EquippedWeapon->CrosshairLeft;
+				CrosshairInfo.CrosshairRight = EquippedWeapon->CrosshairRight;
 			}
 			else
 			{
-				HUDPackage.CrosshairDot = nullptr;
-				HUDPackage.CrosshairBottom = nullptr;
-				HUDPackage.CrosshairTop = nullptr;
-				HUDPackage.CrosshairLeft = nullptr;
-				HUDPackage.CrosshairRight = nullptr;
+				CrosshairInfo.CrosshairDot = nullptr;
+				CrosshairInfo.CrosshairBottom = nullptr;
+				CrosshairInfo.CrosshairTop = nullptr;
+				CrosshairInfo.CrosshairLeft = nullptr;
+				CrosshairInfo.CrosshairRight = nullptr;
 			}
+			
 			// Calculate crosshair spread
-			FCrosshairInfo CrosshairInfo = BlasterHUD->GetCrosshairInfo();
-
 			// [0, 600] -> [0, 1]
 			FVector2D WalkSpeedRange(0.f, BlasterCharacter->GetMovementComponent()->GetMaxSpeed());
 			FVector2D VelocityMultiplierRange(0.f, 1.f);
@@ -122,11 +125,11 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 			
 			if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Static)
 			{
-				HUDPackage.CrosshairSpread = 0.f;
+				CrosshairInfo.CrosshairSpread = 0.f;
 			} // Static crosshair
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Dynamic)
 			{
-				HUDPackage.CrosshairSpread =
+				CrosshairInfo.CrosshairSpread =
 					Combat::AimShrinkFactor +
 					CrosshairMovementFactor +
 					CrosshairInAirFactor +
@@ -135,19 +138,19 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 			} // Dynamic crosshair (Both Movement and Firing)
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyMovement)
 			{
-				HUDPackage.CrosshairSpread =
+				CrosshairInfo.CrosshairSpread =
 					CrosshairMovementFactor +
 					CrosshairInAirFactor;
 			} // Only Movement crosshair
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyShooting)
 			{
-				HUDPackage.CrosshairSpread =
+				CrosshairInfo.CrosshairSpread =
 					Combat::AimShrinkFactor +
 					CrosshairAimFactor +
 					CrosshairShootingFactor;
 			} // Only Shooting crosshair
 			
-			BlasterHUD->SetHUDPackage(HUDPackage);
+			BlasterHUD->SetHUDPackage(CrosshairInfo);
 		}
 	}
 }
@@ -236,11 +239,8 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if(bFireButtonPressed)
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshair(HitResult, false);
-		
 		// Called on client to run on server
-		ServerFire(HitResult.ImpactPoint);
+		ServerFire(HitTarget);
 
 		if(EquippedWeapon)
 		{
@@ -286,20 +286,36 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDe
 
 	// "UGameplayStatics::GetPlayerController(this, 0)" Even if this is a multiplayer game we can get the player with
 	// index 0 as it is the player that plays the game on current machine
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this, 0),
-		CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(PC, CrosshairLocation,
+		CrosshairWorldPosition, CrosshairWorldDirection);
 
 	if(bScreenToWorld)
 	{
 		FVector Start = CrosshairWorldPosition;
+		if(BlasterCharacter)
+		{
+			float DistanceToCharacter = (BlasterCharacter->GetActorLocation() - Start).Size();
+			Start += CrosshairWorldDirection * (DistanceToCharacter + 55.f);
+			//Start.Y -= 50.f;
+			//Start.Z -= 75.f;
+			
+			//DrawDebugSphere(GetWorld(), Start, 16.f, 12, FColor::Black, false);
+		}
 		FVector End = CrosshairWorldDirection * Combat::TraceLength;
 
 		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECC_Visibility);
-
-		if(!OutHitResult.bBlockingHit)
+		
+		if(OutHitResult.GetActor() && OutHitResult.GetActor()->Implements<UCrosshairInteractionInterface>())
 		{
-			OutHitResult.ImpactPoint = End;
+			if(CrosshairInfo.bChangeColorOnEnemy)
+			{
+				CrosshairInfo.CrosshairColor = FLinearColor::Red;
+			}
+		}
+		else
+		{
+			CrosshairInfo.CrosshairColor = CrosshairColor;
 		}
 
 #if ENABLE_DRAW_DEBUG

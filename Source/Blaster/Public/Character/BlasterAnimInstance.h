@@ -62,6 +62,12 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
 	EBTurningInPlace TurningInPlace;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	bool bLocallyControlled;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	FRotator RightHandRotation;
 	
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;

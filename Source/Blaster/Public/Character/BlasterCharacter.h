@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "BlasterInterfaces/CrosshairInteractionInterface.h"
 #include "BlasterTypes/BTurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
@@ -18,7 +19,7 @@ class UInputMappingContext;
 class UAnimMontage;
 
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter
+class BLASTER_API ABlasterCharacter : public ACharacter, public ICrosshairInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,7 @@ public:
 	EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
+	FVector GetHitTarget() const;
 	
 	bool IsWeaponEquipped();
 	bool IsAiming();

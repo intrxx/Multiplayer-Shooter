@@ -21,7 +21,7 @@ enum EB_CrosshairType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FHUDPackage
+struct FCrosshairInfo
 {
 	GENERATED_BODY()
 	
@@ -42,16 +42,10 @@ public:
 	TObjectPtr<UTexture2D> CrosshairBottom;
 
 	float CrosshairSpread;
-};
-
-USTRUCT(BlueprintType)
-struct FCrosshairInfo
-{
-	GENERATED_BODY()
-	
-public:
 	EB_CrosshairType CrosshairType = EB_CrosshairType::ECT_Dynamic;
 	bool bDrawCrosshairDot = true;
+	bool bChangeColorOnEnemy = true;
+	FLinearColor CrosshairColor = FLinearColor::Green;
 };
 
 /**
@@ -65,14 +59,11 @@ class BLASTER_API ABlasterHUD : public AHUD
 public:
 	virtual void DrawHUD() override;
 
-	 void SetHUDPackage(const FHUDPackage& Package){HUDPackage = Package;}
-	 FCrosshairInfo GetCrosshairInfo() const {return CrosshairInfo;}
-
+	 void SetHUDPackage(const FCrosshairInfo& Package){CrosshairInfo = Package;}
 private:
-	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread);
+	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
 	
 private:
-	FHUDPackage HUDPackage;
 	FCrosshairInfo CrosshairInfo;
 
 	UPROPERTY(EditAnywhere)

@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include "HUD/BlasterHUD.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
+
 
 class ABlasterHUD;
 class ABPlayerController;
@@ -83,12 +85,16 @@ private:
 	/**
 	 *	HUD
 	 */
+	FCrosshairInfo CrosshairInfo;
 
+	FVector HitTarget;
+	
 	float CrosshairMovementFactor;
 	float CrosshairInAirFactor;
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
-
+	FLinearColor CrosshairColor;
+	
 	/**
 	 *	Aiming and FOV
 	 */

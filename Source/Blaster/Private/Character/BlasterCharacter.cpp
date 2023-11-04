@@ -32,6 +32,7 @@ ABlasterCharacter::ABlasterCharacter()
 	CameraComponent->bUsePawnControlRotation = false;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -296,6 +297,15 @@ ABWeapon* ABlasterCharacter::GetEquippedWeapon()
 		return nullptr;
 	}
 	return CombatComp->EquippedWeapon;
+}
+
+FVector ABlasterCharacter::GetHitTarget() const
+{
+	if(CombatComp == nullptr)
+	{
+		return FVector::ZeroVector;
+	}
+	return CombatComp->HitTarget;
 }
 
 bool ABlasterCharacter::IsWeaponEquipped()
