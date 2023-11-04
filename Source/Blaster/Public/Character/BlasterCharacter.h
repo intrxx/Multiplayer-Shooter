@@ -77,6 +77,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
 	TObjectPtr<UCameraComponent> CameraComponent;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|Camera")
+	float CameraThreshold = 100.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|UI")
 	TObjectPtr<UWidgetComponent> OverheadWidget;
 
@@ -88,7 +91,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
-
+	
 	float AO_Yaw;
 	float InterpAO_Yaw;
 	float AO_Pitch;
@@ -102,4 +105,6 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();
+
+	void HideCharacterIfCameraClose();
 };

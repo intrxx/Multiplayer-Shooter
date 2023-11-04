@@ -2,6 +2,8 @@
 
 
 #include "Blaster/Public/Character/BlasterCharacter.h"
+
+#include "BlasterGameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
@@ -85,6 +87,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AimOffset(DeltaTime);
+	HideCharacterIfCameraClose();
 }
 
 void ABlasterCharacter::AimOffset(float DeltaTime)
@@ -361,6 +364,32 @@ void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 	if(LastWeapon)
 	{
 		LastWeapon->ShowPickUpWidget(false);	
+	}
+}
+
+void ABlasterCharacter::HideCharacterIfCameraClose()
+{
+	if(!IsLocallyControlled())
+	{
+		return;
+	}
+
+	// Distance to Character less than CameraThreshold
+	if((CameraComponent->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold)
+	{
+		GetMesh()->SetVisibility(false);
+		if(CombatComp && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->GetWeaponMesh())
+		{
+			CombatComp->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true);
+		if(CombatComp && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->GetWeaponMesh())
+		{
+			CombatComp->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
 	}
 }
 

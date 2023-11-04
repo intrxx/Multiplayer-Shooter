@@ -17,7 +17,8 @@ void ABlasterHUD::DrawHUD()
 
 		if(CrosshairInfo.CrosshairDot && CrosshairInfo.bDrawCrosshairDot)
 		{
-			DrawCrosshairElement(CrosshairInfo.CrosshairDot, ViewportCenter, FVector2D::Zero(), CrosshairInfo.CrosshairColor);
+			DrawCrosshairElement(CrosshairInfo.CrosshairDot, ViewportCenter, FVector2D::ZeroVector,
+				CrosshairInfo.CrosshairColor);
 		}
 		
 		if(CrosshairInfo.CrosshairBottom)
