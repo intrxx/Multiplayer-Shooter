@@ -53,7 +53,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
 	{
 		FHitResult HitResult;
-		TraceUnderCrosshair(HitResult, true);
+		TraceUnderCrosshair(HitResult, false);
 		HitTarget = HitResult.ImpactPoint;
 		
 		SetHUDCrosshair(DeltaTime);

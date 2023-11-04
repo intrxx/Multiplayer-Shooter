@@ -36,6 +36,9 @@ public:
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 
 	void PlayFireMontage(bool bAiming);
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
@@ -63,6 +66,7 @@ protected:
 	void AimOffset(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
 
+	void PlayHitReactMontage();
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UBInputConfig> InputConfig;
@@ -91,6 +95,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 	
 	float AO_Yaw;
 	float InterpAO_Yaw;
@@ -105,6 +112,7 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();
-
+	
 	void HideCharacterIfCameraClose();
 };
+

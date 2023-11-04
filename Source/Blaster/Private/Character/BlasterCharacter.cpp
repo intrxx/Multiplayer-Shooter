@@ -3,7 +3,7 @@
 
 #include "Blaster/Public/Character/BlasterCharacter.h"
 
-#include "BlasterGameplayStatics.h"
+#include "Physics/BlasterCollisionChannels.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
@@ -33,6 +33,8 @@ ABlasterCharacter::ABlasterCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	
+	GetMesh()->SetCollisionObjectType(ECC_ObjectChannel_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	
@@ -354,6 +356,22 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void ABlasterCharacter::PlayHitReactMontage()
+{
+	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		FName SectionName = FName("FromFront");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 {
 	if(OverlappingWeapon)
@@ -399,6 +417,11 @@ void ABlasterCharacter::ServerEquip_Implementation()
 	{
 		CombatComp->EquipWeapon(OverlappingWeapon);
 	}
+}
+
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
 }
 
 
