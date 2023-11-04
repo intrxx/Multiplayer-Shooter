@@ -28,10 +28,9 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	virtual void PostInitializeComponents() override;
+	virtual void OnRep_ReplicatedMovement() override;
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 
@@ -46,6 +45,7 @@ public:
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	FVector GetHitTarget() const;
+	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -64,7 +64,10 @@ protected:
 	void FireWeaponReleased();
 
 	void AimOffset(float DeltaTime);
+	void SimProxiesTurn();
 	void TurnInPlace(float DeltaTime);
+	void CalculateAO_Pitch();
+	float CalculateSpeed();
 
 	void PlayHitReactMontage();
 protected:
@@ -105,6 +108,12 @@ private:
 	FRotator StartingAimRotation;
 
 	EBTurningInPlace TurningInPlace;
+	bool bRotateRootBone;
+	float TurnThreshold = 0.75f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementRep;
 
 private:
 	UFUNCTION()

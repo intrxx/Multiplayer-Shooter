@@ -71,6 +71,14 @@ void ABlasterCharacter::PostInitializeComponents()
 	}
 }
 
+void ABlasterCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+	
+	SimProxiesTurn();
+	TimeSinceLastMovementRep = 0.f;
+}
+
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -88,7 +96,20 @@ void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AimOffset(DeltaTime);
+	if(GetLocalRole() > ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		TimeSinceLastMovementRep += DeltaTime;
+		if(TimeSinceLastMovementRep > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalculateAO_Pitch();
+	}
+	
 	HideCharacterIfCameraClose();
 }
 
@@ -99,13 +120,13 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		return;
 	}
 	
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.0f;
-	float Speed = Velocity.Size();
+	float Speed = CalculateSpeed();
 	bool bIsInAir = GetCharacterMovement()->IsFalling();
 	
-	if(!bIsInAir && Speed == 0.0f) // Standing still
+	if(!bIsInAir && Speed == 0.0f) // Standing still and jumping
 	{
+		bRotateRootBone = true;
+		
 		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.0f);
 		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
@@ -120,12 +141,18 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	
 	if(bIsInAir || Speed > 0.0f)
 	{
+		bRotateRootBone = false;
+		
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.0f);
 		AO_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
 		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 	}
+	CalculateAO_Pitch();
+}
 
+void ABlasterCharacter::CalculateAO_Pitch()
+{
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	if(AO_Pitch > 45.f && !IsLocallyControlled())
 	{
@@ -134,6 +161,52 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		const FVector2D OutRange(-90.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
+}
+
+float ABlasterCharacter::CalculateSpeed()
+{
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.0f;
+	return  Velocity.Size();
+}
+
+void ABlasterCharacter::SimProxiesTurn()
+{
+	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
+	{
+		return;
+	}
+	bRotateRootBone = false;
+	
+	float Speed = CalculateSpeed();
+	if(Speed > 0)
+	{
+		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+		return;
+	}
+	
+	ProxyRotationLastFrame = ProxyRotation;
+	ProxyRotation = GetActorRotation();
+	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotation, ProxyRotationLastFrame).Yaw;
+	
+	if(FMath::Abs(ProxyYaw) > TurnThreshold)
+	{
+		if(ProxyYaw > TurnThreshold)
+		{
+			TurningInPlace = EBTurningInPlace::ETIP_Right;
+		}
+		else if(ProxyYaw < -TurnThreshold)
+		{
+			TurningInPlace = EBTurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+		}
+		return;
+	}
+
+	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
