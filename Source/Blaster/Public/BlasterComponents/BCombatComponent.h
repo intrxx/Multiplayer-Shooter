@@ -112,4 +112,17 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Aiming")
 	float UnZoomInterpSpeed = 20.f;
+
+	/**
+	 * Automatic Fire
+	 */
+
+	FTimerHandle FireTimer;
+	bool bCanFire = true;
+	
+private:
+	void Fire();
+	void StartFireTimer();
+	void FireTimerFinished();
+	void ShrinkCrosshairWhileShooting();
 };

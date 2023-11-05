@@ -159,11 +159,16 @@ void ABWeapon::Fire(const FVector& HitTarget)
 
 void ABWeapon::ChangeFiringMode()
 {
+	if(FiringModes.IsEmpty())
+	{
+		return;
+	}
+	
 	if(ChangingModeSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ChangingModeSound, GetActorLocation());
 	}
-
+	
 	if(FiringModeCount == FiringModes.Num()-1)
 	{
 		FiringModeCount = 0;

@@ -46,9 +46,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UParticleSystem> TracerParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
-	TObjectPtr<UParticleSystem> ImpactParticle;
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
+	TObjectPtr<UParticleSystem> MetalImpactParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
+	TObjectPtr<UParticleSystem> CharacterImpactParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<USoundCue> ImpactSound;
+
+	bool bHitCharacter = false;
 };

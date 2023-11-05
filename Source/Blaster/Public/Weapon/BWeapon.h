@@ -59,6 +59,7 @@ public:
 	float GetZoomInterpSpeed() const {return ZoomedInterpSpeed;}
 	float GetShootingError() const {return FiringCrosshairErrorValue;}
 	bool CanChangeFiringMode() const {return bCanChangeFiringMode;}
+	EBFiringMode GetFiringMode() const {return FiringMode;}
 	
 public:
 	/**
@@ -93,6 +94,9 @@ public:
 	/**
 	 *
 	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|FiringModes")
+	float FireDelay = .15f;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -132,7 +136,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon|FiringModes")
 	TObjectPtr<USoundCue> ChangingModeSound;
-
+	
 	float FiringModeCount = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")

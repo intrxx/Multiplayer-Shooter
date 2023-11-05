@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/BWeapon.h"
+#include "TimerManager.h"
 
 UBCombatComponent::UBCombatComponent()
 {
@@ -238,18 +239,12 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }
 
-void UBCombatComponent::SetAiming(bool bIsAiming)
+void UBCombatComponent::OnRep_EquippedWeapon()
 {
-	// Leaving it here because if we call it on the client we don't need to wait for the ServerRPC to execute the function
-	// so we see the result of clicking the aim button faster on the client and it then runs on the server replicating
-	// to all clients so they can see the result too
-	bAiming = bIsAiming;
-	
-	ServerSetAiming(bIsAiming);
-
-	if(BlasterCharacter)
+	if(EquippedWeapon && BlasterCharacter)
 	{
-		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		BlasterCharacter->bUseControllerRotationYaw = true;
 	}
 }
 
@@ -262,32 +257,66 @@ void UBCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 	}
 }
 
-void UBCombatComponent::OnRep_EquippedWeapon()
+void UBCombatComponent::FireButtonPressed(bool bPressed)
 {
-	if(EquippedWeapon && BlasterCharacter)
+	if(EquippedWeapon == nullptr)
 	{
-		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-		BlasterCharacter->bUseControllerRotationYaw = true;
+		return;
+	}
+	
+	// Called locally
+	bFireButtonPressed = bPressed;
+	if(bFireButtonPressed)
+	{
+		if(EquippedWeapon->GetFiringMode() == EBFiringMode::EFM_SingleBullet || EquippedWeapon->GetFiringMode() == EBFiringMode::EFM_FullAuto)
+		{
+			Fire();
+		}
+		else if(EquippedWeapon->GetFiringMode() == EBFiringMode::EFM_Burst)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Weapon %s has Burst mode avaible but no Burst Mode logic"), *EquippedWeapon->GetName());
+		}
 	}
 }
 
-void UBCombatComponent::FireButtonPressed(bool bPressed)
+void UBCombatComponent::Fire()
 {
-	// Called locally
-	bFireButtonPressed = bPressed;
-
-	if(bFireButtonPressed)
+	if(bCanFire)
 	{
+		bCanFire = false;
+		
 		// Called on client to run on server
 		ServerFire(HitTarget);
-
-		if(EquippedWeapon)
-		{
-			CrosshairShootingFactor += CrosshairShootingFactor + EquippedWeapon->GetShootingError(); 
-			CrosshairShootingFactor = FMath::Clamp(CrosshairShootingFactor, EquippedWeapon->GetShootingError(),
-				3.f);
-		}
+		ShrinkCrosshairWhileShooting();
+		StartFireTimer();
 	}
+}
+
+void UBCombatComponent::StartFireTimer()
+{
+	if(EquippedWeapon == nullptr)
+	{
+		return;
+	}
+
+	BlasterCharacter->GetWorldTimerManager().SetTimer(FireTimer, this, &UBCombatComponent::FireTimerFinished,
+		EquippedWeapon->FireDelay);
+}
+
+void UBCombatComponent::FireTimerFinished()
+{
+	bCanFire = true;
+	if(bFireButtonPressed && EquippedWeapon->GetFiringMode() == EBFiringMode::EFM_FullAuto)
+	{
+		Fire();
+	}
+}
+
+inline void UBCombatComponent::ShrinkCrosshairWhileShooting()
+{
+	CrosshairShootingFactor += CrosshairShootingFactor + EquippedWeapon->GetShootingError(); 
+	CrosshairShootingFactor = FMath::Clamp(CrosshairShootingFactor, EquippedWeapon->GetShootingError(),
+		3.f);
 }
 
 void UBCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -307,6 +336,21 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire(TraceHitTarget);
+	}
+}
+
+void UBCombatComponent::SetAiming(bool bIsAiming)
+{
+	// Leaving it here because if we call it on the client we don't need to wait for the ServerRPC to execute the function
+	// so we see the result of clicking the aim button faster on the client and it then runs on the server replicating
+	// to all clients so they can see the result too
+	bAiming = bIsAiming;
+	
+	ServerSetAiming(bIsAiming);
+
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
 	}
 }
 
