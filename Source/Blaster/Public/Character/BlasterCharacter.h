@@ -62,6 +62,7 @@ protected:
 	virtual void Jump() override;
 	void FireWeaponPressed();
 	void FireWeaponReleased();
+	void ChangeFiringModeButtonPressed();
 
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();

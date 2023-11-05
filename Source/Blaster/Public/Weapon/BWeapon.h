@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BWeapon.generated.h"
 
+class USoundCue;
 class ABBulletShell;
 class USphereComponent;
 class UWidgetComponent;
@@ -20,6 +21,17 @@ enum class EBWeaponState : uint8
 	EWS_Dropped UMETA(DisplayName = "Dropped"),
 
 	EWS_MAX UMETA(DisplayName = "Default MAX")
+};
+
+UENUM(BlueprintType)
+enum class EBFiringMode : uint8
+{
+	EFM_None UMETA(DisplayName = "None"),
+	EFM_SingleBullet UMETA(DisplayName = "SingleBullet"),
+	EFM_Burst UMETA(DisplayName = "Burst"),
+	EFM_FullAuto UMETA(DisplayName = "FullAuto"),
+
+	EFM_MAX UMETA(DisplayName = "Default MAX")
 };
 
 UCLASS()
@@ -37,14 +49,16 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SetWeaponState(EBWeaponState State);
-
+	
 	virtual void Fire(const FVector& HitTarget);
+	virtual void ChangeFiringMode();
 	
 	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
 	float GetZoomedFOV() const {return ZoomedFOV;}
 	float GetZoomInterpSpeed() const {return ZoomedInterpSpeed;}
 	float GetShootingError() const {return FiringCrosshairErrorValue;}
+	bool CanChangeFiringMode() const {return bCanChangeFiringMode;}
 	
 public:
 	/**
@@ -100,12 +114,26 @@ private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Blaster|Weapon")
 	EBWeaponState WeaponState;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
+	EBFiringMode FiringMode;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<UWidgetComponent> PickUpWidgetComp;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<UAnimationAsset> FireAnimation;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon|FiringModes")
+	bool bCanChangeFiringMode;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon|FiringModes")
+	TArray<EBFiringMode> FiringModes;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon|FiringModes")
+	TObjectPtr<USoundCue> ChangingModeSound;
+
+	float FiringModeCount = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	float FiringCrosshairErrorValue;

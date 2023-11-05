@@ -2,13 +2,14 @@
 
 
 #include "Weapon/BWeapon.h"
-
+#include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
-#include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/GameplayStatics.h"
 #include "Weapon/BBulletShell.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 ABWeapon::ABWeapon()
 {
@@ -49,6 +50,11 @@ void ABWeapon::BeginPlay()
 	if(PickUpWidgetComp)
 	{
 		PickUpWidgetComp->SetVisibility(false);
+	}
+
+	if(bCanChangeFiringMode && !FiringModes.IsEmpty())
+	{
+		FiringMode = FiringModes[0];
 	}
 }
 
@@ -148,6 +154,25 @@ void ABWeapon::Fire(const FVector& HitTarget)
 				World->SpawnActor<ABBulletShell>(BulletShell, SocketTransform.GetLocation(), RandomRotation);
 			}
 		}
+	}
+}
+
+void ABWeapon::ChangeFiringMode()
+{
+	if(ChangingModeSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ChangingModeSound, GetActorLocation());
+	}
+
+	if(FiringModeCount == FiringModes.Num()-1)
+	{
+		FiringModeCount = 0;
+		FiringMode = FiringModes[FiringModeCount];
+	}
+	else
+	{
+		FiringModeCount++;
+		FiringMode = FiringModes[FiringModeCount];
 	}
 }
 

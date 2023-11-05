@@ -18,6 +18,7 @@ public:
 	ABProjectileWeapon();
 
 	virtual void Fire(const FVector& HitTarget) override;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TSubclassOf<ABProjectile> ProjectileClass;

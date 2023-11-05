@@ -250,6 +250,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
 		&ThisClass::CrouchButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ChangeFiringType, ETriggerEvent::Triggered, this,
+		&ThisClass::ChangeFiringModeButtonPressed);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -365,6 +367,14 @@ void ABlasterCharacter::FireWeaponReleased()
 	if(CombatComp)
 	{
 		CombatComp->FireButtonPressed(false);
+	}
+}
+
+void ABlasterCharacter::ChangeFiringModeButtonPressed()
+{
+	if(CombatComp && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->CanChangeFiringMode())
+	{
+		CombatComp->EquippedWeapon->ChangeFiringMode();
 	}
 }
 

@@ -20,6 +20,7 @@ public:
 	FGameplayTag Input_Crouch;
 	FGameplayTag Input_Aim;
 	FGameplayTag Input_Fire;
+	FGameplayTag Input_ChangeFiringType;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);
