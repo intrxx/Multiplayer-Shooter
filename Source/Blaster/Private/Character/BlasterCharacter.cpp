@@ -9,7 +9,7 @@
 #include "InputActionValue.h"
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
-#include "BlasterComponents/CombatComponent.h"
+#include "BlasterComponents/BCombatComponent.h"
 #include "Character/BlasterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
@@ -44,7 +44,7 @@ ABlasterCharacter::ABlasterCharacter()
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadComponent"));
 	OverheadWidget->SetupAttachment(RootComponent);
 
-	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponen"));
+	CombatComp = CreateDefaultSubobject<UBCombatComponent>(TEXT("CombatComponen"));
 	CombatComp->SetIsReplicated(true);
 	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;

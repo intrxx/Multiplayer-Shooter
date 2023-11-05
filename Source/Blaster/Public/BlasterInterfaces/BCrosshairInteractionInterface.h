@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "CrosshairInteractionInterface.generated.h"
+#include "BCrosshairInteractionInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UCrosshairInteractionInterface : public UInterface
+class UBCrosshairInteractionInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UCrosshairInteractionInterface : public UInterface
 /**
  * 
  */
-class BLASTER_API ICrosshairInteractionInterface
+class BLASTER_API IBCrosshairInteractionInterface
 {
 	GENERATED_BODY()
 

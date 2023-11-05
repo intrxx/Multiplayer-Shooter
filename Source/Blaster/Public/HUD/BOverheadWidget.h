@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "OverheadWidget.generated.h"
+#include "BOverheadWidget.generated.h"
 
 class UTextBlock;
 /**
  * 
  */
 UCLASS()
-class BLASTER_API UOverheadWidget : public UUserWidget
+class BLASTER_API UBOverheadWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

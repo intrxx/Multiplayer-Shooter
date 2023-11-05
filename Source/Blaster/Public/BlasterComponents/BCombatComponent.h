@@ -5,7 +5,7 @@
 #include "HUD/BlasterHUD.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "CombatComponent.generated.h"
+#include "BCombatComponent.generated.h"
 
 
 class ABlasterHUD;
@@ -20,12 +20,12 @@ namespace Combat
 }
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class BLASTER_API UCombatComponent : public UActorComponent
+class BLASTER_API UBCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	UCombatComponent();
+	UBCombatComponent();
 	friend ABlasterCharacter;
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

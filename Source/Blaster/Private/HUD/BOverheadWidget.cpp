@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HUD/OverheadWidget.h"
+#include "HUD/BOverheadWidget.h"
 
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
 
-void UOverheadWidget::SetNetRoleText(FString TextToDisplay)
+void UBOverheadWidget::SetNetRoleText(FString TextToDisplay)
 {
 	if(NetRoleText)
 	{
@@ -14,7 +14,7 @@ void UOverheadWidget::SetNetRoleText(FString TextToDisplay)
 	}
 }
 
-void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
+void UBOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 {
 	if(!InPawn)
 	{
@@ -58,7 +58,7 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 	
 }
 
-void UOverheadWidget::NativeDestruct()
+void UBOverheadWidget::NativeDestruct()
 {
 	RemoveFromParent();
 	

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "LobbyGameMode.generated.h"
+#include "BLobbyGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BLASTER_API ALobbyGameMode : public AGameMode
+class BLASTER_API ABLobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
 

@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "BlasterInterfaces/CrosshairInteractionInterface.h"
+#include "BlasterInterfaces/BCrosshairInteractionInterface.h"
 #include "BlasterTypes/BTurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
-class UCombatComponent;
+class UBCombatComponent;
 class ABWeapon;
 class UWidgetComponent;
 class UBInputConfig;
@@ -19,7 +19,7 @@ class UInputMappingContext;
 class UAnimMontage;
 
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter, public ICrosshairInteractionInterface
+class BLASTER_API ABlasterCharacter : public ACharacter, public IBCrosshairInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -94,7 +94,7 @@ private:
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
-	TObjectPtr<UCombatComponent> CombatComp;
+	TObjectPtr<UBCombatComponent> CombatComp;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> FireWeaponMontage;

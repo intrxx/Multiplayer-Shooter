@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BlasterComponents/CombatComponent.h"
+#include "BlasterComponents/BCombatComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Player/BPlayerController.h"
@@ -12,7 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Weapon/BWeapon.h"
 
-UCombatComponent::UCombatComponent()
+UBCombatComponent::UBCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -20,15 +20,15 @@ UCombatComponent::UCombatComponent()
 	AimWalkSpeed = 425.f;
 }
 
-void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
-	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UBCombatComponent, bAiming);
 }
 
-void UCombatComponent::BeginPlay()
+void UBCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -46,7 +46,7 @@ void UCombatComponent::BeginPlay()
 	}
 }
 
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UBCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
@@ -61,7 +61,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
-void UCombatComponent::SetHUDCrosshair(float DeltaTime)
+void UBCombatComponent::SetHUDCrosshair(float DeltaTime)
 {
 	if(BlasterCharacter == nullptr || BlasterCharacter->Controller == nullptr)
 	{
@@ -155,7 +155,7 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 	}
 }
 
-void UCombatComponent::InterpFOV(float DeltaTime)
+void UBCombatComponent::InterpFOV(float DeltaTime)
 {
 	if(EquippedWeapon == nullptr)
 	{
@@ -178,7 +178,7 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	}
 }
 
-void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
+void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 {
 	if(BlasterCharacter == nullptr || WeaponToEquip == nullptr)
 	{
@@ -199,7 +199,7 @@ void UCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }
 
-void UCombatComponent::SetAiming(bool bIsAiming)
+void UBCombatComponent::SetAiming(bool bIsAiming)
 {
 	// Leaving it here because if we call it on the client we don't need to wait for the ServerRPC to execute the function
 	// so we see the result of clicking the aim button faster on the client and it then runs on the server replicating
@@ -214,7 +214,7 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	}
 }
 
-void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+void UBCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
 	if(BlasterCharacter)
@@ -223,7 +223,7 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 	}
 }
 
-void UCombatComponent::OnRep_EquippedWeapon()
+void UBCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && BlasterCharacter)
 	{
@@ -232,7 +232,7 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
-void UCombatComponent::FireButtonPressed(bool bPressed)
+void UBCombatComponent::FireButtonPressed(bool bPressed)
 {
 	// Called locally
 	bFireButtonPressed = bPressed;
@@ -251,13 +251,13 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 }
 
-void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UBCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	// Called on server
 	MulticastFire(TraceHitTarget);
 }
 
-void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if(EquippedWeapon == nullptr)
 	{
@@ -271,7 +271,7 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& T
 	}
 }
 
-void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug)
+void UBCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug)
 {
 	FVector2D ViewportSize;
 	if(GEngine && GEngine->GameViewport)
@@ -302,7 +302,7 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDe
 
 		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECC_Visibility);
 		
-		if(OutHitResult.GetActor() && OutHitResult.GetActor()->Implements<UCrosshairInteractionInterface>())
+		if(OutHitResult.GetActor() && OutHitResult.GetActor()->Implements<UBCrosshairInteractionInterface>())
 		{
 			if(CrosshairInfo.bChangeColorOnEnemy)
 			{
