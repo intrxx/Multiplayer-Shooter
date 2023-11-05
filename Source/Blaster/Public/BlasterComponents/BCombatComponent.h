@@ -16,7 +16,8 @@ class ABWeapon;
 namespace Combat
 {
 	static constexpr float TraceLength = 80000.0f;
-	static constexpr float AimShrinkFactor = 0.55f;
+	static constexpr float AimShrinkFactor = 0.35f;
+	static constexpr float AimAtPlayerShrinkFactor = 0.25f;
 }
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -89,11 +90,14 @@ private:
 
 	FVector HitTarget;
 	
-	float CrosshairMovementFactor;
-	float CrosshairInAirFactor;
-	float CrosshairAimFactor;
-	float CrosshairShootingFactor;
+	float CrosshairMovementFactor = 0.f;
+	float CrosshairInAirFactor = 0.f;
+	float CrosshairAimFactor = 0.f;;
+	float CrosshairShootingFactor = 0.f;;
+	float CrosshairAimAtAnotherPlayerFactor = 0.f;;
+	
 	FLinearColor CrosshairColor;
+	bool bAimingAtAnotherPlayer;
 	
 	/**
 	 *	Aiming and FOV

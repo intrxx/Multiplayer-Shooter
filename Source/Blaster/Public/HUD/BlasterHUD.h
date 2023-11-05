@@ -45,6 +45,7 @@ public:
 	EB_CrosshairType CrosshairType = EB_CrosshairType::ECT_Dynamic;
 	bool bDrawCrosshairDot = true;
 	bool bChangeColorOnEnemy = true;
+	bool bShrinkOnEnemy = true;
 	FLinearColor CrosshairColor = FLinearColor::Green;
 };
 

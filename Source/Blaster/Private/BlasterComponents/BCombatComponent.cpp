@@ -121,6 +121,30 @@ void UBCombatComponent::SetHUDCrosshair(float DeltaTime)
 				CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f);
 			}
 
+			if(bAimingAtAnotherPlayer)
+			{
+				if(CrosshairInfo.bChangeColorOnEnemy)
+				{
+					CrosshairInfo.CrosshairColor = FLinearColor::Red;
+				}
+			
+				if(CrosshairInfo.bShrinkOnEnemy)
+				{
+					CrosshairAimAtAnotherPlayerFactor = FMath::FInterpTo(CrosshairAimAtAnotherPlayerFactor,
+						-Combat::AimAtPlayerShrinkFactor, DeltaTime, 30.f);
+				}
+			}
+			else
+			{
+				CrosshairInfo.CrosshairColor = CrosshairColor;
+			
+				if(CrosshairInfo.bShrinkOnEnemy)
+				{
+					CrosshairAimAtAnotherPlayerFactor = FMath::FInterpTo(CrosshairAimAtAnotherPlayerFactor,
+						0.f, DeltaTime, 30.f);
+				}
+			}
+
 			CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 7.5f);
 			
 			if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_Static)
@@ -135,12 +159,20 @@ void UBCombatComponent::SetHUDCrosshair(float DeltaTime)
 					CrosshairInAirFactor +
 					CrosshairAimFactor +
 					CrosshairShootingFactor;
+				
+				if(CrosshairInfo.bShrinkOnEnemy)
+				{
+					CrosshairInfo.CrosshairSpread +=
+						Combat::AimAtPlayerShrinkFactor +
+						CrosshairAimAtAnotherPlayerFactor;
+				}
 			} // Dynamic crosshair (Both Movement and Firing)
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyMovement)
 			{
 				CrosshairInfo.CrosshairSpread =
 					CrosshairMovementFactor +
 					CrosshairInAirFactor;
+				
 			} // Only Movement crosshair
 			else if(CrosshairInfo.CrosshairType == EB_CrosshairType::ECT_DynamicOnlyShooting)
 			{
@@ -148,6 +180,13 @@ void UBCombatComponent::SetHUDCrosshair(float DeltaTime)
 					Combat::AimShrinkFactor +
 					CrosshairAimFactor +
 					CrosshairShootingFactor;
+				
+				if(CrosshairInfo.bShrinkOnEnemy)
+				{
+					CrosshairInfo.CrosshairSpread +=
+						Combat::AimAtPlayerShrinkFactor +
+						CrosshairAimAtAnotherPlayerFactor;
+				}
 			} // Only Shooting crosshair
 			
 			BlasterHUD->SetHUDPackage(CrosshairInfo);
@@ -304,14 +343,11 @@ void UBCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseD
 		
 		if(OutHitResult.GetActor() && OutHitResult.GetActor()->Implements<UBCrosshairInteractionInterface>())
 		{
-			if(CrosshairInfo.bChangeColorOnEnemy)
-			{
-				CrosshairInfo.CrosshairColor = FLinearColor::Red;
-			}
+			bAimingAtAnotherPlayer = true;
 		}
 		else
 		{
-			CrosshairInfo.CrosshairColor = CrosshairColor;
+			bAimingAtAnotherPlayer = false;
 		}
 
 #if ENABLE_DRAW_DEBUG
