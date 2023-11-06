@@ -116,10 +116,22 @@ private:
 	float ProxyYaw;
 	float TimeSinceLastMovementRep;
 
+	/**
+	 * Player health
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Health, Category = "Blaster|Attributes")
+	float Health = 100.f;
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
 
+	UFUNCTION()
+	void OnRep_Health();
+	
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();
 	

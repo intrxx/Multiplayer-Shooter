@@ -60,6 +60,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(ABlasterCharacter, Health);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -466,6 +467,10 @@ void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 	{
 		LastWeapon->ShowPickUpWidget(false);	
 	}
+}
+
+void ABlasterCharacter::OnRep_Health()
+{
 }
 
 void ABlasterCharacter::HideCharacterIfCameraClose()

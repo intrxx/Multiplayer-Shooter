@@ -7,6 +7,8 @@
 #include "BlasterHUD.generated.h"
 
 class UTexture2D;
+class UBCharacterOverlay;
+class UUserWidget;
 
 UENUM(BlueprintType)
 enum EB_CrosshairType : uint8
@@ -61,6 +63,18 @@ public:
 	virtual void DrawHUD() override;
 
 	 void SetHUDPackage(const FCrosshairInfo& Package){CrosshairInfo = Package;}
+
+public:
+	TObjectPtr<UBCharacterOverlay> CharacterOverlay;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
+	TSubclassOf<UUserWidget> CharacterOverlayClass;
+
+protected:
+	virtual void BeginPlay() override;
+	
+	void AddCharacterOverlay();
+	
 private:
 	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
 	
