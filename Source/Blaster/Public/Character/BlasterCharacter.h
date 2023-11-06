@@ -9,6 +9,7 @@
 #include "BlasterTypes/BTurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
+class ABPlayerController;
 class UBCombatComponent;
 class ABWeapon;
 class UWidgetComponent;
@@ -79,6 +80,8 @@ protected:
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 private:
+	TObjectPtr<ABPlayerController> BlasterPC;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	

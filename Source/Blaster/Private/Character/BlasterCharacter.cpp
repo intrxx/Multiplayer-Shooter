@@ -91,6 +91,12 @@ void ABlasterCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	BlasterPC = Cast<ABPlayerController>(Controller);
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDHealth(Health, MaxHealth);
+	}
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
