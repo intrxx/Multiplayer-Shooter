@@ -6,6 +6,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "Physics/BlasterCollisionChannels.h"
 #include "Sound/SoundCue.h"
 
@@ -59,6 +60,7 @@ void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 	{
 		MulticastPlayHitParticleAndSound(false);
 	}
+	
 	Destroy();
 }
 
@@ -70,7 +72,6 @@ void ABProjectile::Tick(float DeltaTime)
 void ABProjectile::Destroyed()
 {
 	Super::Destroyed();
-	
 }
 
 void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharacterHit)
