@@ -7,7 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "Weapon/BBulletShell.h"
+#include "Weapon/Projectile/BBulletShell.h"
 #include "Net/UnrealNetwork.h"
 #include "Sound/SoundCue.h"
 

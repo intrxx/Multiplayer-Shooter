@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapon/BProjectile.h"
+#include "Weapon/Projectile/BProjectile.h"
 #include "BlasterComponents/BProjectileMovementComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
@@ -27,6 +27,8 @@ ABProjectile::ABProjectile()
 	ProjectileMoveComp->bRotationFollowsVelocity = true;
 	ProjectileMoveComp->InitialSpeed = 16000.f;
 	ProjectileMoveComp->MaxSpeed = 16000.f;
+	
+	Damage = 20.f;
 }
 
 void ABProjectile::BeginPlay()
@@ -48,13 +50,14 @@ void ABProjectile::BeginPlay()
 void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	bHitCharacter = false;
-	
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if(BlasterCharacter)
 	{
-		bHitCharacter = true;
-		BlasterCharacter->MulticastHit();
+		MulticastPlayHitParticleAndSound(true);
+	}
+	else
+	{
+		MulticastPlayHitParticleAndSound(false);
 	}
 	Destroy();
 }
@@ -62,25 +65,39 @@ void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 void ABProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABProjectile::Destroyed()
 {
 	Super::Destroyed();
-
-	if(MetalImpactParticle && bHitCharacter == false)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorTransform());
-	}
-	else if(CharacterImpactParticle && bHitCharacter)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticle, GetActorTransform());
-	}
 	
-	if(ImpactSound)
+}
+
+void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharacterHit)
+{
+	if(bCharacterHit)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
+		if(CharacterImpactParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticle, GetActorTransform());
+		}
+
+		if(CharacterImpactSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), CharacterImpactSound, GetActorLocation());
+		}
+	}
+	else
+	{
+		if(MetalImpactParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorTransform());
+		}
+
+		if(SurfaceImpactSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SurfaceImpactSound, GetActorLocation());
+		}
 	}
 }
 

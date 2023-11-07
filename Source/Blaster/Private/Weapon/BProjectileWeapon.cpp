@@ -3,7 +3,7 @@
 
 #include "Weapon/BProjectileWeapon.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "Weapon/BProjectile.h"
+#include "Weapon/Projectile/BProjectile.h"
 
 ABProjectileWeapon::ABProjectileWeapon()
 {

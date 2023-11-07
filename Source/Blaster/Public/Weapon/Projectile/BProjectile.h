@@ -34,6 +34,10 @@ protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit);
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Damage")
+	float Damage;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UBoxComponent> CollisionBox;
@@ -52,8 +56,13 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<UParticleSystem> CharacterImpactParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
-	TObjectPtr<USoundCue> ImpactSound;
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
+	TObjectPtr<USoundCue> SurfaceImpactSound;
 
-	bool bHitCharacter = false;
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
+	TObjectPtr<USoundCue> CharacterImpactSound;
+
+private:
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayHitParticleAndSound(bool bCharacterHit);
 };

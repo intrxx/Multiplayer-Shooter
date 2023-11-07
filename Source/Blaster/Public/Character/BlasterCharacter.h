@@ -18,6 +18,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UAnimMontage;
+class AController;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IBCrosshairInteractionInterface
@@ -37,9 +38,6 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 	
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
-
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
 	EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
@@ -71,7 +69,13 @@ protected:
 	void CalculateAO_Pitch();
 	float CalculateSpeed();
 
+	void UpdateHUDHealth();
 	void PlayHitReactMontage();
+
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+		AController* InstigatorController, AActor* DamageCauser);
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UBInputConfig> InputConfig;

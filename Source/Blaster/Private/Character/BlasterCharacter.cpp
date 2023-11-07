@@ -92,10 +92,11 @@ void ABlasterCharacter::BeginPlay()
 		}
 	}
 
-	BlasterPC = Cast<ABPlayerController>(Controller);
-	if(BlasterPC)
+	UpdateHUDHealth();
+	
+	if(HasAuthority())
 	{
-		BlasterPC->SetHUDHealth(Health, MaxHealth);
+		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
 	}
 }
 
@@ -462,6 +463,30 @@ void ABlasterCharacter::PlayHitReactMontage()
 	}
 }
 
+void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+void ABlasterCharacter::OnRep_Health()
+{
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+void ABlasterCharacter::UpdateHUDHealth()
+{
+	BlasterPC =  BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 {
 	if(OverlappingWeapon)
@@ -473,10 +498,6 @@ void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
 	{
 		LastWeapon->ShowPickUpWidget(false);	
 	}
-}
-
-void ABlasterCharacter::OnRep_Health()
-{
 }
 
 void ABlasterCharacter::HideCharacterIfCameraClose()
@@ -513,10 +534,6 @@ void ABlasterCharacter::ServerEquip_Implementation()
 	}
 }
 
-void ABlasterCharacter::MulticastHit_Implementation()
-{
-	PlayHitReactMontage();
-}
 
 
 
