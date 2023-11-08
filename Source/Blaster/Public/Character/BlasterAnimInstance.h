@@ -71,6 +71,9 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
 	bool bRotateRootBone;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	bool bHasDied;
 	
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;

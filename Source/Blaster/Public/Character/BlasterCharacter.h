@@ -36,8 +36,13 @@ public:
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 	void PlayFireMontage(bool bAiming);
+	void PlayDeathMontage(bool bAiming);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHandleDeath();
 
-	void Elim();
+	// For just server functionality
+	void HandleDeath();
 	
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
@@ -46,9 +51,17 @@ public:
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	FVector GetHitTarget() const;
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
+	bool IsDead() const {return bDead;}
 	
 	bool IsWeaponEquipped();
 	bool IsAiming();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UBInputConfig> InputConfig;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,13 +89,6 @@ protected:
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 		AController* InstigatorController, AActor* DamageCauser);
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UBInputConfig> InputConfig;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 private:
 	TObjectPtr<ABPlayerController> BlasterPC;
@@ -111,6 +117,19 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UAnimMontage> RareDeathMontage;
+
+	// Rare Death Montage Chance - [0,1]
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	int32 RareDeathChance;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Hip;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Aim;
+	
 	float AO_Yaw;
 	float InterpAO_Yaw;
 	float AO_Pitch;
@@ -133,6 +152,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Health, Category = "Blaster|Attributes")
 	float Health = 100.f;
+	
+	bool bDead = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Combat|Death")
+	float RespawnDelay;
+	FTimerHandle RespawnTimerHandle;
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
@@ -144,5 +169,6 @@ private:
 	void ServerEquip();
 	
 	void HideCharacterIfCameraClose();
+	void RespawnTimerFinished();
 };
 

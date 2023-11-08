@@ -20,6 +20,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/BPlayerController.h"
 #include "Weapon/BWeapon.h"
+#include "TimerManager.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -52,8 +53,12 @@ ABlasterCharacter::ABlasterCharacter()
 	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 750.f, 0.f);
 
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
+	RareDeathChance = 20;
+	RespawnDelay = 3.f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -448,6 +453,31 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void ABlasterCharacter::PlayDeathMontage(bool bAiming)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if(AnimInstance == nullptr)
+	{
+		return;
+	}
+	
+	if(FMath::RandRange(0, 100) < RareDeathChance)
+	{
+		if(RareDeathMontage)
+		{
+			AnimInstance->Montage_Play(RareDeathMontage);
+			return;
+		}
+	}
+
+	UAnimMontage* AnimMontageToPlay =
+	bAiming ? RegularDeathMontages_Aim[FMath::RandRange(0,RegularDeathMontages_Aim.Num()-1)] :
+	RegularDeathMontages_Hip[FMath::RandRange(0,RegularDeathMontages_Hip.Num()-1)];
+	
+	AnimInstance->Montage_Play(AnimMontageToPlay);
+}
+
 void ABlasterCharacter::PlayHitReactMontage()
 {
 	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
@@ -500,8 +530,26 @@ void ABlasterCharacter::UpdateHUDHealth()
 	}
 }
 
-void ABlasterCharacter::Elim()
+void ABlasterCharacter::HandleDeath()
 {
+	MulticastHandleDeath();
+
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::RespawnTimerFinished, RespawnDelay);
+}
+
+void ABlasterCharacter::MulticastHandleDeath_Implementation()
+{
+	bDead = true;
+	PlayDeathMontage(IsAiming());
+}
+
+void ABlasterCharacter::RespawnTimerFinished()
+{
+	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	if(BlasterGameMode)
+	{
+		BlasterGameMode->RequestRespawn(this, Controller);
+	}
 }
 
 void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)
