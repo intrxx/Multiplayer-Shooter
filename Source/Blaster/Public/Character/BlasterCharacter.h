@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "BlasterInterfaces/BCrosshairInteractionInterface.h"
 #include "BlasterTypes/BTurningInPlace.h"
+#include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
 class ABPlayerController;
@@ -90,6 +91,8 @@ protected:
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 		AController* InstigatorController, AActor* DamageCauser);
 
+	void CreateDeathDynamicMaterialInstances();
+
 private:
 	TObjectPtr<ABPlayerController> BlasterPC;
 	
@@ -158,6 +161,42 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Combat|Death")
 	float RespawnDelay;
 	FTimerHandle RespawnTimerHandle;
+
+	/**
+	 *	Dissolve Effect
+	 */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UTimelineComponent> DissolveTimelineComp;
+
+	FOnTimelineFloat DissolveTrackDelegate;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UCurveFloat> DissolveCurve;
+	
+	// Dynamic instance that we can change at runtime
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Body1;
+
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Body2;
+
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Head;
+
+	// Material instance set on the Blueprint, used with the dynamic material instance
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Head;
+
+	/**
+	 * 
+	 */
+	
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
@@ -170,5 +209,9 @@ private:
 	
 	void HideCharacterIfCameraClose();
 	void RespawnTimerFinished();
+
+	UFUNCTION()
+	void UpdateDissolveMaterial(float DissolveValue);
+	void StartDissolve();
 };
 

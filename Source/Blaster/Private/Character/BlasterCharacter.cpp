@@ -53,6 +53,8 @@ ABlasterCharacter::ABlasterCharacter()
 	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 750.f, 0.f);
 
+	DissolveTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComp"));
+
 	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	
 	NetUpdateFrequency = 66.f;
@@ -541,6 +543,31 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 {
 	bDead = true;
 	PlayDeathMontage(IsAiming());
+
+	CreateDeathDynamicMaterialInstances();
+	StartDissolve();
+}
+
+void ABlasterCharacter::CreateDeathDynamicMaterialInstances()
+{
+	if(DissolveMaterialInstance_Body1 && DissolveMaterialInstance_Body2 && DissolveMaterialInstance_Head)
+	{
+		DissolveDynamicMaterialInstance_Body1 = UMaterialInstanceDynamic::Create(DissolveMaterialInstance_Body1, this);
+		DissolveDynamicMaterialInstance_Body2 = UMaterialInstanceDynamic::Create(DissolveMaterialInstance_Body2, this);
+		DissolveDynamicMaterialInstance_Head = UMaterialInstanceDynamic::Create(DissolveMaterialInstance_Head, this);
+
+		GetMesh()->SetMaterial(0, DissolveDynamicMaterialInstance_Body1);
+		GetMesh()->SetMaterial(1, DissolveDynamicMaterialInstance_Head);
+		GetMesh()->SetMaterial(2, DissolveDynamicMaterialInstance_Body2);
+
+		DissolveDynamicMaterialInstance_Body1->SetScalarParameterValue(TEXT("DissolveValue"), -0.55f);
+		DissolveDynamicMaterialInstance_Body2->SetScalarParameterValue(TEXT("DissolveValue"), -0.55f);
+		DissolveDynamicMaterialInstance_Head->SetScalarParameterValue(TEXT("DissolveValue"), -0.55f);
+		
+		DissolveDynamicMaterialInstance_Body1->SetScalarParameterValue(TEXT("Glow"), 250.f);
+		DissolveDynamicMaterialInstance_Body2->SetScalarParameterValue(TEXT("Glow"), 250.f);
+		DissolveDynamicMaterialInstance_Head->SetScalarParameterValue(TEXT("Glow"), 250.f);
+	}
 }
 
 void ABlasterCharacter::RespawnTimerFinished()
@@ -549,6 +576,26 @@ void ABlasterCharacter::RespawnTimerFinished()
 	if(BlasterGameMode)
 	{
 		BlasterGameMode->RequestRespawn(this, Controller);
+	}
+}
+
+void ABlasterCharacter::UpdateDissolveMaterial(float DissolveValue)
+{
+	if(DissolveDynamicMaterialInstance_Body1 && DissolveDynamicMaterialInstance_Body2 && DissolveDynamicMaterialInstance_Head)
+	{
+		DissolveDynamicMaterialInstance_Body1->SetScalarParameterValue(TEXT("DissolveValue"), DissolveValue);
+		DissolveDynamicMaterialInstance_Body2->SetScalarParameterValue(TEXT("DissolveValue"), DissolveValue);
+		DissolveDynamicMaterialInstance_Head->SetScalarParameterValue(TEXT("DissolveValue"), DissolveValue);
+	}
+}
+
+void ABlasterCharacter::StartDissolve()
+{
+	DissolveTrackDelegate.BindDynamic(this, &ThisClass::UpdateDissolveMaterial);
+	if(DissolveCurve && DissolveTimelineComp)
+	{
+		DissolveTimelineComp->AddInterpFloat(DissolveCurve, DissolveTrackDelegate);
+		DissolveTimelineComp->Play();
 	}
 }
 
