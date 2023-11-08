@@ -26,10 +26,37 @@ void ABlasterGameMode::RequestRespawn(ABlasterCharacter* CharacterToRespawn, ACo
 	
 	if(ElimmedBPC)
 	{
-		TArray<AActor*> PlayerStarts;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), /*OUT*/ PlayerStarts);
-		int32 Selection = FMath::RandRange(0, PlayerStarts.Num() - 1);
+		AActor* SelectedPlayerStart;
+		CalculateFurthestSpawnLocation(/*OUT*/ SelectedPlayerStart);
 		
-		RestartPlayerAtPlayerStart(ElimmedBPC, PlayerStarts[Selection]);
+		RestartPlayerAtPlayerStart(ElimmedBPC, SelectedPlayerStart);
+	}
+}
+
+void ABlasterGameMode::CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint)
+{
+	TArray<AActor*> PlayerStarts;
+	TArray<AActor*> Players;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), /*OUT*/ PlayerStarts);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABlasterCharacter::StaticClass(), /*OUT*/ Players);
+		
+	float FurthestDistance = 0.f;
+	OutSpawnPoint = PlayerStarts[0];
+	
+	for(int32 i = 0; i < PlayerStarts.Num(); i++)
+	{
+		FVector PlayerStartLocation = PlayerStarts[i]->GetActorLocation();
+		float Distance = 0.f;
+			
+		for(int32 j = 0; j < Players.Num(); j++)
+		{
+			FVector PlayerLocation = Players[j]->GetActorLocation();
+			Distance += (PlayerStartLocation - PlayerLocation).Size();
+		}
+		if(Distance > FurthestDistance)
+		{
+			FurthestDistance = Distance;
+			OutSpawnPoint = PlayerStarts[i];
+		}
 	}
 }
