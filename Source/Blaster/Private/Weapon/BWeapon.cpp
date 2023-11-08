@@ -41,7 +41,7 @@ void ABWeapon::BeginPlay()
 
 	if(HasAuthority())
 	{
-		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
 		SphereComp->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
@@ -108,6 +108,18 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 	case EBWeaponState::EWS_Equipped:
 		ShowPickUpWidget(false);
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMeshComp->SetSimulatePhysics(false);
+		WeaponMeshComp->SetEnableGravity(false);
+		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EBWeaponState::EWS_Dropped:
+		if(HasAuthority())
+		{
+			SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+		WeaponMeshComp->SetSimulatePhysics(true);
+		WeaponMeshComp->SetEnableGravity(true);
+		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	default:
 		break;
@@ -120,6 +132,14 @@ void ABWeapon::OnRep_WeaponState()
 	{
 	case EBWeaponState::EWS_Equipped:
 		ShowPickUpWidget(false);
+		WeaponMeshComp->SetSimulatePhysics(false);
+		WeaponMeshComp->SetEnableGravity(false);
+		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EBWeaponState::EWS_Dropped:
+		WeaponMeshComp->SetSimulatePhysics(true);
+		WeaponMeshComp->SetEnableGravity(true);
+		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	default:
 		break;
@@ -179,5 +199,15 @@ void ABWeapon::ChangeFiringMode()
 		FiringModeCount++;
 		FiringMode = FiringModes[FiringModeCount];
 	}
+}
+
+void ABWeapon::Dropped()
+{
+	SetWeaponState(EBWeaponState::EWS_Dropped);
+
+	const FDetachmentTransformRules TransformRules(EDetachmentRule::KeepWorld, true);
+	WeaponMeshComp->DetachFromComponent(TransformRules);
+
+	SetOwner(nullptr);
 }
 

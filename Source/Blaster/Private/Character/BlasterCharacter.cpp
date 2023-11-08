@@ -544,8 +544,26 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	bDead = true;
 	PlayDeathMontage(IsAiming());
 
+	// Start Dissolve Effect
 	CreateDeathDynamicMaterialInstances();
 	StartDissolve();
+
+	// Disable Character Movement
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+	if(BlasterPC)
+	{
+		DisableInput(BlasterPC);
+	}
+
+	// Disable Collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if(CombatComp && CombatComp->EquippedWeapon)
+	{
+		CombatComp->EquippedWeapon->Dropped();
+	}
 }
 
 void ABlasterCharacter::CreateDeathDynamicMaterialInstances()

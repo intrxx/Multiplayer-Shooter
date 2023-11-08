@@ -52,6 +52,8 @@ public:
 	
 	virtual void Fire(const FVector& HitTarget);
 	virtual void ChangeFiringMode();
+
+	void Dropped();
 	
 	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}

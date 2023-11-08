@@ -232,7 +232,7 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 	if(HandSocket)
 	{
-		HandSocket->AttachActor(WeaponToEquip, BlasterCharacter->GetMesh());
+		HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
 	}
 	EquippedWeapon->SetOwner(BlasterCharacter);
 	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -243,6 +243,13 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && BlasterCharacter)
 	{
+		EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+		const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		if(HandSocket)
+		{
+			HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
+		}
+		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BlasterCharacter->bUseControllerRotationYaw = true;
 	}
