@@ -21,7 +21,6 @@ public:
 	ABProjectile();
 	
 	virtual void Tick(float DeltaTime) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// We can put the Hit logic here like playing sound and spawning particles, because we call Destroy() from OnHit
 	virtual void Destroyed() override;
 
@@ -61,6 +60,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<USoundCue> CharacterImpactSound;
+
+	TObjectPtr<UParticleSystem> HitParticles;
+	TObjectPtr<USoundCue> HitSound;
 
 private:
 	UFUNCTION(NetMulticast, Reliable)

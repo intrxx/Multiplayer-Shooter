@@ -6,7 +6,6 @@
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Net/UnrealNetwork.h"
 #include "Physics/BlasterCollisionChannels.h"
 #include "Sound/SoundCue.h"
 
@@ -60,8 +59,6 @@ void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 	{
 		MulticastPlayHitParticleAndSound(false);
 	}
-	
-	Destroy();
 }
 
 void ABProjectile::Tick(float DeltaTime)
@@ -72,33 +69,16 @@ void ABProjectile::Tick(float DeltaTime)
 void ABProjectile::Destroyed()
 {
 	Super::Destroyed();
+	
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, GetActorTransform());
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 }
 
 void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharacterHit)
 {
-	if(bCharacterHit)
-	{
-		if(CharacterImpactParticle)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticle, GetActorTransform());
-		}
+	HitParticles = bCharacterHit ? CharacterImpactParticle : MetalImpactParticle;
+	HitSound = bCharacterHit ? CharacterImpactSound : SurfaceImpactSound;
 
-		if(CharacterImpactSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), CharacterImpactSound, GetActorLocation());
-		}
-	}
-	else
-	{
-		if(MetalImpactParticle)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorTransform());
-		}
-
-		if(SurfaceImpactSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SurfaceImpactSound, GetActorLocation());
-		}
-	}
+	Destroy();
 }
 

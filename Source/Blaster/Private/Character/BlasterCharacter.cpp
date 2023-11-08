@@ -14,6 +14,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameModes/BlasterGameMode.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -470,6 +471,18 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	
 	UpdateHUDHealth();
 	PlayHitReactMontage();
+
+	if(Health == 0.f)
+	{
+		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+		if(BlasterGameMode)
+		{
+			BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+			ABPlayerController* AttackerController = Cast<ABPlayerController>(InstigatorController);
+			
+			BlasterGameMode->PlayerEliminated(this, BlasterPC, AttackerController);
+		}
+	}
 }
 
 void ABlasterCharacter::OnRep_Health()
@@ -485,6 +498,10 @@ void ABlasterCharacter::UpdateHUDHealth()
 	{
 		BlasterPC->SetHUDHealth(Health, MaxHealth);
 	}
+}
+
+void ABlasterCharacter::Elim()
+{
 }
 
 void ABlasterCharacter::OnRep_OverlappingWeapon(ABWeapon* LastWeapon)

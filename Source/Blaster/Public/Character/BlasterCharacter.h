@@ -35,8 +35,9 @@ public:
 	virtual void OnRep_ReplicatedMovement() override;
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
-
 	void PlayFireMontage(bool bAiming);
+
+	void Elim();
 	
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
