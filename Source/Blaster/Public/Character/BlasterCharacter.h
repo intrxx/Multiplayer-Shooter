@@ -10,6 +10,7 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+class USoundCue;
 class ABPlayerController;
 class UBCombatComponent;
 class ABWeapon;
@@ -56,6 +57,8 @@ public:
 	
 	bool IsWeaponEquipped();
 	bool IsAiming();
+
+	virtual void Destroyed() override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
@@ -120,17 +123,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TObjectPtr<UAnimMontage> RareDeathMontage;
 
 	// Rare Death Montage Chance - [0,1]
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	int32 RareDeathChance;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Hip;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Aim;
 	
 	float AO_Yaw;
@@ -158,41 +161,58 @@ private:
 	
 	bool bDead = false;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Death")
 	float RespawnDelay;
 	FTimerHandle RespawnTimerHandle;
 
 	/**
 	 *	Dissolve Effect
 	 */
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTimelineComponent> DissolveTimelineComp;
 
 	FOnTimelineFloat DissolveTrackDelegate;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UCurveFloat> DissolveCurve;
 	
 	// Dynamic instance that we can change at runtime
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Body1;
 
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Body2;
 
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Head;
 
 	// Material instance set on the Blueprint, used with the dynamic material instance
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body1;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body2;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Combat|Death")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Head;
 
+	/**
+	 * Death Bot
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|DeathBot")
+	TObjectPtr<UParticleSystem> DeathBotEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|DeathBot")
+	TObjectPtr<UParticleSystemComponent> DeathBotEffectComp;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|DeathBot")
+	TObjectPtr<USoundCue> DeathBotSound;
+
+	UPROPERTY(Replicated)
+	float DeathBotSpawnZOffset = 115.f;
+	
 	/**
 	 * 
 	 */

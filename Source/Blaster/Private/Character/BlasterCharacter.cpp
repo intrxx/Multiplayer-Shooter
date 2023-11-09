@@ -21,6 +21,9 @@
 #include "Player/BPlayerController.h"
 #include "Weapon/BWeapon.h"
 #include "TimerManager.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -69,6 +72,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ABlasterCharacter, Health);
+	DOREPLIFETIME(ABlasterCharacter, DeathBotSpawnZOffset);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -422,6 +426,16 @@ bool ABlasterCharacter::IsAiming()
 	return (CombatComp && CombatComp->bAiming);
 }
 
+void ABlasterCharacter::Destroyed()
+{
+	Super::Destroyed();
+
+	if(DeathBotEffectComp)
+	{
+		DeathBotEffectComp->DestroyComponent();
+	}
+}
+
 void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)
 {
 	if(OverlappingWeapon)
@@ -468,11 +482,13 @@ void ABlasterCharacter::PlayDeathMontage(bool bAiming)
 	{
 		if(RareDeathMontage)
 		{
+			DeathBotSpawnZOffset = 150.f;
 			AnimInstance->Montage_Play(RareDeathMontage);
 			return;
 		}
 	}
 
+	DeathBotSpawnZOffset = 115.f;
 	UAnimMontage* AnimMontageToPlay =
 	bAiming ? RegularDeathMontages_Aim[FMath::RandRange(0,RegularDeathMontages_Aim.Num()-1)] :
 	RegularDeathMontages_Hip[FMath::RandRange(0,RegularDeathMontages_Hip.Num()-1)];
@@ -563,6 +579,19 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	if(CombatComp && CombatComp->EquippedWeapon)
 	{
 		CombatComp->EquippedWeapon->Dropped();
+	}
+
+	// Spawn Death Bot
+	if(DeathBotEffect)
+	{
+		FVector DeathBotSpawnPoint(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + DeathBotSpawnZOffset);
+		DeathBotEffectComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DeathBotEffect, DeathBotSpawnPoint,
+			GetActorRotation());
+
+		if(DeathBotSound)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeathBotSound, GetActorLocation());
+		}
 	}
 }
 
