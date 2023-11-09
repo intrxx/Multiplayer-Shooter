@@ -18,8 +18,10 @@ class BLASTER_API ABPlayerController : public APlayerController
 	
 public:
 	void SetHUDHealth(float Health, float MaxHealth);
+	
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
 	TObjectPtr<ABlasterHUD> BlasterHUD;

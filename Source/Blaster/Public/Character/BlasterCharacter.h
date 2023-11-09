@@ -54,7 +54,17 @@ public:
 	FVector GetHitTarget() const;
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
+
+	/**
+	 * Attributes Getters
+	 */
+
+	float GetHeath() const {return Health;}
+	float GetMaxHeath() const {return MaxHealth;}
 	
+	/**
+	 **
+	 */
 	bool IsWeaponEquipped();
 	bool IsAiming();
 

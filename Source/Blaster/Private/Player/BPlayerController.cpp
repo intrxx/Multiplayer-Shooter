@@ -6,6 +6,14 @@
 #include "Components/TextBlock.h"
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BlasterHUD.h"
+#include "Character/BlasterCharacter.h"
+
+void ABPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+}
 
 void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
@@ -25,9 +33,13 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
-void ABPlayerController::BeginPlay()
+void ABPlayerController::OnPossess(APawn* InPawn)
 {
-	Super::BeginPlay();
+	Super::OnPossess(InPawn);
 
-	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(InPawn);
+	if(BlasterCharacter)
+	{
+		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
+	}
 }
