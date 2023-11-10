@@ -24,6 +24,7 @@
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Player/BPlayerState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -131,6 +132,19 @@ void ABlasterCharacter::Tick(float DeltaTime)
 	}
 	
 	HideCharacterIfCameraClose();
+	PollInit();
+}
+
+void ABlasterCharacter::PollInit()
+{
+	if(BlasterPS == nullptr)
+	{
+		BlasterPS = GetPlayerState<ABPlayerState>();
+		if(BlasterPS)
+		{
+			BlasterPS->AddToScore(0.f);
+		}
+	}
 }
 
 void ABlasterCharacter::AimOffset(float DeltaTime)
@@ -272,6 +286,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::CrouchButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ChangeFiringType, ETriggerEvent::Triggered, this,
 		&ThisClass::ChangeFiringModeButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ToggleScoreboard, ETriggerEvent::Triggered, this,
+		&ThisClass::ToggleScoreBoard);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -395,6 +411,19 @@ void ABlasterCharacter::ChangeFiringModeButtonPressed()
 	if(CombatComp && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->CanChangeFiringMode())
 	{
 		CombatComp->EquippedWeapon->ChangeFiringMode();
+	}
+}
+
+void ABlasterCharacter::ToggleScoreBoard()
+{
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(BlasterPC->GetHUD()) : BlasterHUD;
+		if(BlasterHUD)
+		{
+			BlasterHUD->ToggleScoreboard(BlasterHUD->IsScoreboardVisible());
+		}
 	}
 }
 

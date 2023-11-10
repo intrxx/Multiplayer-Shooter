@@ -5,12 +5,14 @@
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "HUD/BCharacterOverlay.h"
+#include "HUD/BScoreBoard.h"
 
 void ABlasterHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
 	AddCharacterOverlay();
+	AddScoreBoard();
 }
 
 void ABlasterHUD::AddCharacterOverlay()
@@ -21,6 +23,45 @@ void ABlasterHUD::AddCharacterOverlay()
 		CharacterOverlay = CreateWidget<UBCharacterOverlay>(PC, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
 	}
+}
+
+void ABlasterHUD::AddScoreBoard()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if(PC && ScoreboardClass)
+	{
+		Scoreboard = CreateWidget<UBScoreBoard>(PC, ScoreboardClass);
+		Scoreboard->AddToViewport();
+		Scoreboard->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void ABlasterHUD::ToggleScoreboard(bool bIsVisible)
+{
+	if(Scoreboard == nullptr)
+	{
+		return;
+	}
+
+	if(bIsVisible)
+	{
+		Scoreboard->SetVisibility(ESlateVisibility::Collapsed);
+		Scoreboard->bIsVisible = false;
+	}
+	else
+	{
+		Scoreboard->SetVisibility(ESlateVisibility::Visible);
+		Scoreboard->bIsVisible = true;
+	}
+}
+
+bool ABlasterHUD::IsScoreboardVisible()
+{
+	if(Scoreboard)
+	{
+		return Scoreboard->bIsVisible;
+	}
+	return false;
 }
 
 void ABlasterHUD::DrawHUD()

@@ -7,12 +7,26 @@
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BlasterHUD.h"
 #include "Character/BlasterCharacter.h"
+#include "GameFramework/PlayerState.h"
+#include "HUD/BScoreBoard.h"
 
 void ABPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+}
+
+void ABPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(InPawn);
+	if(BlasterCharacter)
+	{
+		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
+		SetHUDScore(PlayerState->GetScore());
+	}
 }
 
 void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -33,13 +47,18 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
-void ABPlayerController::OnPossess(APawn* InPawn)
+void ABPlayerController::SetHUDScore(float Score)
 {
-	Super::OnPossess(InPawn);
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(InPawn);
-	if(BlasterCharacter)
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->Scoreboard &&
+		BlasterHUD->Scoreboard->ScoreAmount;
+	if(bHUDValid)
 	{
-		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
+		FString ScoreText = FString::Printf(TEXT("%d"), FMath::FloorToInt(Score));
+		BlasterHUD->Scoreboard->ScoreAmount->SetText(FText::FromString(ScoreText));
 	}
 }
+
+

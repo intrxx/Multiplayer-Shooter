@@ -6,17 +6,26 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/BPlayerController.h"
 #include "GameFramework/PlayerStart.h"
+#include "Player/BPlayerState.h"
 
-void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* ElimmedBPC,
+void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC,
 	ABPlayerController* AttackerBPC)
 {
+	ABPlayerState* AttackerPS = AttackerBPC ? Cast<ABPlayerState>(AttackerBPC->PlayerState) : nullptr;
+	ABPlayerState* TargetPS = TargetBPC ? Cast<ABPlayerState>(TargetBPC->PlayerState) : nullptr;
+
+	if(AttackerPS && AttackerPS != TargetPS)
+	{
+		AttackerPS->AddToScore(KillScoreAward);
+	}
+	
 	if(ElimmedCharacter)
 	{
 		ElimmedCharacter->HandleDeath();
 	}
 }
 
-void ABlasterGameMode::RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* ElimmedBPC)
+void ABlasterGameMode::RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC)
 {
 	if(CharacterToRespawn)
 	{
@@ -24,12 +33,12 @@ void ABlasterGameMode::RequestRespawn(ABlasterCharacter* CharacterToRespawn, ACo
 		CharacterToRespawn->Destroy();
 	}
 	
-	if(ElimmedBPC)
+	if(TargetBPC)
 	{
 		AActor* SelectedPlayerStart;
 		CalculateFurthestSpawnLocation(/*OUT*/ SelectedPlayerStart);
 		
-		RestartPlayerAtPlayerStart(ElimmedBPC, SelectedPlayerStart);
+		RestartPlayerAtPlayerStart(TargetBPC, SelectedPlayerStart);
 	}
 }
 

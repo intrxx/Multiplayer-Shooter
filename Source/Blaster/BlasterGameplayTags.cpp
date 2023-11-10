@@ -22,6 +22,7 @@ void FBlasterGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Input_Aim, "Input.Aim", "Tag used for aim input");
 	AddTag(Input_Fire, "Input.Fire", "Tag used for fire input");
 	AddTag(Input_ChangeFiringType, "Input.ChangeFiringType", "Tag used for change firing type input");
+	AddTag(Input_ToggleScoreboard, "Input.ToggleScoreboard", "Tag used for toggling ScoreBoard input");
 }
 
 void FBlasterGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

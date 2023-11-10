@@ -10,6 +10,8 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+class ABPlayerState;
+class ABlasterHUD;
 class USoundCue;
 class ABPlayerController;
 class UBCombatComponent;
@@ -90,6 +92,7 @@ protected:
 	void FireWeaponPressed();
 	void FireWeaponReleased();
 	void ChangeFiringModeButtonPressed();
+	void ToggleScoreBoard();
 
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
@@ -106,8 +109,13 @@ protected:
 
 	void CreateDeathDynamicMaterialInstances();
 
+	// Poll for any relevant classes and initialize HUD
+	void PollInit();
+
 private:
 	TObjectPtr<ABPlayerController> BlasterPC;
+	TObjectPtr<ABlasterHUD> BlasterHUD;
+	TObjectPtr<ABPlayerState> BlasterPS;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;

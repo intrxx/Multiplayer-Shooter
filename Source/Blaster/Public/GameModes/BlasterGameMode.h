@@ -17,9 +17,14 @@ class BLASTER_API ABlasterGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* ElimmedBPC, ABPlayerController* AttackerBPC);
-	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* ElimmedBPC);
+	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC, ABPlayerController* AttackerBPC);
+	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC);
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Blaster|Gameplay")
+	float KillScoreAward = 2.f;
+	
+protected:
 	void CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint);
+	
 };

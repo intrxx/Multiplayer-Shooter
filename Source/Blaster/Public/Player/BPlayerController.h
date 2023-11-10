@@ -18,6 +18,7 @@ class BLASTER_API ABPlayerController : public APlayerController
 	
 public:
 	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDScore(float Score);
 	
 protected:
 	virtual void BeginPlay() override;

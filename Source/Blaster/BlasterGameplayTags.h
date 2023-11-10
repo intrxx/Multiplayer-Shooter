@@ -21,6 +21,7 @@ public:
 	FGameplayTag Input_Aim;
 	FGameplayTag Input_Fire;
 	FGameplayTag Input_ChangeFiringType;
+	FGameplayTag Input_ToggleScoreboard;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);
