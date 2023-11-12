@@ -14,7 +14,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameModes/BlasterGameMode.h"
+#include "Game/BlasterGameMode.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"

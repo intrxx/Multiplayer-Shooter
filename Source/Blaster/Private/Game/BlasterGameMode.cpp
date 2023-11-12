@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameModes/BlasterGameMode.h"
+#include "Game/BlasterGameMode.h"
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BPlayerController.h"
 #include "GameFramework/PlayerStart.h"
-#include "GameModes/BlasterGameState.h"
+#include "Game/BlasterGameState.h"
 #include "Player/BPlayerState.h"
 
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC,

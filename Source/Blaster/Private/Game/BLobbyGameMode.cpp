@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "..\..\Public\GameModes\BLobbyGameMode.h"
+#include "Game/BLobbyGameMode.h"
 #include "GameFramework/GameStateBase.h"
 
 void ABLobbyGameMode::PostLogin(APlayerController* NewPlayer)
