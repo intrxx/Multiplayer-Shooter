@@ -3,12 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUD/BlasterHUD.h"
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
 
-
 class ABlasterHUD;
+
+USTRUCT(BlueprintType)
+struct FPlayerStats
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FString PlayerName;
+	
+	UPROPERTY()
+	float Score = 0.f;
+	
+	UPROPERTY()
+	int32 Kills = 0.f;
+	
+	UPROPERTY()
+	int32 Deaths = 0.f;
+	
+	UPROPERTY()
+	int32 Assists = 0.f;
+	
+	UPROPERTY()
+	float Damage = 0.f;
+};
 
 /**
  * 
@@ -19,16 +42,27 @@ class BLASTER_API ABPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(float Health, float MaxHealth);
-	void SetHUDScore(float Score);
-	
-	void SetHUDPlayerNames(TArray<FPlayerStats> PlayerStats);
-	
+	//void SetHUDScore(float Score);
+
+	UFUNCTION(Client, Reliable)
+	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
+
+	UFUNCTION()
+	void OnRep_PlayerStats();
+
+	void SetPlayerStats(TArray<FPlayerStats> Stats) {LocalPlayerStats = Stats;}
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerStats)
+	TArray<FPlayerStats> LocalPlayerStats;
+	
 private:
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 	
 };
+

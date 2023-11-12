@@ -7,8 +7,9 @@
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BlasterHUD.h"
 #include "Character/BlasterCharacter.h"
-#include "GameFramework/PlayerState.h"
 #include "HUD/BScoreBoard.h"
+#include "Net/UnrealNetwork.h"
+
 
 void ABPlayerController::BeginPlay()
 {
@@ -25,8 +26,14 @@ void ABPlayerController::OnPossess(APawn* InPawn)
 	if(BlasterCharacter)
 	{
 		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
-		SetHUDScore(PlayerState->GetScore());
 	}
+}
+
+void ABPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABPlayerController, LocalPlayerStats)
 }
 
 void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -47,34 +54,73 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
+/*
 void ABPlayerController::SetHUDScore(float Score)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Scoreboard; //&&
-		//BlasterHUD->Scoreboard->ScoreAmount;
+		BlasterHUD->Scoreboard->ScoreAmount;
 	if(bHUDValid)
 	{
 		FString ScoreText = FString::Printf(TEXT("%d"), FMath::FloorToInt(Score));
-		//BlasterHUD->Scoreboard->ScoreAmount->SetText(FText::FromString(ScoreText));
+		BlasterHUD->Scoreboard->ScoreAmount->SetText(FText::FromString(ScoreText));
 	}
 }
+*/
 
-void ABPlayerController::SetHUDPlayerNames(TArray<FPlayerStats> PlayerStats)
+void ABPlayerController::ClientSetHUDPlayerStats_Implementation(const TArray<FPlayerStats>& PlayerStats)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-
+	
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Scoreboard;
 	
 	if(bHUDValid)
 	{
+		if(PlayerStats.IsEmpty())
+		{
+			UE_LOG(LogTemp, Error, TEXT("PlayerStats is empty on %s"), *GetNetOwningPlayer()->GetName());
+			return;
+		}
+		
 		for(FPlayerStats PStats : PlayerStats)
 		{
 			BlasterHUD->Scoreboard->UpdatePlayerList(PlayerStats);
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No HUD on: %s"), *GetNetOwningPlayer()->GetName());
+	}
 }
+
+void ABPlayerController::OnRep_PlayerStats()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->Scoreboard;
+
+	if(bHUDValid)
+	{
+		if(LocalPlayerStats.IsEmpty())
+		{
+			UE_LOG(LogTemp, Error, TEXT("PlayerStats is empty on %s"), *GetNetOwningPlayer()->GetName());
+			return;
+		}
+		
+		for(FPlayerStats PStats : LocalPlayerStats)
+		{
+			BlasterHUD->Scoreboard->UpdatePlayerList(LocalPlayerStats);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No HUD on: %s"), *GetNetOwningPlayer()->GetName());
+	}
+}
+
 
 

@@ -52,20 +52,6 @@ public:
 	FLinearColor CrosshairColor = FLinearColor::Green;
 };
 
-USTRUCT(BlueprintType)
-struct FPlayerStats
-{
-	GENERATED_BODY()
-
-public:
-	FString PlayerName;
-	float Score = 0.f;
-	float Kills = 0.f;
-	float Deaths = 0.f;
-	float Assists = 0.f;
-	float Damage = 0.f;
-};
-
 /**
  * 
  */

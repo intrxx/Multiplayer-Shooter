@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "HUD/BlasterHUD.h"
+#include "Player/BPlayerController.h"
 #include "BScoreboardPlayerEntry.generated.h"
 
 class UTextBlock;

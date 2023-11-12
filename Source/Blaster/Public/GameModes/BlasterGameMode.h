@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "HUD/BlasterHUD.h"
 #include "BlasterGameMode.generated.h"
 
+class ABlasterGameState;
 class ABlasterCharacter;
 class ABPlayerController;
+struct FPlayerStats;
+
 /**
  * 
  */
@@ -23,17 +25,20 @@ public:
 
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
-
+	
 	void UpdatePlayerList();
 
 public:
 	TArray<TObjectPtr<AController>> LoginPlayerControllers;
 
+	UPROPERTY()
+	TArray<FPlayerStats> PlayerStats;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Gameplay")
 	float KillScoreAward = 2.f;
 	
-	TArray<FPlayerStats> PlayerStats;
+	TObjectPtr<ABlasterGameState> BlasterGameState;
 	
 protected:
 	void CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint);

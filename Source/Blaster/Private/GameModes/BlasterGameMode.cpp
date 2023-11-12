@@ -5,12 +5,12 @@
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BPlayerController.h"
-#include "HUD/BlasterHUD.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameModes/BlasterGameState.h"
 #include "Player/BPlayerState.h"
 
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC,
-	ABPlayerController* AttackerBPC)
+                                        ABPlayerController* AttackerBPC)
 {
 	ABPlayerState* AttackerPS = AttackerBPC ? Cast<ABPlayerState>(AttackerBPC->PlayerState) : nullptr;
 	ABPlayerState* TargetPS = TargetBPC ? Cast<ABPlayerState>(TargetBPC->PlayerState) : nullptr;
@@ -18,6 +18,7 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 	if(AttackerPS && AttackerPS != TargetPS)
 	{
 		AttackerPS->AddToScore(KillScoreAward);
+		UpdatePlayerList();
 	}
 	
 	if(ElimmedCharacter)
@@ -101,16 +102,24 @@ void ABlasterGameMode::UpdatePlayerList()
 			NewPlayerStats.Score = PS->GetScore();
 			PlayerStats.Add(NewPlayerStats);
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("PS is not valid for some reason"));
+		}
 	}
 
-	for(AController* C : LoginPlayerControllers)
+	for(AController* C  : LoginPlayerControllers)
 	{
 		ABPlayerController* PC = Cast<ABPlayerController>(C);
-		if(PC)
 		{
-			if(HasAuthority())
+			if (PC)
 			{
-				PC->SetHUDPlayerNames(PlayerStats);
+				//PC->SetPlayerStats(PlayerStats);
+				PC->ClientSetHUDPlayerStats(PlayerStats);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("PC is not valid for some reason"));
 			}
 		}
 	}

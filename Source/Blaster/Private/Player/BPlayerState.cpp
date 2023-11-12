@@ -2,28 +2,14 @@
 
 
 #include "Player/BPlayerState.h"
-#include "GameModes/BlasterGameMode.h"
-#include "Kismet/GameplayStatics.h"
 
 
-void ABPlayerState::OnRep_Score()
+void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::OnRep_Score();
-
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if(BlasterGameMode)
-	{
-		BlasterGameMode->UpdatePlayerList();
-	}
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void ABPlayerState::AddToScore(float ScoreToAdd)
 {
 	SetScore(GetScore() + ScoreToAdd);
-	
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if(BlasterGameMode)
-	{
-		BlasterGameMode->UpdatePlayerList();
-	}
 }

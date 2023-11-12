@@ -8,7 +8,6 @@
 void UBScoreboardPlayerEntry::SetPlayerStats(FPlayerStats Stats)
 {
 	PlayerStats = Stats;
-
 	
 	if(PlayerName)
 	{
@@ -17,19 +16,19 @@ void UBScoreboardPlayerEntry::SetPlayerStats(FPlayerStats Stats)
 	
 	if(KillsAmount)
 	{
-		FString Kills = FString::Printf(TEXT("%d"), FMath::FloorToInt(PlayerStats.Kills));
+		FString Kills = FString::Printf(TEXT("%d"), PlayerStats.Kills);
 		KillsAmount->SetText(FText::FromString(Kills));
 	}
 
 	if(DeathsAmount)
 	{
-		FString Deaths = FString::Printf(TEXT("%d"), FMath::FloorToInt(PlayerStats.Deaths));
+		FString Deaths = FString::Printf(TEXT("%d"), PlayerStats.Deaths);
 		DeathsAmount->SetText(FText::FromString(Deaths));
 	}
 
 	if(AssistsAmount)
 	{
-		FString Assists = FString::Printf(TEXT("%d"), FMath::FloorToInt(PlayerStats.Assists));
+		FString Assists = FString::Printf(TEXT("%d"), PlayerStats.Assists);
 		AssistsAmount->SetText(FText::FromString(Assists));
 	}
 

@@ -19,7 +19,7 @@ void UBScoreBoard::UpdatePlayerList(TArray<FPlayerStats> PlayerStats)
 	{
 		//if(i > PlayerEntries.Num()-1)
 	//	{
-			UBScoreboardPlayerEntry* PlayerEntry = CreateWidget<UBScoreboardPlayerEntry>(this->GetOwningPlayer(), ScoreboardPlayerEntryClass);
+			UBScoreboardPlayerEntry* PlayerEntry = CreateWidget<UBScoreboardPlayerEntry>(this, ScoreboardPlayerEntryClass);
 			if(PlayerEntry)
 			{
 				PlayerContainer->AddChild(PlayerEntry);
