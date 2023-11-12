@@ -8,6 +8,8 @@
 
 class UProgressBar;
 class UTextBlock;
+class UOverlay;
+
 /**
  * 
  */
@@ -22,4 +24,16 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> KilledByName;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> DamageDone;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> DamageTaken;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> DeathInfoOverlay;
 };

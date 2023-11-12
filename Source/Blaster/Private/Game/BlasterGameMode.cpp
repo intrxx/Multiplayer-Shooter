@@ -15,6 +15,8 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 	ABPlayerState* AttackerPS = AttackerBPC ? Cast<ABPlayerState>(AttackerBPC->PlayerState) : nullptr;
 	ABPlayerState* TargetPS = TargetBPC ? Cast<ABPlayerState>(TargetBPC->PlayerState) : nullptr;
 
+	ABPlayerController* TargetController = Cast<ABPlayerController>(ElimmedCharacter->Controller);
+
 	if(AttackerPS && AttackerPS != TargetPS)
 	{
 		AttackerPS->AddToScore(KillScoreAward);
@@ -30,6 +32,11 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 	
 	if(ElimmedCharacter)
 	{
+		if(TargetController)
+		{
+			FString KillerName = TargetPS->GetPlayerName();
+			TargetController->ClientSetHUDDeathScreen(KillerName);
+		}
 		ElimmedCharacter->HandleDeath();
 	}
 }
@@ -48,6 +55,11 @@ void ABlasterGameMode::RequestRespawn(ABlasterCharacter* CharacterToRespawn, ACo
 		CalculateFurthestSpawnLocation(/*OUT*/ SelectedPlayerStart);
 		
 		RestartPlayerAtPlayerStart(TargetBPC, SelectedPlayerStart);
+
+		if(ABPlayerController* BPC = Cast<ABPlayerController>(TargetBPC))
+		{
+			BPC->SetDeathScreenVisibility(false);
+		}
 	}
 }
 

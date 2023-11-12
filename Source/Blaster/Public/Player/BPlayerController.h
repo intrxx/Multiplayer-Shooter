@@ -44,23 +44,29 @@ class BLASTER_API ABPlayerController : public APlayerController
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(float Health, float MaxHealth);
+	
+	void SetDeathScreenVisibility(bool bSetVisibility);
+	
 	//void SetHUDScore(float Score);
-
+	UFUNCTION(Client, Reliable)
+	void ClientSetHUDDeathScreen(const FString& KillerName);
+	
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
 
 	UFUNCTION()
 	void OnRep_PlayerStats();
-
+	
 	void SetPlayerStats(TArray<FPlayerStats> Stats) {LocalPlayerStats = Stats;}
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 
+protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerStats)
 	TArray<FPlayerStats> LocalPlayerStats;
-	
+
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;

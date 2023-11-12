@@ -103,6 +103,9 @@ void ABlasterCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+
+		//TODO Look here in case of some weird Death Screen Behaviour
+		PC->SetDeathScreenVisibility(false);
 	}
 
 	UpdateHUDHealth();
