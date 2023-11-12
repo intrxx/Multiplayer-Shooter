@@ -3,13 +3,22 @@
 
 #include "Player/BPlayerState.h"
 
-
-void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
 void ABPlayerState::AddToScore(float ScoreToAdd)
 {
 	SetScore(GetScore() + ScoreToAdd);
+}
+
+void ABPlayerState::AddToDeaths(int32 DeathToAdd)
+{
+	Deaths += DeathToAdd;
+}
+
+void ABPlayerState::AddToKills(int32 KillsToAdd)
+{
+	Kills += KillsToAdd;
+}
+
+void ABPlayerState::AddToAssists(int32 AssistsToAdd)
+{
+	Assists += AssistsToAdd;
 }

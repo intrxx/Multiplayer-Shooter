@@ -18,12 +18,19 @@ class BLASTER_API ABPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual void OnRep_Score() override;
 	void AddToScore(float ScoreToAdd);
+	void AddToDeaths(int32 DeathToAdd);
+	void AddToKills(int32 KillsToAdd);
+	void AddToAssists(int32 AssistsToAdd);
+
+	int32 GetKills() {return Kills;}
+	int32 GetDeaths() {return Deaths;}
 	
 private:
+	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
+
+	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
 
 	int32 Deaths;

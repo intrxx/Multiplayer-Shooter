@@ -29,6 +29,7 @@ public:
 	void UpdatePlayerList();
 
 public:
+	UPROPERTY()
 	TArray<TObjectPtr<AController>> LoginPlayerControllers;
 
 	UPROPERTY()
@@ -37,9 +38,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Gameplay")
 	float KillScoreAward = 2.f;
-	
-	TObjectPtr<ABlasterGameState> BlasterGameState;
-	
+
 protected:
 	void CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint);
 };

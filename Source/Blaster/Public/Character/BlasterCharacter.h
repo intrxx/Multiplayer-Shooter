@@ -113,8 +113,11 @@ protected:
 	void PollInit();
 
 private:
+	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
+	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
+	UPROPERTY()
 	TObjectPtr<ABPlayerState> BlasterPS;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")

@@ -7,7 +7,6 @@
 #include "Components/ActorComponent.h"
 #include "BCombatComponent.generated.h"
 
-
 class ABlasterHUD;
 class ABPlayerController;
 class ABlasterCharacter;
@@ -65,8 +64,11 @@ protected:
 	void InterpFOV(float DeltaTime);
 
 private:
+	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
+	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
+	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)

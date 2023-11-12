@@ -62,6 +62,7 @@ protected:
 	TArray<FPlayerStats> LocalPlayerStats;
 	
 private:
+	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 	
 };

@@ -43,7 +43,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBProjectileMovementComponent> ProjectileMoveComp;
-	
+
+	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
@@ -61,7 +62,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<USoundCue> CharacterImpactSound;
 
+	UPROPERTY()
 	TObjectPtr<UParticleSystem> HitParticles;
+	
+	UPROPERTY()
 	TObjectPtr<USoundCue> HitSound;
 
 private:

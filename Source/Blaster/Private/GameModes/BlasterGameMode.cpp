@@ -18,6 +18,13 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 	if(AttackerPS && AttackerPS != TargetPS)
 	{
 		AttackerPS->AddToScore(KillScoreAward);
+		AttackerPS->AddToKills(1);
+		UpdatePlayerList();
+	}
+	
+	if(TargetPS)
+	{
+		TargetPS->AddToDeaths(1);
 		UpdatePlayerList();
 	}
 	
@@ -100,11 +107,9 @@ void ABlasterGameMode::UpdatePlayerList()
 			FPlayerStats NewPlayerStats;
 			NewPlayerStats.PlayerName = PS->GetPlayerName();
 			NewPlayerStats.Score = PS->GetScore();
+			NewPlayerStats.Deaths = PS->GetDeaths();
+			NewPlayerStats.Kills = PS->GetKills();
 			PlayerStats.Add(NewPlayerStats);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("PS is not valid for some reason"));
 		}
 	}
 
