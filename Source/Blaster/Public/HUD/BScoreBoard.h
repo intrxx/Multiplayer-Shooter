@@ -6,8 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "BScoreBoard.generated.h"
 
-class UTextBlock;
-
+class UVerticalBox;
+class UBScoreboardPlayerEntry;
+struct FPlayerStats;
 /**
  * 
  */
@@ -17,8 +18,17 @@ class BLASTER_API UBScoreBoard : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ScoreAmount;
-
 	bool bIsVisible = false;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UVerticalBox> PlayerContainer;
+
+public:
+	void UpdatePlayerList(TArray<FPlayerStats> PlayerStats);
+
+protected:
+	TArray<TObjectPtr<UBScoreboardPlayerEntry>> PlayerEntries;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|UI")
+	TSubclassOf<UBScoreboardPlayerEntry> ScoreboardPlayerEntryClass;
 };

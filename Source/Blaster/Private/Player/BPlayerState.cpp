@@ -2,21 +2,18 @@
 
 
 #include "Player/BPlayerState.h"
-#include "Character/BlasterCharacter.h"
-#include "Player/BPlayerController.h"
+#include "GameModes/BlasterGameMode.h"
+#include "Kismet/GameplayStatics.h"
+
 
 void ABPlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
 
-	BlasterCharacter = BlasterCharacter == nullptr ? Cast<ABlasterCharacter>(GetPawn()) : BlasterCharacter;
-	if(BlasterCharacter)
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(BlasterGameMode)
 	{
-		BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
-		if(BlasterPC)
-		{
-			BlasterPC->SetHUDScore(GetScore());
-		}
+		BlasterGameMode->UpdatePlayerList();
 	}
 }
 
@@ -24,13 +21,9 @@ void ABPlayerState::AddToScore(float ScoreToAdd)
 {
 	SetScore(GetScore() + ScoreToAdd);
 	
-	BlasterCharacter = BlasterCharacter == nullptr ? Cast<ABlasterCharacter>(GetPawn()) : BlasterCharacter;
-	if(BlasterCharacter)
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(BlasterGameMode)
 	{
-		BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
-		if(BlasterPC)
-		{
-			BlasterPC->SetHUDScore(GetScore());
-		}
+		BlasterGameMode->UpdatePlayerList();
 	}
 }

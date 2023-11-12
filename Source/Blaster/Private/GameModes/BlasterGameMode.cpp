@@ -5,6 +5,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BPlayerController.h"
+#include "HUD/BlasterHUD.h"
 #include "GameFramework/PlayerStart.h"
 #include "Player/BPlayerState.h"
 
@@ -66,6 +67,51 @@ void ABlasterGameMode::CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint)
 		{
 			FurthestDistance = Distance;
 			OutSpawnPoint = PlayerStarts[i];
+		}
+	}
+}
+
+void ABlasterGameMode::OnPostLogin(AController* NewPlayer)
+{
+	Super::OnPostLogin(NewPlayer);
+
+	LoginPlayerControllers.Add(NewPlayer);
+	UpdatePlayerList();
+}
+
+void ABlasterGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	LoginPlayerControllers.Remove(Exiting);
+	UpdatePlayerList();
+}
+
+void ABlasterGameMode::UpdatePlayerList()
+{
+	PlayerStats.Empty();
+	
+	for(AController* C : LoginPlayerControllers)
+	{
+		ABPlayerState* PS = C->GetPlayerState<ABPlayerState>();
+		if(PS)
+		{
+			FPlayerStats NewPlayerStats;
+			NewPlayerStats.PlayerName = PS->GetPlayerName();
+			NewPlayerStats.Score = PS->GetScore();
+			PlayerStats.Add(NewPlayerStats);
+		}
+	}
+
+	for(AController* C : LoginPlayerControllers)
+	{
+		ABPlayerController* PC = Cast<ABPlayerController>(C);
+		if(PC)
+		{
+			if(HasAuthority())
+			{
+				PC->SetHUDPlayerNames(PlayerStats);
+			}
 		}
 	}
 }

@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HUD/BlasterHUD.h"
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
+
 
 class ABlasterHUD;
 
@@ -20,10 +22,13 @@ public:
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
 	
+	void SetHUDPlayerNames(TArray<FPlayerStats> PlayerStats);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
-	
+
 private:
 	TObjectPtr<ABlasterHUD> BlasterHUD;
+	
 };

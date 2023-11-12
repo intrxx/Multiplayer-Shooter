@@ -52,12 +52,28 @@ void ABPlayerController::SetHUDScore(float Score)
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
 	bool bHUDValid = BlasterHUD &&
-		BlasterHUD->Scoreboard &&
-		BlasterHUD->Scoreboard->ScoreAmount;
+		BlasterHUD->Scoreboard; //&&
+		//BlasterHUD->Scoreboard->ScoreAmount;
 	if(bHUDValid)
 	{
 		FString ScoreText = FString::Printf(TEXT("%d"), FMath::FloorToInt(Score));
-		BlasterHUD->Scoreboard->ScoreAmount->SetText(FText::FromString(ScoreText));
+		//BlasterHUD->Scoreboard->ScoreAmount->SetText(FText::FromString(ScoreText));
+	}
+}
+
+void ABPlayerController::SetHUDPlayerNames(TArray<FPlayerStats> PlayerStats)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->Scoreboard;
+	
+	if(bHUDValid)
+	{
+		for(FPlayerStats PStats : PlayerStats)
+		{
+			BlasterHUD->Scoreboard->UpdatePlayerList(PlayerStats);
+		}
 	}
 }
 
