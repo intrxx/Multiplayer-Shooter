@@ -7,6 +7,7 @@
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BlasterHUD.h"
 #include "Character/BlasterCharacter.h"
+#include "Components/Image.h"
 #include "HUD/BScoreBoard.h"
 #include "Components/Overlay.h"
 #include "Net/UnrealNetwork.h"
@@ -52,6 +53,51 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 
 		FString HealthText = FString::Printf(TEXT("%d"), FMath::CeilToInt(Health));
 		BlasterHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
+	}
+}
+
+void ABPlayerController::SetHUDWeaponAmmo(int32 Ammo)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->WeaponAmmoAmount;
+		
+	if(bHUDValid)
+	{
+		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
+		BlasterHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
+	}
+}
+
+void ABPlayerController::SetHUDWeaponAmmoImage(EBFiringMode FireMode)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->AmmoImage &&
+		BlasterHUD->CharacterOverlay->SingleAmmoImage &&
+		BlasterHUD->CharacterOverlay->BurstAmmoImage &&
+		BlasterHUD->CharacterOverlay->AutomaticAmmoImage;
+		
+	if(bHUDValid)
+	{
+		switch(FireMode)
+		{
+		case EBFiringMode::EFM_SingleBullet:
+			BlasterHUD->CharacterOverlay->AmmoImage->SetBrushFromTexture(BlasterHUD->CharacterOverlay->SingleAmmoImage);
+			break;
+		case EBFiringMode::EFM_Burst:
+			BlasterHUD->CharacterOverlay->AmmoImage->SetBrushFromTexture(BlasterHUD->CharacterOverlay->BurstAmmoImage);
+			break;
+		case EBFiringMode::EFM_FullAuto:
+			BlasterHUD->CharacterOverlay->AmmoImage->SetBrushFromTexture(BlasterHUD->CharacterOverlay->AutomaticAmmoImage);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

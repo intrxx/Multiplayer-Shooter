@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/Projectile/BBulletShell.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/BPlayerController.h"
 #include "Sound/SoundCue.h"
 
 ABWeapon::ABWeapon()
@@ -63,6 +64,32 @@ void ABWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABWeapon, WeaponState);
+	DOREPLIFETIME(ABWeapon, Ammo);
+}
+
+void ABWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	
+	if(Owner == nullptr)
+	{
+		BlasterCharacterOwner == nullptr;
+		BlasterControllerOwner == nullptr;
+	}
+	else
+	{
+		// Temporary fix because idk why Owners doesn't get nulled after we set the owner to null in BWeapon::Dropped()
+		BlasterCharacterOwner = Cast<ABlasterCharacter>(GetOwner());
+		if(BlasterCharacterOwner)
+		{
+			BlasterControllerOwner = Cast<ABPlayerController>(BlasterCharacterOwner->Controller);
+			if(BlasterControllerOwner)
+			{
+				SetHUDAmmo();
+				SetHUDAmmoImage();
+			}
+		}
+	}
 }
 
 void ABWeapon::Tick(float DeltaTime)
@@ -175,6 +202,19 @@ void ABWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 	}
+
+	SpendRound();
+}
+
+void ABWeapon::SpendRound()
+{
+	Ammo--;
+	SetHUDAmmo();
+}
+
+void ABWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
 }
 
 void ABWeapon::ChangeFiringMode()
@@ -199,15 +239,46 @@ void ABWeapon::ChangeFiringMode()
 		FiringModeCount++;
 		FiringMode = FiringModes[FiringModeCount];
 	}
+	
+	SetHUDAmmoImage();
 }
 
+void ABWeapon::SetHUDAmmo()
+{
+	BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(GetOwner())  : BlasterCharacterOwner;
+	if(BlasterCharacterOwner)
+	{
+		BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
+		if(BlasterControllerOwner)
+		{
+			BlasterControllerOwner->SetHUDWeaponAmmo(Ammo);
+		}
+	}
+}
+
+void ABWeapon::SetHUDAmmoImage()
+{
+	BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterCharacterOwner;
+	if(BlasterCharacterOwner)
+	{
+		BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
+		if(BlasterControllerOwner)
+		{
+			BlasterControllerOwner->SetHUDWeaponAmmoImage(FiringMode);
+		}
+	}	
+}
 void ABWeapon::Dropped()
 {
 	SetWeaponState(EBWeaponState::EWS_Dropped);
 
 	const FDetachmentTransformRules TransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMeshComp->DetachFromComponent(TransformRules);
-
+	
 	SetOwner(nullptr);
+	BlasterCharacterOwner = nullptr;
+	BlasterControllerOwner = nullptr;
 }
+
+
 

@@ -224,8 +224,12 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	{
 		return;
 	}
-
-	//TODO Drop equipped weapon later if weapon is already equipped
+	
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Dropped();
+	}
+	
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
 	
@@ -235,6 +239,9 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 		HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
 	}
 	EquippedWeapon->SetOwner(BlasterCharacter);
+	EquippedWeapon->SetHUDAmmo();
+	EquippedWeapon->SetHUDAmmoImage();
+	
 	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }

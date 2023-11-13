@@ -589,6 +589,11 @@ void ABlasterCharacter::HandleDeath()
 
 void ABlasterCharacter::MulticastHandleDeath_Implementation()
 {
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDWeaponAmmo(0);
+	}
+	
 	bDead = true;
 	PlayDeathMontage(IsAiming());
 

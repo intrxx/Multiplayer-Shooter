@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapon/BWeapon.h"
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
 
+
 class ABlasterHUD;
+class UTexture;
 
 USTRUCT(BlueprintType)
 struct FPlayerStats
@@ -44,6 +47,8 @@ class BLASTER_API ABPlayerController : public APlayerController
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDWeaponAmmo(int32 Ammo);
+	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	

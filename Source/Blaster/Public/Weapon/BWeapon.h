@@ -12,6 +12,8 @@ class USphereComponent;
 class UWidgetComponent;
 class UAnimationAsset;
 class UTexture2D;
+class ABlasterCharacter;
+class ABPlayerController;
 
 UENUM(BlueprintType)
 enum class EBWeaponState : uint8
@@ -43,16 +45,15 @@ public:
 	ABWeapon();
 	
 	virtual void Tick(float DeltaTime) override;
-
-	void ShowPickUpWidget(bool bShowWidget);
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnRep_Owner() override;
 
+	void SetHUDAmmo();
+	void SetHUDAmmoImage();
+	void ShowPickUpWidget(bool bShowWidget);
 	void SetWeaponState(EBWeaponState State);
-	
 	virtual void Fire(const FVector& HitTarget);
 	virtual void ChangeFiringMode();
-
 	void Dropped();
 	
 	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
@@ -82,7 +83,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Crosshair")
 	TObjectPtr<UTexture2D> CrosshairBottom;
-
+	
 	/**
 	 *  Zoomed FOV while aiming
 	 */
@@ -97,9 +98,9 @@ public:
 	 *
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|FiringModes")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	float FireDelay = .15f;
-	
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -110,6 +111,12 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+protected:
+	UPROPERTY()
+	TObjectPtr<ABlasterCharacter> BlasterCharacterOwner;
+	UPROPERTY()
+	TObjectPtr<ABPlayerController> BlasterControllerOwner;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
@@ -149,9 +156,23 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	float RandomRotationConstant;
+	
+	/**
+	 * Ammo
+	 */
+
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo, Category = "Blaster|Weapon")
+	int32 Ammo;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	int32 MagCapacity;
 
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();
+	
+	UFUNCTION()
+	void OnRep_Ammo();
+	void SpendRound();
 };
 
