@@ -5,10 +5,6 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Weapon/Projectile/BProjectile.h"
 
-ABProjectileWeapon::ABProjectileWeapon()
-{
-}
-
 void ABProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);

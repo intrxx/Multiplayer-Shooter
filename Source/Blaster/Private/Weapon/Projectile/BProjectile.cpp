@@ -27,8 +27,6 @@ ABProjectile::ABProjectile()
 	ProjectileMoveComp->bRotationFollowsVelocity = true;
 	ProjectileMoveComp->InitialSpeed = 16000.f;
 	ProjectileMoveComp->MaxSpeed = 16000.f;
-	
-	Damage = 20.f;
 }
 
 void ABProjectile::BeginPlay()

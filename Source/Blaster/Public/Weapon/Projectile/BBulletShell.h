@@ -31,14 +31,14 @@ private:
 	TObjectPtr<UStaticMeshComponent> ShellMeshComp;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|BulletShell")
-	float ShellEjectionImpulse;
+	float ShellEjectionImpulse = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	TObjectPtr<USoundCue> ShellDropSound;
 
 	// Time until Bullet Shell is destroyed after it hits the ground
 	UPROPERTY(EditAnywhere, Category = "Blaster|BulletShell")
-	float TimeUntilDestroyed;
+	float TimeUntilDestroyed = 4.f;
 
 	FTimerDelegate ShellDropTimerDelegate;
 	FTimerHandle ShellDropTimerHandle;

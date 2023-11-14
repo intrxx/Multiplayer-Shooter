@@ -149,13 +149,13 @@ private:
 	float FiringModeCount = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
-	float FiringCrosshairErrorValue;
+	float FiringCrosshairErrorValue = 0.75f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	TSubclassOf<ABBulletShell> BulletShell;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
-	float RandomRotationConstant;
+	float RandomRotationConstant = 30.f;
 	
 	/**
 	 * Ammo

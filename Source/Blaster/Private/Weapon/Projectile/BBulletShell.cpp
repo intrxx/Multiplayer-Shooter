@@ -19,10 +19,7 @@ ABBulletShell::ABBulletShell()
 
 	ShellMeshComp->SetSimulatePhysics(true);
 	ShellMeshComp->SetNotifyRigidBodyCollision(true);
-
-	ShellEjectionImpulse = 3.f;
-	TimeUntilDestroyed = 4.f;
-
+	
 	ShellDropTimerDelegate.BindUObject(this, &ThisClass::BulletShellDestroy);
 }
 

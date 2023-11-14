@@ -23,8 +23,8 @@ public:
 	void AddToKills(int32 KillsToAdd);
 	void AddToAssists(int32 AssistsToAdd);
 
-	int32 GetKills() {return Kills;}
-	int32 GetDeaths() {return Deaths;}
+	int32 GetKills() const {return Kills;}
+	int32 GetDeaths() const {return Deaths;}
 	
 private:
 	UPROPERTY()

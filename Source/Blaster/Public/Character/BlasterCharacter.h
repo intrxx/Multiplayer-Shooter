@@ -149,7 +149,7 @@ private:
 
 	// Rare Death Montage Chance - [0,1]
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
-	int32 RareDeathChance;
+	int32 RareDeathChance = 20.f;
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Hip;
@@ -183,7 +183,7 @@ private:
 	bool bDead = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Death")
-	float RespawnDelay;
+	float RespawnDelay = 3.f;
 	FTimerHandle RespawnTimerHandle;
 
 	/**

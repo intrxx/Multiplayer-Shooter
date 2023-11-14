@@ -78,10 +78,10 @@ private:
 	bool bAiming;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
-	float BaseWalkSpeed;
+	float BaseWalkSpeed = 600.f;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
-	float AimWalkSpeed;
+	float AimWalkSpeed = 425.f;
 
 	bool bFireButtonPressed;
 

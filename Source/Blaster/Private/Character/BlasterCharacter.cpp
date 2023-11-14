@@ -63,8 +63,6 @@ ABlasterCharacter::ABlasterCharacter()
 	
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
-	RareDeathChance = 20;
-	RespawnDelay = 3.f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

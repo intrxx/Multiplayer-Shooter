@@ -16,9 +16,6 @@
 UBCombatComponent::UBCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	BaseWalkSpeed = 600.f;
-	AimWalkSpeed = 425.f;
 }
 
 void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

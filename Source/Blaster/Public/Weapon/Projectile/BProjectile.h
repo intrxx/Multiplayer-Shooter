@@ -35,7 +35,7 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Damage")
-	float Damage;
+	float Damage = 20.f;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
