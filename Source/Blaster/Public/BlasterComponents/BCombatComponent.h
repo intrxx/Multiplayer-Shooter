@@ -29,7 +29,6 @@ public:
 	friend ABlasterCharacter;
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(ABWeapon* WeaponToEquip);
@@ -40,7 +39,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	void SetAiming(bool bIsAiming);
-
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool bIsAiming);
 
@@ -58,9 +56,7 @@ protected:
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug);
-
 	void SetHUDCrosshair(float DeltaTime);
-
 	void InterpFOV(float DeltaTime);
 
 private:
@@ -127,4 +123,6 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void ShrinkCrosshairWhileShooting();
+
+	bool CanFire();
 };

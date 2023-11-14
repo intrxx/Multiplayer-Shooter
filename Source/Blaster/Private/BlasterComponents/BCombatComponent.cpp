@@ -12,6 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Weapon/BWeapon.h"
 #include "TimerManager.h"
+#include "Sound/SoundCue.h"
 
 UBCombatComponent::UBCombatComponent()
 {
@@ -292,7 +293,7 @@ void UBCombatComponent::FireButtonPressed(bool bPressed)
 
 void UBCombatComponent::Fire()
 {
-	if(bCanFire)
+	if(CanFire())
 	{
 		bCanFire = false;
 		
@@ -301,6 +302,23 @@ void UBCombatComponent::Fire()
 		ShrinkCrosshairWhileShooting();
 		StartFireTimer();
 	}
+
+	if(EquippedWeapon && EquippedWeapon->IsMagEmpty() && EquippedWeapon->EmptyMagSound)
+	{
+		if(GetOwner())
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EmptyMagSound, GetOwner()->GetActorLocation());
+		}
+	}
+}
+
+bool UBCombatComponent::CanFire()
+{
+	if(EquippedWeapon == nullptr)
+	{
+		return false;
+	}
+	return !EquippedWeapon->IsMagEmpty() || !bCanFire;
 }
 
 void UBCombatComponent::StartFireTimer()

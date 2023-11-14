@@ -205,7 +205,7 @@ void ABWeapon::Fire(const FVector& HitTarget)
 
 void ABWeapon::SpendRound()
 {
-	Ammo--;
+	Ammo = FMath::Clamp(Ammo-1, 0.f, MagCapacity);
 	SetHUDAmmo();
 }
 
@@ -275,6 +275,11 @@ void ABWeapon::Dropped()
 	SetOwner(nullptr);
 	BlasterCharacterOwner = nullptr;
 	BlasterControllerOwner = nullptr;
+}
+
+bool ABWeapon::IsMagEmpty() const
+{
+	return Ammo <= 0;
 }
 
 

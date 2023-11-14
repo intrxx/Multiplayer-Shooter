@@ -33,8 +33,6 @@ void ABlasterHUD::AddScoreBoard()
 		Scoreboard = CreateWidget<UBScoreBoard>(PC, ScoreboardClass);
 		Scoreboard->AddToViewport();
 		Scoreboard->SetVisibility(ESlateVisibility::Collapsed);
-		
-		UE_LOG(LogTemp, Error, TEXT("I GOT SCOREBOARD %s"), *GetNetOwningPlayer()->GetName());
 	}
 }
 

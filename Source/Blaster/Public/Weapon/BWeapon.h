@@ -63,6 +63,7 @@ public:
 	float GetShootingError() const {return FiringCrosshairErrorValue;}
 	bool CanChangeFiringMode() const {return bCanChangeFiringMode;}
 	EBFiringMode GetFiringMode() const {return FiringMode;}
+	bool IsMagEmpty() const;
 	
 public:
 	/**
@@ -100,6 +101,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	float FireDelay = .15f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	TObjectPtr<USoundCue> EmptyMagSound;
 
 protected:
 	virtual void BeginPlay() override;
@@ -147,7 +151,7 @@ private:
 	TObjectPtr<USoundCue> ChangingModeSound;
 	
 	float FiringModeCount = 0.f;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|BulletShell")
 	float FiringCrosshairErrorValue = 0.75f;
 
