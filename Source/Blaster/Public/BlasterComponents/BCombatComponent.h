@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "HUD/BlasterHUD.h"
 #include "CoreMinimal.h"
+#include "HUD/BlasterHUD.h"
+#include "BlasterTypes/BWeaponTypes.h"
 #include "Components/ActorComponent.h"
 #include "BCombatComponent.generated.h"
 
@@ -118,6 +119,12 @@ private:
 	FTimerHandle FireTimer;
 	bool bCanFire = true;
 
+	// Carried ammo for the currently equipped weapon
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+
+	TMap<EBWeaponType, int32> CarriedAmmoMap;
+
 private:
 	void Fire();
 	void StartFireTimer();
@@ -125,4 +132,7 @@ private:
 	void ShrinkCrosshairWhileShooting();
 
 	bool CanFire();
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo(); 
 };

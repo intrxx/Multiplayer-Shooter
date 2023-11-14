@@ -25,6 +25,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
+	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedAmmo, COND_OwnerOnly);
 }
 
 void UBCombatComponent::BeginPlay()
@@ -339,6 +340,10 @@ void UBCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+}
+
+void UBCombatComponent::OnRep_CarriedAmmo()
+{
 }
 
 inline void UBCombatComponent::ShrinkCrosshairWhileShooting()
