@@ -25,6 +25,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
+	DOREPLIFETIME(UBCombatComponent, CombatState);
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedAmmo, COND_OwnerOnly);
 }
 
@@ -261,24 +262,6 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }
 
-void UBCombatComponent::Reload()
-{
-	if(CarriedAmmo > 0)
-	{
-		ServerReload();
-	}
-}
-
-void UBCombatComponent::ServerReload_Implementation()
-{
-	if(BlasterCharacter == nullptr)
-	{
-		return;
-	}
-
-	BlasterCharacter->PlayReloadMontage();
-}
-
 void UBCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && BlasterCharacter)
@@ -292,6 +275,55 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BlasterCharacter->bUseControllerRotationYaw = true;
+	}
+}
+
+void UBCombatComponent::Reload()
+{
+	if(CarriedAmmo > 0 && CombatState != EBCombatState::ECS_Reloading)
+	{
+		ServerReload();
+	}
+}
+
+void UBCombatComponent::FinishReloading()
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+
+	if(BlasterCharacter->HasAuthority())
+	{
+		CombatState = EBCombatState::ECS_Unoccupied;
+	}
+}
+
+void UBCombatComponent::ServerReload_Implementation()
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+
+	CombatState = EBCombatState::ECS_Reloading;
+	HandleReload();
+}
+
+void UBCombatComponent::HandleReload()
+{
+	BlasterCharacter->PlayReloadMontage();
+}
+
+void UBCombatComponent::OnRep_CombatState()
+{
+	switch (CombatState)
+	{
+	case EBCombatState::ECS_Reloading:
+		HandleReload();
+		break;
+	default:
+		break;
 	}
 }
 

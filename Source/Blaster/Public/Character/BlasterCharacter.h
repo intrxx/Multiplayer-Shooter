@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "BlasterInterfaces/BCrosshairInteractionInterface.h"
+#include "BlasterTypes/BCombatState.h"
 #include "BlasterTypes/BTurningInPlace.h"
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
@@ -52,6 +53,7 @@ public:
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
 	EBTurningInPlace GetTurningInPlace() const {return TurningInPlace;}
+	EBCombatState GetCombatState() const;
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	FVector GetHitTarget() const;
@@ -138,7 +140,7 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess), Category = "Blaster|Combat")
 	TObjectPtr<UBCombatComponent> CombatComp;
 
 	/**

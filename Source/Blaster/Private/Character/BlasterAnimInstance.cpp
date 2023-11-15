@@ -5,6 +5,7 @@
 #include "Character/BlasterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "BlasterTypes/BCombatState.h"
 #include "Weapon/BWeapon.h"
 
 void UBlasterAnimInstance::NativeInitializeAnimation()
@@ -84,4 +85,6 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(),
 			RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget()));
 	}
+
+	bUseFABRIK = BlasterCharacter->GetCombatState() != EBCombatState::ECS_Reloading;
 }

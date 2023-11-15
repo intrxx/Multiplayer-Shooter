@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "HUD/BlasterHUD.h"
 #include "BlasterTypes/BWeaponTypes.h"
+#include "BlasterTypes/BCombatState.h"
 #include "Components/ActorComponent.h"
 #include "BCombatComponent.generated.h"
 
@@ -34,6 +35,8 @@ public:
 
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	void Reload();
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 	
 public:
 	
@@ -55,6 +58,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
+	void HandleReload();
 
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
@@ -71,6 +75,9 @@ private:
 	TObjectPtr<ABPlayerController> BlasterPC;
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	EBCombatState CombatState = EBCombatState::ECS_Unoccupied;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;
@@ -143,4 +150,7 @@ private:
 	UFUNCTION()
 	void OnRep_CarriedAmmo();
 	void InitializeCarriedAmmo();
+
+	UFUNCTION()
+	void OnRep_CombatState();
 };

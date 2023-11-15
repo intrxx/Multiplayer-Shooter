@@ -440,6 +440,15 @@ void ABlasterCharacter::ToggleScoreBoard()
 	}
 }
 
+EBCombatState ABlasterCharacter::GetCombatState() const
+{
+	if(CombatComp)
+	{
+		return CombatComp->CombatState;
+	}
+	return EBCombatState::ECS_MAX;
+}
+
 ABWeapon* ABlasterCharacter::GetEquippedWeapon()
 {
 	if(CombatComp == nullptr)
