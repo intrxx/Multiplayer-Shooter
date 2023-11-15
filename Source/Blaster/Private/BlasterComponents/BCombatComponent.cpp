@@ -43,6 +43,11 @@ void UBCombatComponent::BeginPlay()
 		}
 
 		CrosshairColor = CrosshairInfo.CrosshairColor;
+
+		if(BlasterCharacter->HasAuthority())
+		{
+			InitializeCarriedAmmo();
+		}
 	}
 }
 
@@ -231,6 +236,11 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
 	
 	const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 	if(HandSocket)
@@ -240,6 +250,12 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	EquippedWeapon->SetOwner(BlasterCharacter);
 	EquippedWeapon->SetHUDAmmo();
 	EquippedWeapon->SetHUDAmmoImage();
+
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+	}
 	
 	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	BlasterCharacter->bUseControllerRotationYaw = true;
@@ -344,6 +360,16 @@ void UBCombatComponent::FireTimerFinished()
 
 void UBCombatComponent::OnRep_CarriedAmmo()
 {
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+}
+
+void UBCombatComponent::InitializeCarriedAmmo()
+{
+	CarriedAmmoMap.Emplace(EBWeaponType::EWT_AssaultRifle, StartingRifleAmmo);
 }
 
 inline void UBCombatComponent::ShrinkCrosshairWhileShooting()

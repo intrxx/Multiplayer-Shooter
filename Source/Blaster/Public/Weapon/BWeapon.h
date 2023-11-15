@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "BlasterTypes/BWeaponTypes.h"
 #include "BlasterTypes/BFiringMode.h"
 #include "BWeapon.generated.h"
 
@@ -53,6 +54,7 @@ public:
 	float GetShootingError() const {return FiringCrosshairErrorValue;}
 	bool CanChangeFiringMode() const {return bCanChangeFiringMode;}
 	EBFiringMode GetFiringMode() const {return FiringMode;}
+	EBWeaponType GetWeaponType() const {return WeaponType;}
 	bool IsMagEmpty() const;
 	
 public:
@@ -113,6 +115,9 @@ protected:
 	TObjectPtr<ABPlayerController> BlasterControllerOwner;
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	EBWeaponType WeaponType;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
 

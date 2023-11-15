@@ -123,6 +123,9 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
 	int32 CarriedAmmo;
 
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	int32 StartingRifleAmmo = 30;
+
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
 
 private:
@@ -134,5 +137,6 @@ private:
 	bool CanFire();
 
 	UFUNCTION()
-	void OnRep_CarriedAmmo(); 
+	void OnRep_CarriedAmmo();
+	void InitializeCarriedAmmo();
 };
