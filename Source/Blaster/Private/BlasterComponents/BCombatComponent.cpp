@@ -280,29 +280,27 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 
 void UBCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState != EBCombatState::ECS_Reloading)
+	if(CarriedAmmo > 0 && CombatState != EBCombatState::ECS_Reloading && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity())
 	{
 		ServerReload();
 	}
 }
 
-void UBCombatComponent::FinishReloading()
+int32 UBCombatComponent::CalculateAmountToReload()
 {
-	if(BlasterCharacter == nullptr)
+	if(EquippedWeapon == nullptr)
 	{
-		return;
+		return 0;
 	}
 
-	if(BlasterCharacter->HasAuthority())
+	int32 RoomInMag = EquippedWeapon->GetMagCapacity() - EquippedWeapon->GetAmmo();
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
 	{
-		CombatState = EBCombatState::ECS_Unoccupied;
+		int32 CarriedAmmoAmount = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+		int32 LeastToReload = FMath::Min(RoomInMag, CarriedAmmoAmount);
+		return FMath::Clamp(RoomInMag, 0, LeastToReload);
 	}
-
-	// This will be true only on the locally controlled character
-	if(bFireButtonPressed)
-	{
-		Fire();
-	}
+	return 0;
 }
 
 void UBCombatComponent::ServerReload_Implementation()
@@ -311,7 +309,7 @@ void UBCombatComponent::ServerReload_Implementation()
 	{
 		return;
 	}
-
+	
 	CombatState = EBCombatState::ECS_Reloading;
 	HandleReload();
 }
@@ -319,6 +317,49 @@ void UBCombatComponent::ServerReload_Implementation()
 void UBCombatComponent::HandleReload()
 {
 	BlasterCharacter->PlayReloadMontage();
+}
+
+void UBCombatComponent::UpdateAmmoValues()
+{
+	if(BlasterCharacter == nullptr || EquippedWeapon == nullptr)
+	{
+		return;
+	}
+	
+	int32 AmmoReloadAmount = CalculateAmountToReload();
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= AmmoReloadAmount;
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+	
+	EquippedWeapon->AddAmmo(AmmoReloadAmount);
+}
+
+void UBCombatComponent::FinishReloading()
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+	
+	if(BlasterCharacter->HasAuthority())
+	{
+		CombatState = EBCombatState::ECS_Unoccupied;
+		UpdateAmmoValues();
+	}
+
+	// This will be true only on the locally controlled character - we check if the fire button was pressed to continue
+	// firing when reload finishes
+	if(bFireButtonPressed)
+	{
+		Fire();
+	}
 }
 
 void UBCombatComponent::OnRep_CombatState()

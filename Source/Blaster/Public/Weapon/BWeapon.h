@@ -43,9 +43,11 @@ public:
 	void SetHUDAmmoImage();
 	void ShowPickUpWidget(bool bShowWidget);
 	void SetWeaponState(EBWeaponState State);
+	
 	virtual void Fire(const FVector& HitTarget);
 	virtual void ChangeFiringMode();
 	void Dropped();
+	void AddAmmo(int32 AmmoToAdd);
 	
 	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
@@ -56,6 +58,8 @@ public:
 	EBFiringMode GetFiringMode() const {return FiringMode;}
 	EBWeaponType GetWeaponType() const {return WeaponType;}
 	bool IsMagEmpty() const;
+	int32 GetAmmo() const {return Ammo;}
+	int32 GetMagCapacity() const {return MagCapacity;}
 	
 public:
 	/**

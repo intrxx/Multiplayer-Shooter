@@ -59,6 +59,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
 	void HandleReload();
+	int32 CalculateAmountToReload();
 
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
@@ -153,4 +154,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_CombatState();
+
+	void UpdateAmmoValues();
 };

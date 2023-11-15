@@ -277,6 +277,12 @@ void ABWeapon::Dropped()
 	BlasterControllerOwner = nullptr;
 }
 
+void ABWeapon::AddAmmo(int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	SetHUDAmmo();
+}
+
 bool ABWeapon::IsMagEmpty() const
 {
 	return Ammo <= 0;
