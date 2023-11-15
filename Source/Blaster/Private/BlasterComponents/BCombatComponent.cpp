@@ -297,6 +297,12 @@ void UBCombatComponent::FinishReloading()
 	{
 		CombatState = EBCombatState::ECS_Unoccupied;
 	}
+
+	// This will be true only on the locally controlled character
+	if(bFireButtonPressed)
+	{
+		Fire();
+	}
 }
 
 void UBCombatComponent::ServerReload_Implementation()
@@ -321,6 +327,12 @@ void UBCombatComponent::OnRep_CombatState()
 	{
 	case EBCombatState::ECS_Reloading:
 		HandleReload();
+		break;
+	case EBCombatState::ECS_Unoccupied:
+		if(bFireButtonPressed)
+		{
+			Fire();
+		}
 		break;
 	default:
 		break;
@@ -385,7 +397,7 @@ bool UBCombatComponent::CanFire()
 	{
 		return false;
 	}
-	return !EquippedWeapon->IsMagEmpty() || !bCanFire;
+	return !EquippedWeapon->IsMagEmpty() && bCanFire && CombatState == EBCombatState::ECS_Unoccupied;
 }
 
 void UBCombatComponent::StartFireTimer()
@@ -442,7 +454,7 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 		return;
 	}
 	
-	if(BlasterCharacter)
+	if(BlasterCharacter && CombatState == EBCombatState::ECS_Unoccupied)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire(TraceHitTarget);
