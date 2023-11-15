@@ -261,6 +261,24 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }
 
+void UBCombatComponent::Reload()
+{
+	if(CarriedAmmo > 0)
+	{
+		ServerReload();
+	}
+}
+
+void UBCombatComponent::ServerReload_Implementation()
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+
+	BlasterCharacter->PlayReloadMontage();
+}
+
 void UBCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && BlasterCharacter)

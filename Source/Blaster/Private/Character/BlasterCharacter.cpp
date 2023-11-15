@@ -25,6 +25,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/BPlayerState.h"
+#include "BlasterTypes/BWeaponTypes.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -281,14 +282,17 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::Look);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Jump, ETriggerEvent::Triggered, this,
 		&ThisClass::Jump);
-	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_EquipWeapon, ETriggerEvent::Triggered, this,
-		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Crouch, ETriggerEvent::Triggered, this,
 		&ThisClass::CrouchButtonPressed);
+	
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_EquipWeapon, ETriggerEvent::Triggered, this,
+		&ThisClass::EquipButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ChangeFiringType, ETriggerEvent::Triggered, this,
 		&ThisClass::ChangeFiringModeButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ToggleScoreboard, ETriggerEvent::Triggered, this,
 		&ThisClass::ToggleScoreBoard);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Reload, ETriggerEvent::Triggered, this,
+		&ThisClass::ReloadButtonPressed);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -404,6 +408,14 @@ void ABlasterCharacter::FireWeaponReleased()
 	if(CombatComp)
 	{
 		CombatComp->FireButtonPressed(false);
+	}
+}
+
+void ABlasterCharacter::ReloadButtonPressed()
+{
+	if(CombatComp)
+	{
+		CombatComp->Reload();
 	}
 }
 
@@ -524,6 +536,29 @@ void ABlasterCharacter::PlayDeathMontage(bool bAiming)
 	RegularDeathMontages_Hip[FMath::RandRange(0,RegularDeathMontages_Hip.Num()-1)];
 	
 	AnimInstance->Montage_Play(AnimMontageToPlay);
+}
+
+void ABlasterCharacter::PlayReloadMontage()
+{
+	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && ReloadWeaponMontage)
+	{
+		AnimInstance->Montage_Play(ReloadWeaponMontage);
+		switch (CombatComp->EquippedWeapon->GetWeaponType())
+		{
+		case EBWeaponType::EWT_AssaultRifle:
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle"));
+			break;
+		default:
+			break;
+		}
+		
+	}
 }
 
 void ABlasterCharacter::PlayHitReactMontage()

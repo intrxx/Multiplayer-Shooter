@@ -41,6 +41,7 @@ public:
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
+	void PlayReloadMontage();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastHandleDeath();
@@ -91,6 +92,7 @@ protected:
 	virtual void Jump() override;
 	void FireWeaponPressed();
 	void FireWeaponReleased();
+	void ReloadButtonPressed();
 	void ChangeFiringModeButtonPressed();
 	void ToggleScoreBoard();
 
@@ -102,6 +104,7 @@ protected:
 
 	void UpdateHUDHealth();
 	void PlayHitReactMontage();
+	
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
@@ -138,8 +141,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UBCombatComponent> CombatComp;
 
+	/**
+	 * Anim Montages 
+	 */
+	
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UAnimMontage> ReloadWeaponMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
@@ -156,6 +166,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Aim;
+
+	/**
+	 * 
+	 */
 	
 	float AO_Yaw;
 	float InterpAO_Yaw;

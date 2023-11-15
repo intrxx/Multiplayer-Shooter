@@ -33,6 +33,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(ABWeapon* WeaponToEquip);
+	void Reload();
 	
 public:
 	
@@ -51,6 +52,9 @@ protected:
 	// Server RPC, when called on client will execute on server
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
 
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
