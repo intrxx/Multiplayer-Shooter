@@ -256,6 +256,7 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	if(BlasterPC)
 	{
 		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+		BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
 	}
 
 	if(EquippedWeapon->EquipSound)
@@ -283,6 +284,12 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 			HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
 		}
 
+		BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+		if(BlasterPC)
+		{
+			BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
+		}
+		
 		if(EquippedWeapon->EquipSound)
 		{
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());

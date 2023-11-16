@@ -50,6 +50,7 @@ public:
 	void SetHUDCarriedAmmo(int32 CarriedAmmo);
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
+	void SetHUDWeaponTypeText(EBWeaponType WeaponType);
 	
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	
@@ -76,6 +77,5 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
-	
 };
 

@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "BlasterTypes/BWeaponTypes.h"
 #include "Weapon/Projectile/BBulletShell.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BPlayerController.h"
@@ -271,6 +272,11 @@ void ABWeapon::Dropped()
 
 	const FDetachmentTransformRules TransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMeshComp->DetachFromComponent(TransformRules);
+
+	if(BlasterControllerOwner)
+	{
+		BlasterControllerOwner->SetHUDWeaponTypeText(EBWeaponType::EWT_MAX);
+	}
 	
 	SetOwner(nullptr);
 	BlasterCharacterOwner = nullptr;

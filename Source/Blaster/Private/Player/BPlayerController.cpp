@@ -116,6 +116,28 @@ void ABPlayerController::SetHUDWeaponAmmoImage(EBFiringMode FireMode)
 	}
 }
 
+void ABPlayerController::SetHUDWeaponTypeText(EBWeaponType WeaponType)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->WeaponType;
+		
+	if(bHUDValid)
+	{
+		switch(WeaponType)
+		{
+		case EBWeaponType::EWT_AssaultRifle:
+			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString(TEXT("Rifle")));
+			break;
+		default:
+			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString(TEXT("-")));
+			break;
+		}
+	}
+}
+
 void ABPlayerController::ClientSetHUDDeathScreen_Implementation(const FString& KillerName)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
