@@ -49,8 +49,8 @@ public:
 	void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
 	
-	USphereComponent* GetWeaponSphereComp() {return  SphereComp;}
-	USkeletalMeshComponent* GetWeaponMesh() {return  WeaponMeshComp;}
+	USphereComponent* GetWeaponSphereComp() const {return  SphereComp;}
+	USkeletalMeshComponent* GetWeaponMesh() const {return  WeaponMeshComp;}
 	float GetZoomedFOV() const {return ZoomedFOV;}
 	float GetZoomInterpSpeed() const {return ZoomedInterpSpeed;}
 	float GetShootingError() const {return FiringCrosshairErrorValue;}
@@ -98,8 +98,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	float FireDelay = .15f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Weapon")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USoundCue> EmptyMagSound;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	TObjectPtr<USoundCue> EquipSound;
 
 protected:
 	virtual void BeginPlay() override;

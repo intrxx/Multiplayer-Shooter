@@ -77,6 +77,13 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
 	bool bUseFABRIK;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	bool bUseAimOffsets;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	bool bTransformRightHand;
+	
 	
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;

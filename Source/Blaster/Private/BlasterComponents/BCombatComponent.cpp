@@ -257,6 +257,16 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	{
 		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
 	}
+
+	if(EquippedWeapon->EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
+	}
+
+	if(EquippedWeapon->IsMagEmpty())
+	{
+		Reload();
+	}
 	
 	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	BlasterCharacter->bUseControllerRotationYaw = true;
@@ -271,6 +281,11 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 		if(HandSocket)
 		{
 			HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
+		}
+
+		if(EquippedWeapon->EquipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
 		}
 		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -423,12 +438,9 @@ void UBCombatComponent::Fire()
 		StartFireTimer();
 	}
 
-	if(EquippedWeapon && EquippedWeapon->IsMagEmpty() && EquippedWeapon->EmptyMagSound)
+	if(BlasterCharacter && EquippedWeapon && EquippedWeapon->IsMagEmpty() && EquippedWeapon->EmptyMagSound)
 	{
-		if(GetOwner())
-		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EmptyMagSound, GetOwner()->GetActorLocation());
-		}
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EmptyMagSound, BlasterCharacter->GetActorLocation());
 	}
 }
 
@@ -459,6 +471,11 @@ void UBCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+
+	if(EquippedWeapon->IsMagEmpty())
+	{
+		Reload();
+	}
 }
 
 void UBCombatComponent::OnRep_CarriedAmmo()
@@ -475,7 +492,7 @@ void UBCombatComponent::InitializeCarriedAmmo()
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_AssaultRifle, StartingRifleAmmo);
 }
 
-inline void UBCombatComponent::ShrinkCrosshairWhileShooting()
+void UBCombatComponent::ShrinkCrosshairWhileShooting()
 {
 	CrosshairShootingFactor += CrosshairShootingFactor + EquippedWeapon->GetShootingError(); 
 	CrosshairShootingFactor = FMath::Clamp(CrosshairShootingFactor, EquippedWeapon->GetShootingError(),

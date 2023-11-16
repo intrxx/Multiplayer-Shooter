@@ -30,16 +30,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> AmmoImage;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> WeaponAmmoAmount;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CarriedAmmoAmount;
-
+	
 	/**
 	 *  Death Overlay
 	 */
@@ -57,8 +48,20 @@ public:
 	TObjectPtr<UTextBlock> DamageTaken;
 
 	/**
-	 * Ammo Images
+	 * Ammo and Weapon
 	 */
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> AmmoImage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> WeaponAmmoAmount;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CarriedAmmoAmount;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> WeaponType;
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	TObjectPtr<UTexture2D> SingleAmmoImage;
