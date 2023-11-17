@@ -101,6 +101,7 @@ void ABlasterCharacter::BeginPlay()
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(InventoryMappingContext, 1);
 		}
 
 		//TODO Look here in case of some weird Death Screen Behaviour
@@ -293,6 +294,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::ToggleScoreBoard);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Reload, ETriggerEvent::Triggered, this,
 		&ThisClass::ReloadButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ToggleInventory, ETriggerEvent::Triggered, this,
+		&ThisClass::ToggleInventory);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -436,6 +439,36 @@ void ABlasterCharacter::ToggleScoreBoard()
 		if(BlasterHUD)
 		{
 			BlasterHUD->ToggleScoreboard(BlasterHUD->IsScoreboardVisible());
+		}
+	}
+}
+
+void ABlasterCharacter::ToggleInventory()
+{
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(BlasterPC->GetHUD()) : BlasterHUD;
+		if(BlasterHUD)
+		{
+			UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(BlasterPC->GetLocalPlayer());
+			if(BlasterHUD->IsInventoryVisible())
+			{
+				BlasterPC->SetShowMouseCursor(false);
+				if(InputSubsystem)
+				{
+					InputSubsystem->AddMappingContext(DefaultMappingContext, 0.f);
+				}
+			}
+			else
+			{
+				BlasterPC->SetShowMouseCursor(true);
+				if(InputSubsystem)
+				{
+					InputSubsystem->RemoveMappingContext(DefaultMappingContext);
+				}
+			}
+			BlasterHUD->ToggleInventory(BlasterHUD->IsInventoryVisible());
 		}
 	}
 }

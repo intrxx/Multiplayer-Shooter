@@ -10,6 +10,7 @@
 #include "Components/Image.h"
 #include "HUD/BScoreBoard.h"
 #include "Components/Overlay.h"
+#include "HUD/BInventoryWidget.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -69,6 +70,28 @@ void ABPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmo)
 		FString AmmoText = FString::Printf(TEXT("%d"), CarriedAmmo);
 		BlasterHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(AmmoText));
 	}
+}
+
+void ABPlayerController::SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	
+	if(BlasterHUD && BlasterHUD->Inventory)
+	{
+		FString AmmoText = FString::Printf(TEXT("%d"), CarriedAmmo);
+		switch (WeaponType)
+		{
+		case EBWeaponType::EWT_AssaultRifle:
+			if(BlasterHUD->Inventory->RifleWeaponAmmoAmount)
+			{
+				BlasterHUD->Inventory->RifleWeaponAmmoAmount->SetText(FText::FromString(AmmoText));
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
 }
 
 void ABPlayerController::SetHUDWeaponAmmo(int32 Ammo)

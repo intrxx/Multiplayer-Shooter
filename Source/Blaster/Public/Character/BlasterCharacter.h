@@ -81,6 +81,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> InventoryMappingContext;
 
 protected:
 	virtual void BeginPlay() override;
@@ -97,6 +100,7 @@ protected:
 	void ReloadButtonPressed();
 	void ChangeFiringModeButtonPressed();
 	void ToggleScoreBoard();
+	void ToggleInventory();
 
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();

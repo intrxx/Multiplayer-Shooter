@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BlasterHUD.generated.h"
 
+class UBInventoryWidget;
 class UBScoreBoard;
 class UTexture2D;
 class UBCharacterOverlay;
@@ -64,13 +65,16 @@ public:
 	virtual void DrawHUD() override;
 
 	bool IsScoreboardVisible();
+	bool IsInventoryVisible();
 
 	void SetHUDPackage(const FCrosshairInfo& Package){CrosshairInfo = Package;}
 	void ToggleScoreboard(bool bIsVisible);
+	void ToggleInventory(bool bIsVisible);
 
 public:
 	TObjectPtr<UBCharacterOverlay> CharacterOverlay;
 	TObjectPtr<UBScoreBoard> Scoreboard;
+	TObjectPtr<UBInventoryWidget> Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
@@ -78,11 +82,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> ScoreboardClass;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
+	TSubclassOf<UUserWidget> InventoryClass;
+
 protected:
 	virtual void BeginPlay() override;
 	
 	void AddCharacterOverlay();
 	void AddScoreBoard();
+	void AddInventoryWidget();
 	
 private:
 	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
@@ -93,3 +101,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CrosshairSpreadMax = 16.f;
 };
+

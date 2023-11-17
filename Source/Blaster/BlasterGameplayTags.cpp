@@ -24,6 +24,7 @@ void FBlasterGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Input_Reload, "Input.Reload", "Tag used for reload input");
 	AddTag(Input_ChangeFiringType, "Input.ChangeFiringType", "Tag used for change firing type input");
 	AddTag(Input_ToggleScoreboard, "Input.ToggleScoreboard", "Tag used for toggling ScoreBoard input");
+	AddTag(Input_ToggleInventory, "Input.ToggleInventory", "Tag used for toggling inventory input");
 }
 
 void FBlasterGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

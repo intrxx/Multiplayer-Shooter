@@ -23,6 +23,7 @@ public:
 	FGameplayTag Input_Reload;
 	FGameplayTag Input_ChangeFiringType;
 	FGameplayTag Input_ToggleScoreboard;
+	FGameplayTag Input_ToggleInventory;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);

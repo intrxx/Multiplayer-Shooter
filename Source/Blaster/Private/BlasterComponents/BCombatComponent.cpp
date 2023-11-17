@@ -256,6 +256,7 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	if(BlasterPC)
 	{
 		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+		BlasterPC->SetHUDInventoryCarriedAmmo(EquippedWeapon->GetWeaponType(), CarriedAmmo);
 		BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
 	}
 
@@ -358,6 +359,7 @@ void UBCombatComponent::UpdateAmmoValues()
 	if(BlasterPC)
 	{
 		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+		BlasterPC->SetHUDInventoryCarriedAmmo(EquippedWeapon->GetWeaponType(), CarriedAmmo);
 	}
 	
 	EquippedWeapon->AddAmmo(AmmoReloadAmount);
@@ -490,6 +492,10 @@ void UBCombatComponent::OnRep_CarriedAmmo()
 	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
 	if(BlasterPC)
 	{
+		if(EquippedWeapon)
+		{
+			BlasterPC->SetHUDInventoryCarriedAmmo(EquippedWeapon->GetWeaponType(), CarriedAmmo);
+		}
 		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 }

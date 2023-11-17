@@ -48,6 +48,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDCarriedAmmo(int32 CarriedAmmo);
+	void SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo);
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	void SetHUDWeaponTypeText(EBWeaponType WeaponType);

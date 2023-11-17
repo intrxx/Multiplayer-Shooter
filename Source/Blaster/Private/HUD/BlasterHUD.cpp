@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BScoreBoard.h"
+#include "HUD/BInventoryWidget.h"
 
 void ABlasterHUD::BeginPlay()
 {
@@ -13,6 +14,7 @@ void ABlasterHUD::BeginPlay()
 	
 	AddCharacterOverlay();
 	AddScoreBoard();
+	AddInventoryWidget();
 }
 
 void ABlasterHUD::AddCharacterOverlay()
@@ -36,6 +38,17 @@ void ABlasterHUD::AddScoreBoard()
 	}
 }
 
+void ABlasterHUD::AddInventoryWidget()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if(PC && InventoryClass)
+	{
+		Inventory = CreateWidget<UBInventoryWidget>(PC, InventoryClass);
+		Inventory->AddToViewport();
+		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
 void ABlasterHUD::ToggleScoreboard(bool bIsVisible)
 {
 	if(Scoreboard == nullptr)
@@ -55,11 +68,39 @@ void ABlasterHUD::ToggleScoreboard(bool bIsVisible)
 	}
 }
 
+void ABlasterHUD::ToggleInventory(bool bIsVisible)
+{
+	if(Inventory == nullptr)
+	{
+		return;
+	}
+
+	if(bIsVisible)
+	{
+		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+		Inventory->bIsVisible = false;
+	}
+	else
+	{
+		Inventory->SetVisibility(ESlateVisibility::Visible);
+		Inventory->bIsVisible = true;
+	}
+}
+
 bool ABlasterHUD::IsScoreboardVisible()
 {
 	if(Scoreboard)
 	{
 		return Scoreboard->bIsVisible;
+	}
+	return false;
+}
+
+bool ABlasterHUD::IsInventoryVisible()
+{
+	if(Inventory)
+	{
+		return Inventory->bIsVisible;
 	}
 	return false;
 }
