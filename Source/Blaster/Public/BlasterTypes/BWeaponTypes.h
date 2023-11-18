@@ -9,3 +9,5 @@ enum class EBWeaponType : uint8
 	
 	EWT_MAX UMETA(DisplayName = "Default MAX")
 };
+
+

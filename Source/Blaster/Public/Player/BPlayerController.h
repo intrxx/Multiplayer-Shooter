@@ -46,12 +46,15 @@ class BLASTER_API ABPlayerController : public APlayerController
 	
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void Tick(float DeltaSeconds) override;
+	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDCarriedAmmo(int32 CarriedAmmo);
 	void SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo);
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	void SetHUDWeaponTypeText(EBWeaponType WeaponType);
+	void SetHUDGameTimer(float Time);
 	
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	
@@ -75,8 +78,12 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerStats)
 	TArray<FPlayerStats> LocalPlayerStats;
 
+	void SetHUDGameTime();
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
+
+	float MatchTimer = 120.f;
+	uint32 CountDown = 0;
 };
 
