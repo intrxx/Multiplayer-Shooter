@@ -47,6 +47,10 @@ class BLASTER_API ABPlayerController : public APlayerController
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void ReceivedPlayer() override;
+
+	// Synced with server World clock
+	virtual float GetServerTimeSeconds();
 	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDCarriedAmmo(int32 CarriedAmmo);
@@ -73,12 +77,34 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
+	void SetHUDGameTime();
+
+	/**
+	 *	Sync time between client and server
+	 */
+
+	// Requests the current server time passing in the client time when the request was sent
+	UFUNCTION(Server, Reliable)
+	void ServerRequestServerTime(float TimeOfClientRequest);
+
+	// Reporst current server time to the client in response to ServerRequestServerTime
+	UFUNCTION(Client, Reliable)
+	void ClientReportServerTime(float TimeOfClientRequest, float TimerServerReceivedClientRequest);
+
+	void CheckTimeSync(float DeltaTime);
 
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerStats)
 	TArray<FPlayerStats> LocalPlayerStats;
 
-	void SetHUDGameTime();
+	// Difference between client and server time
+	float ClientServerDelta = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Time")
+	float TimeSyncFrequency = 5.f;
+
+	float TimeSyncRunningTime = 0.f;
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;

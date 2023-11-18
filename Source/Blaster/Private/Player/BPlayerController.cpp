@@ -26,6 +26,18 @@ void ABPlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	SetHUDGameTime();
+	CheckTimeSync(DeltaSeconds);
+}
+
+void ABPlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+
+	// Sync with server clock as soon as possible
+	if(IsLocalController())
+	{
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+	}
 }
 
 void ABPlayerController::OnPossess(APawn* InPawn)
@@ -37,6 +49,22 @@ void ABPlayerController::OnPossess(APawn* InPawn)
 	{
 		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
 	}
+}
+
+void ABPlayerController::ServerRequestServerTime_Implementation(float TimeOfClientRequest)
+{
+	float ServerTimeOfReceipt = GetWorld()->GetTimeSeconds();
+	ClientReportServerTime(TimeOfClientRequest, ServerTimeOfReceipt);
+}
+
+void ABPlayerController::ClientReportServerTime_Implementation(float TimeOfClientRequest,
+	float TimerServerReceivedClientRequest)
+{
+	// Time from sending the request to server and receiving the answer from server
+	float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
+	float CurrentServerTime = TimerServerReceivedClientRequest + (0.5f * RoundTripTime);
+
+	ClientServerDelta = CurrentServerTime - GetWorld()->GetTimeSeconds();
 }
 
 void ABPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -185,6 +213,15 @@ void ABPlayerController::SetHUDGameTimer(float Time)
 	}
 }
 
+float ABPlayerController::GetServerTimeSeconds()
+{
+	if(HasAuthority())
+	{
+		return GetWorld()->GetTimeSeconds();
+	}
+	return GetWorld()->GetTimeSeconds() + ClientServerDelta;
+}
+
 void ABPlayerController::ClientSetHUDDeathScreen_Implementation(const FString& KillerName)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
@@ -236,13 +273,23 @@ void ABPlayerController::SetHUDScore(float Score)
 
 void ABPlayerController::SetHUDGameTime()
 {
-	uint32 SecondLeft = FMath::CeilToInt(MatchTimer - GetWorld()->GetTimeSeconds());
+	uint32 SecondLeft = FMath::CeilToInt(MatchTimer - GetServerTimeSeconds());
 
 	if(CountDown != SecondLeft)
 	{
-		SetHUDGameTimer(MatchTimer - GetWorld()->GetTimeSeconds());
+		SetHUDGameTimer(MatchTimer - GetServerTimeSeconds());
 	}
 	CountDown = SecondLeft;
+}
+
+void ABPlayerController::CheckTimeSync(float DeltaTime)
+{
+	TimeSyncRunningTime += DeltaTime;
+	if(IsLocalController() && TimeSyncRunningTime > TimeSyncFrequency)
+	{
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+		TimeSyncRunningTime = 0.f;
+	}
 }
 
 void ABPlayerController::ClientSetHUDPlayerStats_Implementation(const TArray<FPlayerStats>& PlayerStats)
