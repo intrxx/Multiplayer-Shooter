@@ -9,6 +9,32 @@
 #include "Game/BlasterGameState.h"
 #include "Player/BPlayerState.h"
 
+ABlasterGameMode::ABlasterGameMode()
+{
+	bDelayedStart = true;
+}
+
+void ABlasterGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LevelStartedTime = GetWorld()->GetTimeSeconds();
+}
+
+void ABlasterGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(MatchState == MatchState::WaitingToStart)
+	{
+		CountdownTime = WarmupTime - GetWorld()->GetTimeSeconds() + LevelStartedTime;
+		if(CountdownTime <= 0.f)
+		{
+			StartMatch();
+		}
+	}
+}
+
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC,
                                         ABPlayerController* AttackerBPC)
 {
