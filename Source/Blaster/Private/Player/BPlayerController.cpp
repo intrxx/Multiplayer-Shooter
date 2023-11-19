@@ -13,6 +13,7 @@
 #include "HUD/BInventoryWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "Game/BlasterGameMode.h"
+#include "HUD/BAnnouncement.h"
 
 
 void ABPlayerController::BeginPlay()
@@ -20,6 +21,10 @@ void ABPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+	if(BlasterHUD)
+	{
+		BlasterHUD->AddAnnouncement();
+	}
 }
 
 void ABPlayerController::Tick(float DeltaSeconds)
@@ -355,24 +360,28 @@ void ABPlayerController::OnMatchStateSet(FName State)
 	MatchState = State;
 	if(MatchState == MatchState::InProgress)
 	{
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if(BlasterHUD)
+		HandleMatchHasStarted();
+	}
+}
+
+void ABPlayerController::HandleMatchHasStarted()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if(BlasterHUD)
+	{
+		BlasterHUD->AddHUD();
+		if(BlasterHUD->Announcement)
 		{
-			BlasterHUD->AddHUD();
+			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
-	
 }
 
 void ABPlayerController::OnRep_MatchState()
 {
 	if(MatchState == MatchState::InProgress)
 	{
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if(BlasterHUD)
-		{
-			BlasterHUD->AddHUD();
-		}
+		HandleMatchHasStarted();
 	}
 }
 

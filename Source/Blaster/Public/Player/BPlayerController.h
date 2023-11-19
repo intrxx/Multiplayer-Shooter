@@ -65,6 +65,7 @@ public:
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	
 	void OnMatchStateSet(FName State);
+	void HandleMatchHasStarted();
 	
 	//void SetHUDScore(float Score);
 	UFUNCTION(Client, Reliable)

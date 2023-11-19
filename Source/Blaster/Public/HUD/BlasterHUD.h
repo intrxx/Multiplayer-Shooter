@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BlasterHUD.generated.h"
 
+class UBAnnouncement;
 class UBInventoryWidget;
 class UBScoreBoard;
 class UTexture2D;
@@ -66,6 +67,7 @@ public:
 
 	/** Adds all the UI to the screen, called from PC */
 	void AddHUD();
+	void AddAnnouncement();
 	
 	bool IsScoreboardVisible();
 	bool IsInventoryVisible();
@@ -81,7 +83,9 @@ public:
 	TObjectPtr<UBScoreBoard> Scoreboard;
 	UPROPERTY()
 	TObjectPtr<UBInventoryWidget> Inventory;
-
+	UPROPERTY()
+	TObjectPtr<UBAnnouncement> Announcement;
+	
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
 	
@@ -91,13 +95,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> InventoryClass;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
+	TSubclassOf<UUserWidget> AnnouncementClass;
+
 protected:
 	virtual void BeginPlay() override;
 
 	void AddCharacterOverlay();
 	void AddScoreBoard();
 	void AddInventoryWidget();
-	
+
 private:
 	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
 	

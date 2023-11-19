@@ -7,6 +7,7 @@
 #include "HUD/BCharacterOverlay.h"
 #include "HUD/BScoreBoard.h"
 #include "HUD/BInventoryWidget.h"
+#include "HUD/BAnnouncement.h"
 
 void ABlasterHUD::BeginPlay()
 {
@@ -43,6 +44,16 @@ void ABlasterHUD::AddInventoryWidget()
 		Inventory = CreateWidget<UBInventoryWidget>(PC, InventoryClass);
 		Inventory->AddToViewport();
 		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void ABlasterHUD::AddAnnouncement()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if(PC && AnnouncementClass)
+	{
+		Announcement = CreateWidget<UBAnnouncement>(PC, AnnouncementClass);
+		Announcement->AddToViewport();
 	}
 }
 
