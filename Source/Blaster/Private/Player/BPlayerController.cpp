@@ -330,7 +330,7 @@ void ABPlayerController::SetHUDGameTime()
 {
 	if(HasAuthority())
 	{
-		ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
 		if(BlasterGameMode)
 		{
 			LevelStartedTime = BlasterGameMode->LevelStartedTime;
@@ -341,7 +341,6 @@ void ABPlayerController::SetHUDGameTime()
 	if(MatchState == MatchState::WaitingToStart)
 	{
 		TimeLeft = WarmupTime - GetServerTimeSeconds() + LevelStartedTime;
-		UE_LOG(LogTemp, Warning, TEXT("Warmup: %f, Server: %f, LS: %f, Wynik: %f"), WarmupTime, GetServerTimeSeconds(), LevelStartedTime, TimeLeft);
 	}
 	else if(MatchState == MatchState::InProgress)
 	{
@@ -382,8 +381,6 @@ void ABPlayerController::ServerCheckMatchState_Implementation()
 		MatchTime = BlasterGameMode->MatchTime;
 		LevelStartedTime = BlasterGameMode->LevelStartedTime;
 		MatchState = BlasterGameMode->GetMatchState();
-		
-		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime);
 
 		if(BlasterHUD && MatchState == MatchState::WaitingToStart)
 		{
@@ -392,6 +389,8 @@ void ABPlayerController::ServerCheckMatchState_Implementation()
 				BlasterHUD->AddAnnouncement();
 			}
 		}
+		
+		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime);
 	}
 }
 

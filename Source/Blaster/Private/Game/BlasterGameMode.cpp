@@ -171,12 +171,7 @@ void ABlasterGameMode::UpdatePlayerList()
 		{
 			if (PC)
 			{
-				//PC->SetPlayerStats(PlayerStats);
 				PC->ClientSetHUDPlayerStats(PlayerStats);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("PC is not valid for some reason"));
 			}
 		}
 	}
