@@ -328,6 +328,15 @@ void ABPlayerController::SetHUDScore(float Score)
 
 void ABPlayerController::SetHUDGameTime()
 {
+	if(HasAuthority())
+	{
+		ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if(BlasterGameMode)
+		{
+			LevelStartedTime = BlasterGameMode->LevelStartedTime;
+		}
+	}
+	
 	float TimeLeft = 0.f;
 	if(MatchState == MatchState::WaitingToStart)
 	{
