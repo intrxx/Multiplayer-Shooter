@@ -12,9 +12,6 @@ void ABlasterHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AddCharacterOverlay();
-	AddScoreBoard();
-	AddInventoryWidget();
 }
 
 void ABlasterHUD::AddCharacterOverlay()
@@ -147,6 +144,13 @@ void ABlasterHUD::DrawHUD()
 			DrawCrosshairElement(CrosshairInfo.CrosshairRight, ViewportCenter, Spread, CrosshairInfo.CrosshairColor);
 		}
 	}
+}
+
+void ABlasterHUD::AddHUD()
+{
+	AddCharacterOverlay();
+	AddScoreBoard();
+	AddInventoryWidget();
 }
 
 void ABlasterHUD::DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor)

@@ -8,6 +8,9 @@
 #include "BPlayerController.generated.h"
 
 
+class UBInventoryWidget;
+class UBScoreBoard;
+class UBCharacterOverlay;
 class ABlasterHUD;
 class UTexture;
 
@@ -49,7 +52,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void ReceivedPlayer() override;
 
-	// Synced with server World clock
+	/** Synced with server World clock */
 	virtual float GetServerTimeSeconds();
 	
 	void SetHUDHealth(float Health, float MaxHealth);
@@ -59,8 +62,9 @@ public:
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	void SetHUDWeaponTypeText(EBWeaponType WeaponType);
 	void SetHUDGameTimer(float Time);
-	
 	void SetDeathScreenVisibility(bool bSetVisibility);
+	
+	void OnMatchStateSet(FName State);
 	
 	//void SetHUDScore(float Score);
 	UFUNCTION(Client, Reliable)
@@ -68,15 +72,21 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
-
-	UFUNCTION()
-	void OnRep_PlayerStats();
 	
-	void SetPlayerStats(TArray<FPlayerStats> Stats) {LocalPlayerStats = Stats;}
+protected:
+	/** Difference between client and server time */
+	float ClientServerDelta = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Time")
+	float TimeSyncFrequency = 5.f;
+
+	float TimeSyncRunningTime = 0.f;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
+
+	void PollInit();
 	
 	void SetHUDGameTime();
 
@@ -84,32 +94,46 @@ protected:
 	 *	Sync time between client and server
 	 */
 
-	// Requests the current server time passing in the client time when the request was sent
+	/** Requests the current server time passing in the client time when the request was sent */
 	UFUNCTION(Server, Reliable)
 	void ServerRequestServerTime(float TimeOfClientRequest);
 
-	// Reporst current server time to the client in response to ServerRequestServerTime
+	/** Reports current server time to the client in response to ServerRequestServerTime */
 	UFUNCTION(Client, Reliable)
 	void ClientReportServerTime(float TimeOfClientRequest, float TimerServerReceivedClientRequest);
 
 	void CheckTimeSync(float DeltaTime);
 
-protected:
-	UPROPERTY(ReplicatedUsing = OnRep_PlayerStats)
-	TArray<FPlayerStats> LocalPlayerStats;
-
-	// Difference between client and server time
-	float ClientServerDelta = 0.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Time")
-	float TimeSyncFrequency = 5.f;
-
-	float TimeSyncRunningTime = 0.f;
+    /**
+	 *	
+	 */
+private:
+	UFUNCTION()
+	void OnRep_MatchState();
+	
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 
 	float MatchTimer = 120.f;
 	uint32 CountDown = 0;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
+	FName MatchState;
+
+	UPROPERTY()
+	UBCharacterOverlay* CharacterOverlay;
+	UPROPERTY()
+	UBScoreBoard* Scoreboard;
+	UPROPERTY()
+	UBInventoryWidget* InventoryWidget;
+
+	bool bInitCharacterOverlay = false;
+	bool bInitScoreboard = false;
+
+	TArray<FPlayerStats> LocalPlayerStats;
+	float HUDHealth;
+	float HUDMaxHealth;
+	
 };
 

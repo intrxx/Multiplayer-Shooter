@@ -23,12 +23,11 @@ public:
 	ABlasterGameMode();
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void OnPostLogin(AController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 	
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC, ABPlayerController* AttackerBPC);
 	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC);
-
-	virtual void OnPostLogin(AController* NewPlayer) override;
-	virtual void Logout(AController* Exiting) override;
 	
 	void UpdatePlayerList();
 
@@ -46,6 +45,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnMatchStateSet() override;
 	
 	void CalculateFurthestSpawnLocation(AActor*& OutSpawnPoint);
 	

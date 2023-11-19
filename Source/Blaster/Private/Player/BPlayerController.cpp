@@ -12,6 +12,7 @@
 #include "Components/Overlay.h"
 #include "HUD/BInventoryWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "Game/BlasterGameMode.h"
 
 
 void ABPlayerController::BeginPlay()
@@ -27,6 +28,7 @@ void ABPlayerController::Tick(float DeltaSeconds)
 
 	SetHUDGameTime();
 	CheckTimeSync(DeltaSeconds);
+	PollInit();
 }
 
 void ABPlayerController::ReceivedPlayer()
@@ -51,6 +53,36 @@ void ABPlayerController::OnPossess(APawn* InPawn)
 	}
 }
 
+void ABPlayerController::PollInit()
+{
+	if(CharacterOverlay == nullptr)
+	{
+		if(BlasterHUD && BlasterHUD->CharacterOverlay)
+		{
+			CharacterOverlay = BlasterHUD->CharacterOverlay;
+			if(CharacterOverlay)
+			{
+				SetHUDHealth(HUDHealth, HUDMaxHealth);
+			}
+		}
+	}
+
+	if(Scoreboard == nullptr)
+	{
+		if(BlasterHUD && BlasterHUD->Scoreboard)
+		{
+			Scoreboard = BlasterHUD->Scoreboard;
+			if(Scoreboard)
+			{
+				for(FPlayerStats Stats : LocalPlayerStats)
+				{
+					BlasterHUD->Scoreboard->UpdatePlayerList(LocalPlayerStats);
+				}
+			}
+		}
+	}
+}
+
 void ABPlayerController::ServerRequestServerTime_Implementation(float TimeOfClientRequest)
 {
 	float ServerTimeOfReceipt = GetWorld()->GetTimeSeconds();
@@ -70,8 +102,8 @@ void ABPlayerController::ClientReportServerTime_Implementation(float TimeOfClien
 void ABPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ABPlayerController, LocalPlayerStats);
+	
+	DOREPLIFETIME(ABPlayerController, MatchState);
 }
 
 void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -89,6 +121,12 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 
 		FString HealthText = FString::Printf(TEXT("%d"), FMath::CeilToInt(Health));
 		BlasterHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
+	}
+	else
+	{
+		bInitCharacterOverlay = true;
+		HUDHealth = Health;
+		HUDMaxHealth = MaxHealth;
 	}
 }
 
@@ -270,7 +308,6 @@ void ABPlayerController::SetHUDScore(float Score)
 }
 */
 
-
 void ABPlayerController::SetHUDGameTime()
 {
 	uint32 SecondLeft = FMath::CeilToInt(MatchTimer - GetServerTimeSeconds());
@@ -301,25 +338,40 @@ void ABPlayerController::ClientSetHUDPlayerStats_Implementation(const TArray<FPl
 	
 	if(bHUDValid)
 	{
-		for(FPlayerStats PStats : PlayerStats)
+		for(FPlayerStats Stats : PlayerStats)
 		{
 			BlasterHUD->Scoreboard->UpdatePlayerList(PlayerStats);
 		}
 	}
+	else
+	{
+		bInitScoreboard = true;
+		LocalPlayerStats = PlayerStats;
+	}
 }
 
-void ABPlayerController::OnRep_PlayerStats()
+void ABPlayerController::OnMatchStateSet(FName State)
 {
-	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-	
-	bool bHUDValid = BlasterHUD &&
-		BlasterHUD->Scoreboard;
-
-	if(bHUDValid)
+	MatchState = State;
+	if(MatchState == MatchState::InProgress)
 	{
-		for(FPlayerStats PStats : LocalPlayerStats)
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if(BlasterHUD)
 		{
-			BlasterHUD->Scoreboard->UpdatePlayerList(LocalPlayerStats);
+			BlasterHUD->AddHUD();
+		}
+	}
+	
+}
+
+void ABPlayerController::OnRep_MatchState()
+{
+	if(MatchState == MatchState::InProgress)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if(BlasterHUD)
+		{
+			BlasterHUD->AddHUD();
 		}
 	}
 }

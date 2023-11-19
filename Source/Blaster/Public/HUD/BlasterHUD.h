@@ -64,6 +64,9 @@ class BLASTER_API ABlasterHUD : public AHUD
 public:
 	virtual void DrawHUD() override;
 
+	/** Adds all the UI to the screen, called from PC */
+	void AddHUD();
+	
 	bool IsScoreboardVisible();
 	bool IsInventoryVisible();
 
@@ -72,8 +75,11 @@ public:
 	void ToggleInventory(bool bIsVisible);
 
 public:
+	UPROPERTY()
 	TObjectPtr<UBCharacterOverlay> CharacterOverlay;
+	UPROPERTY()
 	TObjectPtr<UBScoreBoard> Scoreboard;
+	UPROPERTY()
 	TObjectPtr<UBInventoryWidget> Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
@@ -87,7 +93,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 	void AddCharacterOverlay();
 	void AddScoreBoard();
 	void AddInventoryWidget();
