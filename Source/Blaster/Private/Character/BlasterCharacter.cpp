@@ -95,15 +95,19 @@ void ABlasterCharacter::OnRep_ReplicatedMovement()
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (ABPlayerController* PC = Cast<ABPlayerController>(GetController()))
+
+	const ULocalPlayer* Player = (GEngine && GetWorld()) ? GEngine->GetFirstGamePlayer(GetWorld()) : nullptr;
+	if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Player))
 	{
-		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		if(DefaultMappingContext && InventoryMappingContext)
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 			Subsystem->AddMappingContext(InventoryMappingContext, 1);
 		}
-
+	}
+	
+	if (ABPlayerController* PC = Cast<ABPlayerController>(GetController()))
+	{
 		//TODO Look here in case of some weird Death Screen Behaviour
 		PC->SetDeathScreenVisibility(false);
 	}
