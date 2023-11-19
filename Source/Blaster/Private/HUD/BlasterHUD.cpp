@@ -50,7 +50,7 @@ void ABlasterHUD::AddInventoryWidget()
 void ABlasterHUD::AddAnnouncement()
 {
 	APlayerController* PC = GetOwningPlayerController();
-	if(PC && AnnouncementClass)
+	if(PC && AnnouncementClass && Announcement == nullptr)
 	{
 		Announcement = CreateWidget<UBAnnouncement>(PC, AnnouncementClass);
 		Announcement->AddToViewport();

@@ -61,7 +61,8 @@ public:
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	void SetHUDWeaponTypeText(EBWeaponType WeaponType);
-	void SetHUDGameTimer(float Time);
+	void SetHUDGameTimer(float CountdownTime);
+	void SetHUDAnnouncementTimer(float CountdownTime);
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	
 	void OnMatchStateSet(FName State);
@@ -108,6 +109,13 @@ protected:
     /**
 	 *	
 	 */
+
+	UFUNCTION(Server, Reliable)
+	void ServerCheckMatchState();
+
+	UFUNCTION(Client, Reliable)
+	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float Match, float LevelStartingTime);
+	
 private:
 	UFUNCTION()
 	void OnRep_MatchState();
@@ -116,7 +124,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 
-	float MatchTimer = 120.f;
+	float LevelStartedTime = 0.f;
+	float MatchTime = 0.f;
+	float WarmupTime = 0.f;
 	uint32 CountDown = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)

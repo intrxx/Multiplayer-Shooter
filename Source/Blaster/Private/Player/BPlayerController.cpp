@@ -14,17 +14,15 @@
 #include "Net/UnrealNetwork.h"
 #include "Game/BlasterGameMode.h"
 #include "HUD/BAnnouncement.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void ABPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
-	if(BlasterHUD)
-	{
-		BlasterHUD->AddAnnouncement();
-	}
+	ServerCheckMatchState();
 }
 
 void ABPlayerController::Tick(float DeltaSeconds)
@@ -239,7 +237,7 @@ void ABPlayerController::SetHUDWeaponTypeText(EBWeaponType WeaponType)
 	}
 }
 
-void ABPlayerController::SetHUDGameTimer(float Time)
+void ABPlayerController::SetHUDGameTimer(float CountdownTime)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
@@ -248,11 +246,26 @@ void ABPlayerController::SetHUDGameTimer(float Time)
 		BlasterHUD->CharacterOverlay->GameTimerText;
 	if(bHUDValid)
 	{
-		int32 Minutes = FMath::FloorToInt(Time / 60.f);
-		int32 Seconds = Time - Minutes * 60;
+		int32 Minutes = FMath::FloorToInt(CountdownTime / 60.f);
+		int32 Seconds = CountdownTime - Minutes * 60;
 		
 		FString CountdownText = FString::Printf(TEXT("%02d : %02d"), Minutes, Seconds); 
 		BlasterHUD->CharacterOverlay->GameTimerText->SetText(FText::FromString(CountdownText));
+	}
+}
+
+void ABPlayerController::SetHUDAnnouncementTimer(float CountdownTime)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->Announcement &&
+		BlasterHUD->Announcement->WarmupTime;
+	if(bHUDValid)
+	{
+		int32 Seconds = FMath::FloorToInt(CountdownTime);
+		FString CountdownText = FString::Printf(TEXT("%02d"), Seconds); 
+		BlasterHUD->Announcement->WarmupTime->SetText(FText::FromString(CountdownText));
 	}
 }
 
@@ -315,11 +328,28 @@ void ABPlayerController::SetHUDScore(float Score)
 
 void ABPlayerController::SetHUDGameTime()
 {
-	uint32 SecondLeft = FMath::CeilToInt(MatchTimer - GetServerTimeSeconds());
+	float TimeLeft = 0.f;
+	if(MatchState == MatchState::WaitingToStart)
+	{
+		TimeLeft = WarmupTime - GetServerTimeSeconds() + LevelStartedTime;
+		UE_LOG(LogTemp, Warning, TEXT("Warmup: %f, Server: %f, LS: %f, Wynik: %f"), WarmupTime, GetServerTimeSeconds(), LevelStartedTime, TimeLeft);
+	}
+	else if(MatchState == MatchState::InProgress)
+	{
+		TimeLeft = WarmupTime + MatchTime - GetServerTimeSeconds() + LevelStartedTime;
+	}
+	uint32 SecondLeft = FMath::CeilToInt(TimeLeft);
 
 	if(CountDown != SecondLeft)
 	{
-		SetHUDGameTimer(MatchTimer - GetServerTimeSeconds());
+		if(MatchState == MatchState::WaitingToStart)
+		{
+			SetHUDAnnouncementTimer(SecondLeft);
+		}
+		else if(MatchState == MatchState::InProgress)
+		{
+			SetHUDGameTimer(SecondLeft);
+		}
 	}
 	CountDown = SecondLeft;
 }
@@ -331,6 +361,48 @@ void ABPlayerController::CheckTimeSync(float DeltaTime)
 	{
 		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
 		TimeSyncRunningTime = 0.f;
+	}
+}
+
+void ABPlayerController::ServerCheckMatchState_Implementation()
+{
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(BlasterGameMode)
+	{
+		WarmupTime = BlasterGameMode->WarmupTime;
+		MatchTime = BlasterGameMode->MatchTime;
+		LevelStartedTime = BlasterGameMode->LevelStartedTime;
+		MatchState = BlasterGameMode->GetMatchState();
+		
+		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime);
+
+		if(BlasterHUD && MatchState == MatchState::WaitingToStart)
+		{
+			if(BlasterHUD)
+			{
+				BlasterHUD->AddAnnouncement();
+			}
+		}
+	}
+}
+
+void ABPlayerController::ClientJoinMidGame_Implementation(FName StateOfMatch, float Warmup, float Match,
+	float LevelStartingTime)
+{
+	WarmupTime = Warmup;
+	MatchTime = Match;
+	LevelStartedTime = LevelStartingTime;
+	MatchState = StateOfMatch;
+
+	// In case this happens after variable replication already happened so the proper values are used
+	OnMatchStateSet(MatchState);
+
+	if(BlasterHUD && MatchState == MatchState::WaitingToStart)
+	{
+		if(BlasterHUD)
+		{
+			BlasterHUD->AddAnnouncement();
+		}
 	}
 }
 

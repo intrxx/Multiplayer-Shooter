@@ -39,7 +39,10 @@ public:
 	TArray<FPlayerStats> PlayerStats;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Time")
-	float WarmupTime = 15.f;
+	float MatchTime = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Time")
+	float WarmupTime = 10.f;
 
 	float LevelStartedTime = 0.f;
 	
