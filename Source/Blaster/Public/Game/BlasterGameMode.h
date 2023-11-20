@@ -32,6 +32,8 @@ public:
 	
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC, ABPlayerController* AttackerBPC);
 	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC);
+
+	float GetCountdownTime() const {return CountdownTime;}
 	
 	void UpdatePlayerList();
 

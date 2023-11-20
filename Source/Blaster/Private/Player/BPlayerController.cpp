@@ -30,7 +30,7 @@ void ABPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	SetHUDGameTime();
+	SetGameTime();
 	CheckTimeSync(DeltaSeconds);
 	PollInit();
 }
@@ -247,6 +247,11 @@ void ABPlayerController::SetHUDGameTimer(float CountdownTime)
 		BlasterHUD->CharacterOverlay->GameTimerText;
 	if(bHUDValid)
 	{
+		if(CountdownTime <  0.f)
+		{
+			BlasterHUD->CharacterOverlay->GameTimerText->SetText(FText::FromString(""));
+			return;
+		}
 		int32 Minutes = FMath::FloorToInt(CountdownTime / 60.f);
 		int32 Seconds = CountdownTime - Minutes * 60;
 		
@@ -259,11 +264,17 @@ void ABPlayerController::SetHUDAnnouncementTimer(float CountdownTime)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
+	UE_LOG(LogTemp, Warning, TEXT("cd, %f"), CountdownTime);
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Announcement &&
 		BlasterHUD->Announcement->WarmupTime;
 	if(bHUDValid)
 	{
+		if(CountdownTime <  0.f)
+		{
+			BlasterHUD->Announcement->WarmupTime->SetText(FText::FromString(""));
+			return;
+		}
 		int32 Seconds = FMath::FloorToInt(CountdownTime);
 		FString CountdownText = FString::Printf(TEXT("%02d"), Seconds); 
 		BlasterHUD->Announcement->WarmupTime->SetText(FText::FromString(CountdownText));
@@ -327,17 +338,8 @@ void ABPlayerController::SetHUDScore(float Score)
 }
 */
 
-void ABPlayerController::SetHUDGameTime()
+void ABPlayerController::SetGameTime()
 {
-	if(HasAuthority())
-	{
-		ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
-		if(BlasterGameMode)
-		{
-			LevelStartedTime = BlasterGameMode->LevelStartedTime;
-		}
-	}
-	
 	float TimeLeft = 0.f;
 	if(MatchState == MatchState::WaitingToStart)
 	{
@@ -347,11 +349,25 @@ void ABPlayerController::SetHUDGameTime()
 	{
 		TimeLeft = WarmupTime + MatchTime - GetServerTimeSeconds() + LevelStartedTime;
 	}
-	uint32 SecondLeft = FMath::CeilToInt(TimeLeft);
+	else if (MatchState == MatchState::Cooldown)
+	{
+		TimeLeft = CooldownTime + WarmupTime + MatchTime - GetServerTimeSeconds() + LevelStartedTime;
+	}
+	//uint32 SecondLeft = FMath::CeilToInt(TimeLeft);
+	int32 SecondLeft = FMath::CeilToInt(TimeLeft);
+	
+	if(HasAuthority())
+	{
+		BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
+		if(BlasterGameMode)
+		{
+			SecondLeft = FMath::CeilToInt(BlasterGameMode->GetCountdownTime()) + LevelStartedTime;
+		}
+	}
 
 	if(CountDown != SecondLeft)
 	{
-		if(MatchState == MatchState::WaitingToStart)
+		if(MatchState == MatchState::WaitingToStart || MatchState == MatchState::Cooldown)
 		{
 			SetHUDAnnouncementTimer(SecondLeft);
 		}
@@ -375,12 +391,13 @@ void ABPlayerController::CheckTimeSync(float DeltaTime)
 
 void ABPlayerController::ServerCheckMatchState_Implementation()
 {
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
 	if(BlasterGameMode)
 	{
 		WarmupTime = BlasterGameMode->WarmupTime;
 		MatchTime = BlasterGameMode->MatchTime;
 		LevelStartedTime = BlasterGameMode->LevelStartedTime;
+		CooldownTime = BlasterGameMode->CooldownTime;
 		MatchState = BlasterGameMode->GetMatchState();
 
 		if(BlasterHUD && MatchState == MatchState::WaitingToStart)
@@ -391,17 +408,18 @@ void ABPlayerController::ServerCheckMatchState_Implementation()
 			}
 		}
 		
-		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime);
+		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime, CooldownTime);
 	}
 }
 
 void ABPlayerController::ClientJoinMidGame_Implementation(FName StateOfMatch, float Warmup, float Match,
-	float LevelStartingTime)
+	float LevelStartingTime, float Cooldown)
 {
 	WarmupTime = Warmup;
 	MatchTime = Match;
 	LevelStartedTime = LevelStartingTime;
 	MatchState = StateOfMatch;
+	CooldownTime = Cooldown;
 
 	// In case this happens after variable replication already happened so the proper values are used
 	OnMatchStateSet(MatchState);
@@ -468,9 +486,10 @@ void ABPlayerController::HandleCooldown()
 	if(BlasterHUD)
 	{
 		BlasterHUD->RemoveHUD();
-		if(BlasterHUD->Announcement)
+		if(BlasterHUD->Announcement && BlasterHUD->Announcement->NewGameText)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
+			BlasterHUD->Announcement->NewGameText->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 

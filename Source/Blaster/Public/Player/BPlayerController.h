@@ -8,6 +8,7 @@
 #include "BPlayerController.generated.h"
 
 
+class ABlasterGameMode;
 class UBInventoryWidget;
 class UBScoreBoard;
 class UBCharacterOverlay;
@@ -91,7 +92,7 @@ protected:
 
 	void PollInit();
 	
-	void SetHUDGameTime();
+	void SetGameTime();
 
 	/**
 	 *	Sync time between client and server
@@ -115,7 +116,7 @@ protected:
 	void ServerCheckMatchState();
 
 	UFUNCTION(Client, Reliable)
-	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float Match, float LevelStartingTime);
+	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float Match, float LevelStartingTime, float Cooldown);
 	
 private:
 	UFUNCTION()
@@ -124,10 +125,13 @@ private:
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterHUD> BlasterHUD;
+	UPROPERTY()
+	TObjectPtr<ABlasterGameMode> BlasterGameMode;
 
 	float LevelStartedTime = 0.f;
 	float MatchTime = 0.f;
 	float WarmupTime = 0.f;
+	float CooldownTime = 0.f;
 	uint32 CountDown = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)

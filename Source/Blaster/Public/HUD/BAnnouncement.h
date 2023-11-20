@@ -19,4 +19,11 @@ class BLASTER_API UBAnnouncement : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> WarmupTime;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> InfoText;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> NewGameText;
+	
 };
