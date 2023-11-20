@@ -57,6 +57,7 @@ public:
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	FVector GetHitTarget() const;
+	TArray<UInputMappingContext*> GetMappingContexts() const {return MappingContexts;};
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
 
@@ -76,6 +77,8 @@ public:
 	virtual void Destroyed() override;
 
 protected:
+	TArray<UInputMappingContext*> MappingContexts;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UBInputConfig> InputConfig;
 	

@@ -102,7 +102,10 @@ void ABlasterCharacter::BeginPlay()
 		if(DefaultMappingContext && InventoryMappingContext)
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			MappingContexts.Add(DefaultMappingContext);
+			
 			Subsystem->AddMappingContext(InventoryMappingContext, 1);
+			MappingContexts.Add(InventoryMappingContext);
 		}
 	}
 	

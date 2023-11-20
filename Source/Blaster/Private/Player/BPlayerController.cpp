@@ -9,6 +9,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Components/Image.h"
 #include "HUD/BScoreBoard.h"
+#include "EnhancedInputSubsystems.h"
 #include "Components/Overlay.h"
 #include "HUD/BInventoryWidget.h"
 #include "Net/UnrealNetwork.h"
@@ -473,7 +474,21 @@ void ABPlayerController::HandleCooldown()
 		}
 	}
 
-	//TODO Remove all input mappings
+	if(GEngine)
+	{
+		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GEngine->GetFirstGamePlayer(GetWorld()));
+		if(InputSubsystem)
+		{
+			if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetCharacter()))
+			{
+				TArray<UInputMappingContext*> MappingContexts = BlasterCharacter->GetMappingContexts();
+				for(const UInputMappingContext* Context : MappingContexts)
+				{
+					InputSubsystem->RemoveMappingContext(Context);
+				}
+			}
+		}
+	}
 }
 
 void ABPlayerController::OnRep_MatchState()
