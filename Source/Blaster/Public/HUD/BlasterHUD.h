@@ -67,6 +67,7 @@ public:
 
 	/** Adds all the UI to the screen, called from PC */
 	void AddHUD();
+	void RemoveHUD();
 	void AddAnnouncement();
 	
 	bool IsScoreboardVisible();

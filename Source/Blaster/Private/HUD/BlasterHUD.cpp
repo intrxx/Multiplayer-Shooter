@@ -164,6 +164,22 @@ void ABlasterHUD::AddHUD()
 	AddInventoryWidget();
 }
 
+void ABlasterHUD::RemoveHUD()
+{
+	if(CharacterOverlay)
+	{
+		CharacterOverlay->RemoveFromParent();
+	}
+	if(Scoreboard)
+	{
+		Scoreboard->RemoveFromParent();
+	}
+	if(Inventory)
+	{
+		Inventory->RemoveFromParent();
+	}
+}
+
 void ABlasterHUD::DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor)
 {
 	const float TextureWidth = Texture->GetSizeX();

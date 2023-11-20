@@ -11,6 +11,10 @@ class ABlasterCharacter;
 class ABPlayerController;
 struct FPlayerStats;
 
+namespace MatchState
+{
+	extern BLASTER_API const FName Cooldown; // Match technically ended, time for displaying information about the played match and begin cooldown timer
+}
 /**
  * 
  */
@@ -43,6 +47,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Time")
 	float WarmupTime = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Time")
+	float CooldownTime = 10.f;
 
 	float LevelStartedTime = 0.f;
 	

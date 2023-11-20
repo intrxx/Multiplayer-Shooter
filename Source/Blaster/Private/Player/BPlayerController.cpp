@@ -442,6 +442,10 @@ void ABPlayerController::OnMatchStateSet(FName State)
 	{
 		HandleMatchHasStarted();
 	}
+	else if(MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
 
 void ABPlayerController::HandleMatchHasStarted()
@@ -457,11 +461,30 @@ void ABPlayerController::HandleMatchHasStarted()
 	}
 }
 
+void ABPlayerController::HandleCooldown()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if(BlasterHUD)
+	{
+		BlasterHUD->RemoveHUD();
+		if(BlasterHUD->Announcement)
+		{
+			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	//TODO Remove all input mappings
+}
+
 void ABPlayerController::OnRep_MatchState()
 {
 	if(MatchState == MatchState::InProgress)
 	{
 		HandleMatchHasStarted();
+	}
+	else if(MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
 	}
 }
 

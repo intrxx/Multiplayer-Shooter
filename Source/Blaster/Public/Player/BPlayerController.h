@@ -67,6 +67,7 @@ public:
 	
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
+	void HandleCooldown();
 	
 	//void SetHUDScore(float Score);
 	UFUNCTION(Client, Reliable)
