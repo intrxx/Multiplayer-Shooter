@@ -17,6 +17,8 @@
 #include "HUD/BAnnouncement.h"
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BCombatComponent.h"
+#include "Game/BlasterGameState.h"
+#include "Player/BPlayerState.h"
 
 void ABPlayerController::BeginPlay()
 {
@@ -485,10 +487,43 @@ void ABPlayerController::HandleCooldown()
 	if(BlasterHUD)
 	{
 		BlasterHUD->RemoveHUD(true, false, true);
-		if(BlasterHUD->Announcement && BlasterHUD->Announcement->NewGameText)
+		if(BlasterHUD->Announcement && BlasterHUD->Announcement->NewGameText &&  BlasterHUD->Announcement->InfoText)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			BlasterHUD->Announcement->NewGameText->SetVisibility(ESlateVisibility::Visible);
+
+			ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(GetWorld()));
+			ABPlayerState* PS = GetPlayerState<ABPlayerState>();
+			if(BlasterGameState && PS)
+			{
+				TArray<ABPlayerState*> TopPlayers = BlasterGameState->TopScoringPlayers;
+				FString WinnerInfo;
+				
+				if(TopPlayers.IsEmpty())
+				{
+					WinnerInfo = FString("Not a soul was killed, how disappointing");
+				}
+				else if(TopPlayers.Num() == 1 && TopPlayers[0] == PS)
+				{
+					WinnerInfo = FString("You are the winner, good job soldier");
+				}
+				else if(TopPlayers.Num() == 1)
+				{
+					WinnerInfo = FString::Printf(TEXT("Winner is: \n%s \n shame on the others"),
+						*TopPlayers[0]->GetPlayerName());
+				}
+				else if(TopPlayers.Num() > 1)
+				{
+					WinnerInfo = FString("Players equally cool: \n");
+					for(auto TiedPlayer : TopPlayers)
+					{
+						WinnerInfo.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+					}
+				}
+				
+				BlasterHUD->Announcement->InfoText->SetVisibility(ESlateVisibility::Visible);
+				BlasterHUD->Announcement->InfoText->SetText(FText::FromString(WinnerInfo));
+			}
 		}
 	}
 

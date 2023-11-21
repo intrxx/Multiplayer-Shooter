@@ -26,6 +26,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/BPlayerState.h"
 #include "BlasterTypes/BWeaponTypes.h"
+#include "Game/BlasterGameState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -541,7 +542,10 @@ void ABlasterCharacter::Destroyed()
 		DeathBotEffectComp->DestroyComponent();
 	}
 
-	if(CombatComp && CombatComp->EquippedWeapon)
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	bool bMatchNotInProgress = BlasterGameMode && BlasterGameMode->GetMatchState() != MatchState::InProgress;
+	
+	if(CombatComp && CombatComp->EquippedWeapon && bMatchNotInProgress)
 	{
 		CombatComp->EquippedWeapon->Destroy();
 	}
@@ -704,7 +708,12 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 			}
 		}
 	}
-
+	
+	if(CombatComp)
+	{
+		CombatComp->FireButtonPressed(false);
+	}
+	
 	bDisableGameplay = true;
 	bDead = true;
 	PlayDeathMontage(IsAiming());

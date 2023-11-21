@@ -6,7 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "BlasterGameState.generated.h"
 
-struct FPlayerStats;
+class ABPlayerState;
 /**
  * 
  */
@@ -14,5 +14,15 @@ UCLASS()
 class BLASTER_API ABlasterGameState : public AGameState
 {
 	GENERATED_BODY()
+
+public:
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void UpdateTopScore(ABPlayerState* ScoringPlayer);
 	
+public:
+	UPROPERTY(Replicated)
+	TArray<TObjectPtr<ABPlayerState>> TopScoringPlayers;
+
+private:
+	float TopScore = 0.f;
 };
