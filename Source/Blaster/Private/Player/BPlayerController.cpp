@@ -16,7 +16,7 @@
 #include "Game/BlasterGameMode.h"
 #include "HUD/BAnnouncement.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "BlasterComponents/BCombatComponent.h"
 
 void ABPlayerController::BeginPlay()
 {
@@ -263,8 +263,7 @@ void ABPlayerController::SetHUDGameTimer(float CountdownTime)
 void ABPlayerController::SetHUDAnnouncementTimer(float CountdownTime)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-
-	UE_LOG(LogTemp, Warning, TEXT("cd, %f"), CountdownTime);
+	
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Announcement &&
 		BlasterHUD->Announcement->WarmupTime;
@@ -485,7 +484,7 @@ void ABPlayerController::HandleCooldown()
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 	if(BlasterHUD)
 	{
-		BlasterHUD->RemoveHUD();
+		BlasterHUD->RemoveHUD(true, false, true);
 		if(BlasterHUD->Announcement && BlasterHUD->Announcement->NewGameText)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
@@ -500,10 +499,16 @@ void ABPlayerController::HandleCooldown()
 		{
 			if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetCharacter()))
 			{
-				TArray<UInputMappingContext*> MappingContexts = BlasterCharacter->GetMappingContexts();
+				TArray<UInputMappingContext*> MappingContexts = BlasterCharacter->GetGameplayMappingContexts();
 				for(const UInputMappingContext* Context : MappingContexts)
 				{
 					InputSubsystem->RemoveMappingContext(Context);
+				}
+
+				if(BlasterCharacter->GetCombatComp())
+				{
+					BlasterCharacter->GetCombatComp()->FireButtonPressed(false);
+					BlasterCharacter->bDisableGameplay = true;
 				}
 			}
 		}

@@ -164,17 +164,17 @@ void ABlasterHUD::AddHUD()
 	AddInventoryWidget();
 }
 
-void ABlasterHUD::RemoveHUD()
+void ABlasterHUD::RemoveHUD(bool bRemoveOverlay, bool bRemoveScoreboard, bool bRemoveInventory)
 {
-	if(CharacterOverlay)
+	if(CharacterOverlay && bRemoveOverlay)
 	{
 		CharacterOverlay->RemoveFromParent();
 	}
-	if(Scoreboard)
+	if(Scoreboard && bRemoveScoreboard)
 	{
 		Scoreboard->RemoveFromParent();
 	}
-	if(Inventory)
+	if(Inventory && bRemoveInventory)
 	{
 		Inventory->RemoveFromParent();
 	}

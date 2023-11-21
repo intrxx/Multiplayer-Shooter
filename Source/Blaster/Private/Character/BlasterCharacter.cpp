@@ -73,6 +73,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ABlasterCharacter, Health);
 	DOREPLIFETIME(ABlasterCharacter, DeathBotSpawnZOffset);
+	DOREPLIFETIME(ABlasterCharacter, bDisableGameplay);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -99,13 +100,15 @@ void ABlasterCharacter::BeginPlay()
 	const ULocalPlayer* Player = (GEngine && GetWorld()) ? GEngine->GetFirstGamePlayer(GetWorld()) : nullptr;
 	if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Player))
 	{
-		if(DefaultMappingContext && InventoryMappingContext)
+		if(DefaultMappingContext && InventoryMappingContext && CooldownStateMappingContext)
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			MappingContexts.Add(DefaultMappingContext);
+			GameplayMappingContexts.Add(DefaultMappingContext);
 			
 			Subsystem->AddMappingContext(InventoryMappingContext, 1);
-			MappingContexts.Add(InventoryMappingContext);
+			GameplayMappingContexts.Add(InventoryMappingContext);
+
+			Subsystem->AddMappingContext(CooldownStateMappingContext, 2);
 		}
 	}
 	
@@ -127,6 +130,21 @@ void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	RotateInPlace(DeltaTime);
+	
+	HideCharacterIfCameraClose();
+	PollInit(); 
+}
+
+void ABlasterCharacter::RotateInPlace(float DeltaTime)
+{
+	if(bDisableGameplay)
+	{
+		bUseControllerRotationYaw = false;
+		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+		return;
+	}
+	
 	if(GetLocalRole() > ROLE_SimulatedProxy && IsLocallyControlled())
 	{
 		AimOffset(DeltaTime);
@@ -140,9 +158,6 @@ void ABlasterCharacter::Tick(float DeltaTime)
 		}
 		CalculateAO_Pitch();
 	}
-	
-	HideCharacterIfCameraClose();
-	PollInit();
 }
 
 void ABlasterCharacter::PollInit()
@@ -525,6 +540,11 @@ void ABlasterCharacter::Destroyed()
 	{
 		DeathBotEffectComp->DestroyComponent();
 	}
+
+	if(CombatComp && CombatComp->EquippedWeapon)
+	{
+		CombatComp->EquippedWeapon->Destroy();
+	}
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(ABWeapon* Weapon)
@@ -627,7 +647,7 @@ void ABlasterCharacter::PlayHitReactMontage()
 }
 
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-	AController* InstigatorController, AActor* DamageCauser)
+                                      AController* InstigatorController, AActor* DamageCauser)
 {
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	
@@ -674,8 +694,18 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	if(BlasterPC)
 	{
 		BlasterPC->SetHUDWeaponAmmo(0);
+		
+		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(BlasterPC->GetLocalPlayer()))
+		{
+			if(DefaultMappingContext && InventoryMappingContext)
+			{
+				Subsystem->RemoveMappingContext(DefaultMappingContext);
+				Subsystem->RemoveMappingContext(InventoryMappingContext);
+			}
+		}
 	}
-	
+
+	bDisableGameplay = true;
 	bDead = true;
 	PlayDeathMontage(IsAiming());
 
@@ -686,11 +716,7 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	// Disable Character Movement
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->StopMovementImmediately();
-	if(BlasterPC)
-	{
-		DisableInput(BlasterPC);
-	}
-
+	
 	// Disable Collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

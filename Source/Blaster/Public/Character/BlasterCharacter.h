@@ -56,11 +56,13 @@ public:
 	EBCombatState GetCombatState() const;
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
+	UBCombatComponent* GetCombatComp() const {return CombatComp;}
 	FVector GetHitTarget() const;
-	TArray<UInputMappingContext*> GetMappingContexts() const {return MappingContexts;};
+	TArray<UInputMappingContext*> GetGameplayMappingContexts() const {return GameplayMappingContexts;};
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
-
+	bool GetDisableGameplay() const {return bDisableGameplay;}
+	
 	/**
 	 * Attributes Getters
 	 */
@@ -76,8 +78,12 @@ public:
 
 	virtual void Destroyed() override;
 
+public:
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
+
 protected:
-	TArray<UInputMappingContext*> MappingContexts;
+	TArray<UInputMappingContext*> GameplayMappingContexts;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UBInputConfig> InputConfig;
@@ -87,6 +93,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UInputMappingContext> InventoryMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> CooldownStateMappingContext;
 
 protected:
 	virtual void BeginPlay() override;
@@ -113,6 +122,8 @@ protected:
 
 	void UpdateHUDHealth();
 	void PlayHitReactMontage();
+
+	void RotateInPlace(float DeltaTime);
 	
 
 	UFUNCTION()

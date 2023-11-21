@@ -37,6 +37,8 @@ public:
 	void Reload();
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
+
+	void FireButtonPressed(bool bPressed);
 	
 public:
 	
@@ -49,9 +51,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
-
-	void FireButtonPressed(bool bPressed);
-
+	
 	// Server RPC, when called on client will execute on server
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);

@@ -54,7 +54,7 @@ public:
 	float CooldownTime = 10.f;
 
 	float LevelStartedTime = 0.f;
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnMatchStateSet() override;
