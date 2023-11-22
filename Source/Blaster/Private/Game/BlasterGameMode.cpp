@@ -8,7 +8,6 @@
 #include "GameFramework/PlayerStart.h"
 #include "Game/BlasterGameState.h"
 #include "Player/BPlayerState.h"
-#include "Game/BlasterGameState.h"
 
 namespace MatchState
 {

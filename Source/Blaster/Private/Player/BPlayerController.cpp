@@ -257,7 +257,17 @@ void ABPlayerController::SetHUDGameTimer(float CountdownTime)
 		int32 Minutes = FMath::FloorToInt(CountdownTime / 60.f);
 		int32 Seconds = CountdownTime - Minutes * 60;
 		
-		FString CountdownText = FString::Printf(TEXT("%02d : %02d"), Minutes, Seconds); 
+		FString CountdownText = FString::Printf(TEXT("%02d : %02d"), Minutes, Seconds);
+		FSlateColor TextColor;
+		if(Minutes == 0 && Seconds <= 15)
+		{
+			TextColor = FLinearColor(1.f, 0.f, 0.f);
+		}
+		else
+		{
+			TextColor = FLinearColor(1.f, 1.f, 1.f);
+		}
+		BlasterHUD->CharacterOverlay->GameTimerText->SetColorAndOpacity(TextColor);
 		BlasterHUD->CharacterOverlay->GameTimerText->SetText(FText::FromString(CountdownText));
 	}
 }
@@ -271,8 +281,17 @@ void ABPlayerController::SetHUDAnnouncementTimer(float CountdownTime)
 		BlasterHUD->Announcement->WarmupTime;
 	if(bHUDValid)
 	{
-		if(CountdownTime <  0.f)
+		if(CountdownTime < 5.f)
 		{
+			BlasterHUD->Announcement->PlayBlinkAnimation();
+		}
+		
+		if(CountdownTime <=  0.f)
+		{
+			if(HasAuthority())
+			{
+				BlasterHUD->Announcement->StopBlinkAnimation();
+			}
 			BlasterHUD->Announcement->WarmupTime->SetText(FText::FromString(""));
 			return;
 		}
@@ -477,6 +496,7 @@ void ABPlayerController::HandleMatchHasStarted()
 		if(BlasterHUD->Announcement)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
+			BlasterHUD->Announcement->StopBlinkAnimation();
 		}
 	}
 }
