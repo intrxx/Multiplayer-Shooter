@@ -278,19 +278,25 @@ void ABPlayerController::SetHUDAnnouncementTimer(float CountdownTime)
 	
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Announcement &&
-		BlasterHUD->Announcement->WarmupTime;
+		BlasterHUD->Announcement->WarmupTime &&
+		BlasterHUD->Announcement->Blink;
 	if(bHUDValid)
 	{
+		UWidgetAnimation* BlinkAnim = BlasterHUD->Announcement->Blink;
 		if(CountdownTime < 5.f)
 		{
-			BlasterHUD->Announcement->PlayBlinkAnimation();
+			if(!BlasterHUD->Announcement->IsAnimationPlaying(BlinkAnim))
+			{
+				BlasterHUD->Announcement->PlayAnimation(BlinkAnim, 0.f, 0.f,
+					EUMGSequencePlayMode::Forward, 1.5f, true);
+			}
 		}
 		
 		if(CountdownTime <=  0.f)
 		{
 			if(HasAuthority())
 			{
-				BlasterHUD->Announcement->StopBlinkAnimation();
+				BlasterHUD->Announcement->StopAnimation(BlinkAnim);
 			}
 			BlasterHUD->Announcement->WarmupTime->SetText(FText::FromString(""));
 			return;
@@ -493,10 +499,10 @@ void ABPlayerController::HandleMatchHasStarted()
 	if(BlasterHUD)
 	{
 		BlasterHUD->AddHUD();
-		if(BlasterHUD->Announcement)
+		if(BlasterHUD->Announcement && BlasterHUD->Announcement->Blink)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
-			BlasterHUD->Announcement->StopBlinkAnimation();
+			BlasterHUD->Announcement->StopAnimation(BlasterHUD->Announcement->Blink);
 		}
 	}
 }

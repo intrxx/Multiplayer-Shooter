@@ -26,10 +26,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> NewGameText;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlayBlinkAnimation();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void StopBlinkAnimation();
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> Blink;
 	
 };
