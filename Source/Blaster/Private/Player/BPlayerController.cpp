@@ -87,6 +87,18 @@ void ABPlayerController::PollInit()
 			}
 		}
 	}
+	
+	if(Announcement == nullptr && HasAuthority())
+	{
+		if(BlasterHUD)
+		{
+			BlasterHUD->AddAnnouncement();
+			if(BlasterHUD->Announcement)
+			{
+				Announcement = BlasterHUD->Announcement;
+			}
+		}
+	}
 }
 
 void ABPlayerController::ServerRequestServerTime_Implementation(float TimeOfClientRequest)
@@ -428,10 +440,7 @@ void ABPlayerController::ServerCheckMatchState_Implementation()
 
 		if(BlasterHUD && MatchState == MatchState::WaitingToStart)
 		{
-			if(BlasterHUD)
-			{
-				BlasterHUD->AddAnnouncement();
-			}
+			BlasterHUD->AddAnnouncement();
 		}
 		
 		ClientJoinMidGame(MatchState, WarmupTime, MatchTime, LevelStartedTime, CooldownTime);
@@ -452,10 +461,7 @@ void ABPlayerController::ClientJoinMidGame_Implementation(FName StateOfMatch, fl
 
 	if(BlasterHUD && MatchState == MatchState::WaitingToStart)
 	{
-		if(BlasterHUD)
-		{
-			BlasterHUD->AddAnnouncement();
-		}
+		BlasterHUD->AddAnnouncement();
 	}
 }
 
@@ -465,6 +471,8 @@ void ABPlayerController::ClientSetHUDPlayerStats_Implementation(const TArray<FPl
 	
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->Scoreboard;
+		
+	LocalPlayerStats = PlayerStats;
 	
 	if(bHUDValid)
 	{
@@ -476,7 +484,6 @@ void ABPlayerController::ClientSetHUDPlayerStats_Implementation(const TArray<FPl
 	else
 	{
 		bInitScoreboard = true;
-		LocalPlayerStats = PlayerStats;
 	}
 }
 
@@ -503,6 +510,10 @@ void ABPlayerController::HandleMatchHasStarted()
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
 			BlasterHUD->Announcement->StopAnimation(BlasterHUD->Announcement->Blink);
+			for(FPlayerStats Stats : LocalPlayerStats)
+			{
+				BlasterHUD->Scoreboard->UpdatePlayerList(LocalPlayerStats);
+			}
 		}
 	}
 }

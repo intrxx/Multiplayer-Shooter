@@ -8,6 +8,7 @@
 #include "BPlayerController.generated.h"
 
 
+class UBAnnouncement;
 class ABlasterGameMode;
 class UBInventoryWidget;
 class UBScoreBoard;
@@ -143,6 +144,8 @@ private:
 	UBScoreBoard* Scoreboard;
 	UPROPERTY()
 	UBInventoryWidget* InventoryWidget;
+	UPROPERTY()
+	UBAnnouncement* Announcement;
 
 	bool bInitCharacterOverlay = false;
 	bool bInitScoreboard = false;
