@@ -26,7 +26,6 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/BPlayerState.h"
 #include "BlasterTypes/BWeaponTypes.h"
-#include "Game/BlasterGameState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
