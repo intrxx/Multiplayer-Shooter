@@ -162,6 +162,8 @@ void ABlasterHUD::AddHUD()
 	AddCharacterOverlay();
 	AddScoreBoard();
 	AddInventoryWidget();
+
+	bHUDAdded = true;
 }
 
 void ABlasterHUD::RemoveHUD(bool bRemoveOverlay, bool bRemoveScoreboard, bool bRemoveInventory)

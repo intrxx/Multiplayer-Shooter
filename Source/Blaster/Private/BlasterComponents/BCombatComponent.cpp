@@ -380,10 +380,10 @@ void UBCombatComponent::FinishReloading()
 
 	// This will be true only on the locally controlled character - we check if the fire button was pressed to continue
 	// firing when reload finishes
-	if(bFireButtonPressed)
-	{
-		Fire();
-	}
+	//f(bFireButtonPressed)
+	//{
+	//	Fire();
+	//}
 }
 
 void UBCombatComponent::OnRep_CombatState()
@@ -507,6 +507,7 @@ void UBCombatComponent::OnRep_CarriedAmmo()
 void UBCombatComponent::InitializeCarriedAmmo()
 {
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_AssaultRifle, StartingRifleAmmo);
+	CarriedAmmoMap.Emplace(EBWeaponType::EWT_RocketLauncher, StartingRocketAmmo);
 }
 
 void UBCombatComponent::ShrinkCrosshairWhileShooting()

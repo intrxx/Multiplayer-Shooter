@@ -51,7 +51,7 @@ void ABWeapon::BeginPlay()
 		PickUpWidgetComp->SetVisibility(false);
 	}
 
-	if(bCanChangeFiringMode && !FiringModes.IsEmpty())
+	if(!FiringModes.IsEmpty())
 	{
 		FiringMode = FiringModes[0];
 	}

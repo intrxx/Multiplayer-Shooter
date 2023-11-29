@@ -8,7 +8,7 @@
 void ABProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);
-
+	
 	// The weapon class has Authority only on the server because it is set to Replicated in the base class
 	// If a class is not set to be replicated it has Authority on both server and client
 	if(!HasAuthority())
@@ -18,7 +18,7 @@ void ABProjectileWeapon::Fire(const FVector& HitTarget)
 	
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 	
-	const USkeletalMeshSocket* ProjSpawnSocket = GetWeaponMesh()->GetSocketByName(FName("ProjectileSpawnSocket"));
+	const USkeletalMeshSocket* ProjSpawnSocket = GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
 	if(ProjSpawnSocket)
 	{
 		FTransform SocketTransform = ProjSpawnSocket->GetSocketTransform(GetWeaponMesh());

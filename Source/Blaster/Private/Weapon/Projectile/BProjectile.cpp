@@ -48,14 +48,23 @@ void ABProjectile::BeginPlay()
 void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
-	if(BlasterCharacter)
+	if(!bUseSameSoundAndParticles)
 	{
-		MulticastPlayHitParticleAndSound(true);
+		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+		if(BlasterCharacter)
+		{
+			MulticastPlayHitParticleAndSound(true);
+		}
+		else
+		{
+			MulticastPlayHitParticleAndSound(false);
+		}
 	}
 	else
 	{
-		MulticastPlayHitParticleAndSound(false);
+		HitParticles = ImpactParticle;
+		HitSound = ImpactSound;
+		Destroy();
 	}
 }
 
@@ -74,7 +83,7 @@ void ABProjectile::Destroyed()
 
 void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharacterHit)
 {
-	HitParticles = bCharacterHit ? CharacterImpactParticle : MetalImpactParticle;
+	HitParticles = bCharacterHit ? CharacterImpactParticle : SurfaceImpactParticle;
 	HitSound = bCharacterHit ? CharacterImpactSound : SurfaceImpactSound;
 
 	Destroy();

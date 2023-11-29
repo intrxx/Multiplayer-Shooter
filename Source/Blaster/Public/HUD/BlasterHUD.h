@@ -99,6 +99,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> AnnouncementClass;
 
+	bool bHUDAdded = false;
+
 protected:
 	virtual void BeginPlay() override;
 

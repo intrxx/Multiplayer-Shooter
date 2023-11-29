@@ -245,6 +245,9 @@ void ABPlayerController::SetHUDWeaponTypeText(EBWeaponType WeaponType)
 		case EBWeaponType::EWT_AssaultRifle:
 			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString(TEXT("Rifle")));
 			break;
+		case EBWeaponType::EWT_RocketLauncher:
+			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString(TEXT("Launcher")));
+			break;
 		default:
 			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString(TEXT("-")));
 			break;
@@ -505,7 +508,10 @@ void ABPlayerController::HandleMatchHasStarted()
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 	if(BlasterHUD)
 	{
-		BlasterHUD->AddHUD();
+		if(BlasterHUD->bHUDAdded == false)
+		{
+			BlasterHUD->AddHUD();
+		}
 		if(BlasterHUD->Announcement && BlasterHUD->Announcement->Blink)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
