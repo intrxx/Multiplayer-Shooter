@@ -6,6 +6,7 @@
 #include "Weapon/Projectile/BProjectile.h"
 #include "BProjectileRocket.generated.h"
 
+class USphereComponent;
 class UBRocketProjectileMovementComp;
 class UNiagaraComponent;
 class UStaticMeshComponent;
@@ -28,6 +29,9 @@ public:
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
+	UFUNCTION()
+	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void BeginPlay() override;
 
 	void DestroyTimerFinished();
@@ -41,10 +45,16 @@ protected:
 	float MinimalDamage = 10.f;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float DamageInnerRadius = 150.f;
+	float DamageInnerRadius = 75.f;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
 	float DamageOuterRadius = 400.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|RocketJump")
+	float RocketJumpImpulse = 800.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|RocketJump")
+	float RocketJumpSelfDamage = 20.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact|Rocket")
 	TObjectPtr<USoundCue> RocketImpactSound;
@@ -65,12 +75,16 @@ protected:
 	TObjectPtr<UAudioComponent> RocketAudioLoopComp;
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
 	TObjectPtr<UBRocketProjectileMovementComp> RocketProjectileMoveComp;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
 	TObjectPtr<UStaticMeshComponent> RocketMesh;
 
+	// Used for the rocket jump logic
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
+	TObjectPtr<USphereComponent> SphereComp;
+	
 	FTimerHandle DestroyTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
