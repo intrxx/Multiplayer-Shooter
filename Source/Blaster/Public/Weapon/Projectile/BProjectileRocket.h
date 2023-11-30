@@ -6,6 +6,7 @@
 #include "Weapon/Projectile/BProjectile.h"
 #include "BProjectileRocket.generated.h"
 
+class UBRocketProjectileMovementComp;
 class UNiagaraComponent;
 class UStaticMeshComponent;
 class UNiagaraSystem;
@@ -23,6 +24,7 @@ class BLASTER_API ABProjectileRocket : public ABProjectile
 public:
 	ABProjectileRocket();
 	virtual void Destroyed() override;
+	
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
@@ -63,6 +65,9 @@ protected:
 	TObjectPtr<UAudioComponent> RocketAudioLoopComp;
 
 private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBRocketProjectileMovementComp> RocketProjectileMoveComp;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
 	TObjectPtr<UStaticMeshComponent> RocketMesh;
 

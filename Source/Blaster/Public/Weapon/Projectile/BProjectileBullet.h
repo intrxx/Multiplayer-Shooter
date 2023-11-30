@@ -6,6 +6,8 @@
 #include "Weapon/Projectile/BProjectile.h"
 #include "BProjectileBullet.generated.h"
 
+class UBProjectileMovementComponent;
+
 /**
  * 
  */
@@ -14,8 +16,15 @@ class BLASTER_API ABProjectileBullet : public ABProjectile
 {
 	GENERATED_BODY()
 
+public:
+	ABProjectileBullet();
+
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBProjectileMovementComponent> BProjectileMoveComp;
 	
 };

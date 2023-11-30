@@ -9,12 +9,19 @@
 #include "NiagaraComponent.h"
 #include "Components/AudioComponent.h"
 #include "NiagaraSystemInstanceController.h"
+#include "BlasterComponents/BRocketProjectileMovementComp.h"
 
 ABProjectileRocket::ABProjectileRocket()
 {
 	RocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Rocket Mesh"));
 	RocketMesh->SetupAttachment(RootComponent);
 	RocketMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	RocketProjectileMoveComp = CreateDefaultSubobject<UBRocketProjectileMovementComp>(TEXT("RocketMoveComp"));
+	RocketProjectileMoveComp->SetIsReplicated(true);
+	RocketProjectileMoveComp->bRotationFollowsVelocity = true;
+	RocketProjectileMoveComp->InitialSpeed = 7000.f;
+	RocketProjectileMoveComp->MaxSpeed = 7000.f;
 }
 
 void ABProjectileRocket::Destroyed()
@@ -53,6 +60,11 @@ void ABProjectileRocket::DestroyTimerFinished()
 void ABProjectileRocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                FVector NormalImpulse, const FHitResult& Hit)
 {
+	if(OtherActor == GetOwner())
+	{
+		return;
+	}
+	
 	APawn* FiringPawn = GetInstigator();
 	if(FiringPawn && HasAuthority())
 	{

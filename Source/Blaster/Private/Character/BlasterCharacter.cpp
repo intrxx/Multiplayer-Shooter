@@ -626,6 +626,9 @@ void ABlasterCharacter::PlayReloadMontage()
 		case EBWeaponType::EWT_AssaultRifle:
 			AnimInstance->Montage_JumpToSection(TEXT("Rifle"));
 			break;
+		case EBWeaponType::EWT_RocketLauncher:
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have Rocket Launcher Reload Anim right now
+			break;
 		default:
 			break;
 		}

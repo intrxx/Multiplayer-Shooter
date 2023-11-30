@@ -22,11 +22,6 @@ ABProjectile::ABProjectile()
 	CollisionBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_ObjectChannel_SkeletalMesh, ECR_Block);
-	
-	ProjectileMoveComp = CreateDefaultSubobject<UBProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
-	ProjectileMoveComp->bRotationFollowsVelocity = true;
-	ProjectileMoveComp->InitialSpeed = 16000.f;
-	ProjectileMoveComp->MaxSpeed = 16000.f;
 }
 
 void ABProjectile::BeginPlay()

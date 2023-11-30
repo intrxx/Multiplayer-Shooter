@@ -4,9 +4,19 @@
 #include "Weapon/Projectile/BProjectileBullet.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "BlasterComponents/BProjectileMovementComponent.h"
+
+ABProjectileBullet::ABProjectileBullet()
+{
+	BProjectileMoveComp = CreateDefaultSubobject<UBProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
+	BProjectileMoveComp->SetIsReplicated(true);
+	BProjectileMoveComp->bRotationFollowsVelocity = true;
+	BProjectileMoveComp->InitialSpeed = 16000.f;
+	BProjectileMoveComp->MaxSpeed = 16000.f;
+}
 
 void ABProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+                               FVector NormalImpulse, const FHitResult& Hit)
 {
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if(OwnerCharacter)

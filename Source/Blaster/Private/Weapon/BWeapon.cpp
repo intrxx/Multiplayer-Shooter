@@ -17,7 +17,7 @@ ABWeapon::ABWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-
+	
 	WeaponMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMeshComponent"));
 	SetRootComponent(WeaponMeshComp);
 	
@@ -38,6 +38,8 @@ void ABWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetReplicateMovement(true);
+	
 	if(HasAuthority())
 	{
 		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);

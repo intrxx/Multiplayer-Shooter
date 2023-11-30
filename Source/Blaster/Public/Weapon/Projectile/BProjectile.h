@@ -8,7 +8,6 @@
 
 class USoundCue;
 class UBoxComponent;
-class UBProjectileMovementComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
 
@@ -39,9 +38,6 @@ protected:
 	TObjectPtr<UBoxComponent> CollisionBox;
 	
 private:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBProjectileMovementComponent> ProjectileMoveComp;
-
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
 
