@@ -48,23 +48,14 @@ void ABProjectile::BeginPlay()
 void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(!bUseSameSoundAndParticles)
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if(BlasterCharacter)
 	{
-		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
-		if(BlasterCharacter)
-		{
-			MulticastPlayHitParticleAndSound(true);
-		}
-		else
-		{
-			MulticastPlayHitParticleAndSound(false);
-		}
+		MulticastPlayHitParticleAndSound(true);
 	}
 	else
 	{
-		HitParticles = ImpactParticle;
-		HitSound = ImpactSound;
-		Destroy();
+		MulticastPlayHitParticleAndSound(false);
 	}
 }
 

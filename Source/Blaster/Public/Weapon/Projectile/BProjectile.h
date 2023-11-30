@@ -34,16 +34,11 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Damage")
 	float Damage = 20.f;
-
-	// Determines if the projectile should use same sound and particle for different surfaces (e.g. Rocket)
-	// Handled in OnHit function
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Impact")
-	bool bUseSameSoundAndParticles = false;
 	
-private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile")
 	TObjectPtr<UBoxComponent> CollisionBox;
-
+	
+private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBProjectileMovementComponent> ProjectileMoveComp;
 
@@ -58,19 +53,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<UParticleSystem> CharacterImpactParticle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact|Base")
-	TObjectPtr<UParticleSystem> ImpactParticle;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<USoundCue> SurfaceImpactSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<USoundCue> CharacterImpactSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact|Base")
-	TObjectPtr<USoundCue> ImpactSound;
-
+	
 	UPROPERTY()
 	TObjectPtr<UParticleSystem> HitParticles;
 	
