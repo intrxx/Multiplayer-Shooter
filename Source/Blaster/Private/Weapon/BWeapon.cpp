@@ -138,6 +138,13 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 		WeaponMeshComp->SetSimulatePhysics(false);
 		WeaponMeshComp->SetEnableGravity(false);
 		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		if(WeaponType == EBWeaponType::EWT_SubMachineGun)
+		{
+			WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			WeaponMeshComp->SetEnableGravity(true);
+			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		}
 		break;
 	case EBWeaponState::EWS_Dropped:
 		if(HasAuthority())
@@ -147,6 +154,9 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 		WeaponMeshComp->SetSimulatePhysics(true);
 		WeaponMeshComp->SetEnableGravity(true);
 		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
+		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 		break;
 	default:
 		break;
@@ -162,11 +172,21 @@ void ABWeapon::OnRep_WeaponState()
 		WeaponMeshComp->SetSimulatePhysics(false);
 		WeaponMeshComp->SetEnableGravity(false);
 		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		if(WeaponType == EBWeaponType::EWT_SubMachineGun)
+		{
+			WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			WeaponMeshComp->SetEnableGravity(true);
+			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		}
 		break;
 	case EBWeaponState::EWS_Dropped:
 		WeaponMeshComp->SetSimulatePhysics(true);
 		WeaponMeshComp->SetEnableGravity(true);
 		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
+		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 		break;
 	default:
 		break;
