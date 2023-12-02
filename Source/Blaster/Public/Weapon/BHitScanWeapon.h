@@ -26,4 +26,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	TObjectPtr<UParticleSystem> CharacterImpactParticles;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
+	TObjectPtr<UParticleSystem> BeamParticles;
 };
