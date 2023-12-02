@@ -627,10 +627,13 @@ void ABlasterCharacter::PlayReloadMontage()
 			AnimInstance->Montage_JumpToSection(TEXT("Rifle"));
 			break;
 		case EBWeaponType::EWT_RocketLauncher:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have Rocket Launcher Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_RocketLauncher Reload Anim right now
 			break;
 		case EBWeaponType::EWT_Pistol:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have Rocket Launcher Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Pistol Reload Anim right now
+			break;
+		case EBWeaponType::EWT_SubMachineGun:
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_SubMachineGun Reload Anim right now
 			break;
 		default:
 			break;

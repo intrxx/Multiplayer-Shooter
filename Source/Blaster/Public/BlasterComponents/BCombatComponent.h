@@ -139,10 +139,13 @@ private:
 	int32 StartingRifleAmmo = 30;
 
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
-	int32 StartingRocketAmmo = 0;
+	int32 StartingRocketAmmo = 4;
 
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
-	int32 StartingPistolAmmo = 0;
+	int32 StartingPistolAmmo = 20;
+
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	int32 StartingSmgAmmo = 40;
 
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
 

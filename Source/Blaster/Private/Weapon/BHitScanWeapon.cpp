@@ -6,6 +6,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h"
 
 void ABHitScanWeapon::Fire(const FVector& HitTarget)
 {
@@ -44,18 +45,20 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 						this, UDamageType::StaticClass());
 					}
 					
-					if(CharacterImpactParticles)
+					if(CharacterImpactParticles && CharacterHitSound)
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(World, CharacterImpactParticles,
 							FireHit.ImpactPoint, FireHit.ImpactNormal.Rotation());
+						UGameplayStatics::PlaySoundAtLocation(World, CharacterHitSound, FireHit.ImpactPoint);
 					}
 				}
 				else
 				{
-					if(SurfaceImpactParticles)
+					if(SurfaceImpactParticles && SurfaceHitSound)
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(World, SurfaceImpactParticles,
 							FireHit.ImpactPoint, FireHit.ImpactNormal.Rotation());
+						UGameplayStatics::PlaySoundAtLocation(World, SurfaceHitSound, FireHit.ImpactPoint);
 					}
 				}
 			}
@@ -68,6 +71,14 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 				{
 					BeamComp->SetVectorParameter(FName("Target"), BeamEnd);
 				}
+			}
+			if(MuzzleFlash)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleFlash, SocketTransform);
+			}
+			if(FireSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(World, FireSound, GetActorLocation());
 			}
 		}
 	}

@@ -29,4 +29,16 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	TObjectPtr<UParticleSystem> BeamParticles;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
+	TObjectPtr<USoundCue> CharacterHitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
+	TObjectPtr<USoundCue> SurfaceHitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Additional")
+	TObjectPtr<UParticleSystem> MuzzleFlash;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Additional")
+	TObjectPtr<USoundCue> FireSound;
 };
