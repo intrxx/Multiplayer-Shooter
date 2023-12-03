@@ -19,11 +19,12 @@ public:
 
 protected:
 	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
+	void HitScanTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	float Damage = 20.f;
-
+	
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	TObjectPtr<UParticleSystem> SurfaceImpactParticles;
 
@@ -58,4 +59,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
 	bool bUseScatter = false;
+
+	/**
+	 *
+	 */
 };
