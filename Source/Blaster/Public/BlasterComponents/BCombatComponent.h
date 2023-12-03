@@ -14,13 +14,6 @@ class ABPlayerController;
 class ABlasterCharacter;
 class ABWeapon;
 
-namespace Combat
-{
-	static constexpr float TraceLength = 80000.0f;
-	static constexpr float AimShrinkFactor = 0.35f;
-	static constexpr float AimAtPlayerShrinkFactor = 0.25f;
-}
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UBCombatComponent : public UActorComponent
 {
@@ -146,6 +139,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
 	int32 StartingSmgAmmo = 40;
+
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	int32 StartingShotgunAmmo = 12;
 
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
 

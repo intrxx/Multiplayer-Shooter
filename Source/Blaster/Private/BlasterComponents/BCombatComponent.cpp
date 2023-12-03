@@ -5,7 +5,6 @@
 #include "Camera/CameraComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Player/BPlayerController.h"
-//#include "HUD/BlasterHUD.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -510,6 +509,7 @@ void UBCombatComponent::InitializeCarriedAmmo()
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_RocketLauncher, StartingRocketAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Pistol, StartingPistolAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_SubMachineGun, StartingSmgAmmo);
+	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Shotgun, StartingShotgunAmmo);
 }
 
 void UBCombatComponent::ShrinkCrosshairWhileShooting()
