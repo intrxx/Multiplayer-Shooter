@@ -510,6 +510,7 @@ void UBCombatComponent::InitializeCarriedAmmo()
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Pistol, StartingPistolAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_SubMachineGun, StartingSmgAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Shotgun, StartingShotgunAmmo);
+	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Sniper, StartingSniperAmmo);
 }
 
 void UBCombatComponent::ShrinkCrosshairWhileShooting()

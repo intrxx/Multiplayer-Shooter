@@ -638,6 +638,9 @@ void ABlasterCharacter::PlayReloadMontage()
 		case EBWeaponType::EWT_Shotgun:
 			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Shotgun Reload Anim right now
 			break;
+		case EBWeaponType::EWT_Sniper:
+			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Sniper Reload Anim right now
+			break;
 		default:
 			break;
 		}
