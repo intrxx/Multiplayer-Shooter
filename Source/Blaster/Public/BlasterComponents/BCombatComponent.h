@@ -153,6 +153,7 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void ShrinkCrosshairWhileShooting();
+	void PlayScopeSounds(bool bIsAiming);
 
 	bool CanFire();
 

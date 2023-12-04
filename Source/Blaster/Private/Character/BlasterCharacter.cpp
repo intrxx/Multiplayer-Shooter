@@ -761,6 +761,11 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeathBotSound, GetActorLocation());
 		}
 	}
+	
+	if(IsLocallyControlled() && CombatComp && CombatComp->bAiming && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Sniper)
+	{
+		ShowScopeWidget(false);
+	}
 }
 
 void ABlasterCharacter::CreateDeathDynamicMaterialInstances()

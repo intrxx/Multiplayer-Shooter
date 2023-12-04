@@ -12,6 +12,7 @@
 #include "Weapon/BWeapon.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/Sniper/BSniperRifle.h"
 
 UBCombatComponent::UBCombatComponent()
 {
@@ -542,16 +543,48 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 
 void UBCombatComponent::SetAiming(bool bIsAiming)
 {
+	if(BlasterCharacter == nullptr || EquippedWeapon == nullptr)
+	{
+		return;
+	}
 	// Leaving it here because if we call it on the client we don't need to wait for the ServerRPC to execute the function
 	// so we see the result of clicking the aim button faster on the client and it then runs on the server replicating
 	// to all clients so they can see the result too
 	bAiming = bIsAiming;
 	
 	ServerSetAiming(bIsAiming);
-
-	if(BlasterCharacter)
+	
+	BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	
+	if(EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Sniper)
 	{
-		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+		if(BlasterCharacter->IsLocallyControlled())
+		{
+			BlasterCharacter->ShowScopeWidget(bIsAiming);
+		}
+
+		PlayScopeSounds(bIsAiming);
+	}
+}
+
+void UBCombatComponent::PlayScopeSounds(bool bIsAiming)
+{
+	if(ABSniperRifle* Sniper = Cast<ABSniperRifle>(EquippedWeapon))
+	{
+		if(Sniper->ScopeInSound && Sniper->ScopeOutSound)
+		{
+			if(bIsAiming)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sniper->ScopeOutSound,
+				BlasterCharacter->GetActorLocation(), BlasterCharacter->GetActorRotation(), 0.7f);
+			}
+			else
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sniper->ScopeInSound,
+				BlasterCharacter->GetActorLocation(), BlasterCharacter->GetActorRotation(), 0.7f);
+			}
+				
+		}
 	}
 }
 

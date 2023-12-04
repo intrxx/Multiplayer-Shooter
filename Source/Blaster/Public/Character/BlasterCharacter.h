@@ -43,6 +43,9 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
 	void PlayReloadMontage();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowScopeWidget(bool bShowScope);
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastHandleDeath();
@@ -113,7 +116,7 @@ protected:
 	void ChangeFiringModeButtonPressed();
 	void ToggleScoreBoard();
 	void ToggleInventory();
-
+	
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
 	void TurnInPlace(float DeltaTime);
