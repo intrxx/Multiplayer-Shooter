@@ -146,6 +146,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
 	int32 StartingSniperAmmo = 10;
 
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	int32 StartingGrenadeLauncherAmmo = 10;
+
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
 
 private:
