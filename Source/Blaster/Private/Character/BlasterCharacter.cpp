@@ -627,22 +627,22 @@ void ABlasterCharacter::PlayReloadMontage()
 			AnimInstance->Montage_JumpToSection(TEXT("Rifle"));
 			break;
 		case EBWeaponType::EWT_RocketLauncher:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_RocketLauncher Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Rocket")); 
 			break;
 		case EBWeaponType::EWT_Pistol:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Pistol Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Pistol")); 
 			break;
 		case EBWeaponType::EWT_SubMachineGun:
 			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_SubMachineGun Reload Anim right now
 			break;
 		case EBWeaponType::EWT_Shotgun:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Shotgun Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Shotgun")); 
 			break;
 		case EBWeaponType::EWT_Sniper:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_Sniper Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("Sniper")); 
 			break;
 		case EBWeaponType::EWT_GrenadeLauncher:
-			AnimInstance->Montage_JumpToSection(TEXT("Rifle")); // Don't have EWT_GrenadeLauncher Reload Anim right now
+			AnimInstance->Montage_JumpToSection(TEXT("GrenadeLauncher"));
 			break;
 		default:
 			break;
