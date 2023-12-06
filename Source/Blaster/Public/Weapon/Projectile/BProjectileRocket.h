@@ -8,9 +8,7 @@
 
 class USphereComponent;
 class UBRocketProjectileMovementComp;
-class UNiagaraComponent;
 class UStaticMeshComponent;
-class UNiagaraSystem;
 class UAudioComponent;
 class USoundCue;
 class USoundAttenuation;
@@ -34,22 +32,7 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void BeginPlay() override;
 
-	void DestroyTimerFinished();
-
 protected:
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|FX")
-	TObjectPtr<UNiagaraSystem> TrailSystem;
-	
-	// Minimal damage applied to actors that are in the outer ring of radial damage
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Damage")
-	float MinimalDamage = 10.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float DamageInnerRadius = 75.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float DamageOuterRadius = 400.f;
-
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|RocketJump")
 	float RocketJumpImpulse = 800.f;
 	
@@ -61,9 +44,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact|Rocket")
 	TObjectPtr<UParticleSystem> RocketImpactParticle;
-
-	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> TrailComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Sound")
 	TObjectPtr<USoundCue> RocketSoundLoop;
@@ -78,15 +58,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
 	TObjectPtr<UBRocketProjectileMovementComp> RocketProjectileMoveComp;
 	
-	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
-	TObjectPtr<UStaticMeshComponent> RocketMesh;
-
 	// Used for the rocket jump logic
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Projectile")
 	TObjectPtr<USphereComponent> SphereComp;
-	
-	FTimerHandle DestroyTimerHandle;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float DestroyTime = 3.f;
 };

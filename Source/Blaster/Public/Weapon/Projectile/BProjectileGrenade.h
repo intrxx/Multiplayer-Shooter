@@ -1,0 +1,36 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Weapon/Projectile/BProjectile.h"
+#include "BProjectileGrenade.generated.h"
+
+class UBProjectileMovementComponent;
+
+/**
+ * 
+ */
+UCLASS()
+class BLASTER_API ABProjectileGrenade : public ABProjectile
+{
+	GENERATED_BODY()
+
+public:
+	ABProjectileGrenade();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+	
+	UFUNCTION()
+	void OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
+	
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBProjectileMovementComponent> BProjectileMoveComp;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Grenade")
+	TObjectPtr<USoundCue> BounceSound;
+	
+};

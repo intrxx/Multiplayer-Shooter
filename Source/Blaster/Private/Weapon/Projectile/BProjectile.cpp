@@ -2,7 +2,7 @@
 
 
 #include "Weapon/Projectile/BProjectile.h"
-#include "BlasterComponents/BProjectileMovementComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -54,9 +54,28 @@ void ABProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 	}
 }
 
+void ABProjectile::SpawnTrailSystem()
+{
+	if(TrailSystem)
+	{
+		TrailComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(TrailSystem, GetRootComponent(), FName(), GetActorLocation(),
+			GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
+	}
+}
+
 void ABProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABProjectile::StartDestroyTimer()
+{
+	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ThisClass::DestroyTimerFinished, DestroyTime);
+}
+
+void ABProjectile::DestroyTimerFinished()
+{
+	Destroy();
 }
 
 void ABProjectile::Destroyed()
@@ -73,5 +92,23 @@ void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharact
 	HitSound = bCharacterHit ? CharacterImpactSound : SurfaceImpactSound;
 
 	Destroy();
+}
+
+void ABProjectile::ExplodeDamage()
+{
+	APawn* FiringPawn = GetInstigator();
+	if(FiringPawn && HasAuthority())
+	{
+		AController* FiringController = FiringPawn->GetController();
+		if(FiringController)
+		{
+			TArray<AActor*> ActorsToIgnore;
+			ActorsToIgnore.Add(GetOwner());
+			
+			UGameplayStatics::ApplyRadialDamageWithFalloff(this, Damage, MinimalDamage,
+				GetActorLocation(), DamageInnerRadius, DamageOuterRadius, 1.f, UDamageType::StaticClass(),
+				ActorsToIgnore, this);
+		}
+	}
 }
 
