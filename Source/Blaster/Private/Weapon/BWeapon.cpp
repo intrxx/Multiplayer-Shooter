@@ -2,6 +2,8 @@
 
 
 #include "Weapon/BWeapon.h"
+
+#include "BlasterComponents/BCombatComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -234,6 +236,10 @@ void ABWeapon::SpendRound()
 
 void ABWeapon::OnRep_Ammo()
 {
+	if(BlasterCharacterOwner && BlasterCharacterOwner->GetCombatComp() && IsMagFull())
+	{
+		BlasterCharacterOwner->GetCombatComp()->JumpToShotGunMontageEnd();
+	}
 	SetHUDAmmo();
 }
 
@@ -314,6 +320,11 @@ void ABWeapon::AddAmmo(int32 AmmoToAdd)
 bool ABWeapon::IsMagEmpty() const
 {
 	return Ammo <= 0;
+}
+
+bool ABWeapon::IsMagFull() const
+{
+	return  Ammo == MagCapacity;
 }
 
 

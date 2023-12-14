@@ -65,6 +65,7 @@ public:
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
 	bool GetDisableGameplay() const {return bDisableGameplay;}
+	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
 	
 	/**
 	 * Attributes Getters

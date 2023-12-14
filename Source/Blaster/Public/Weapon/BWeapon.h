@@ -58,6 +58,7 @@ public:
 	EBFiringMode GetFiringMode() const {return FiringMode;}
 	EBWeaponType GetWeaponType() const {return WeaponType;}
 	bool IsMagEmpty() const;
+	bool IsMagFull() const;
 	int32 GetAmmo() const {return Ammo;}
 	int32 GetMagCapacity() const {return MagCapacity;}
 	

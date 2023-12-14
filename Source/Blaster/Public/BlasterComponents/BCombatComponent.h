@@ -28,9 +28,13 @@ public:
 
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	void Reload();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void FinishReloading();
-
+	
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
+	void ShotgunShellReload();
+	void JumpToShotGunMontageEnd();
+	
 	void FireButtonPressed(bool bPressed);
 	
 public:
@@ -168,4 +172,5 @@ private:
 	void OnRep_CombatState();
 
 	void UpdateAmmoValues();
+	void UpdateShotgunAmmoValues();
 };
