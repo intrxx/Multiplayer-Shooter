@@ -26,6 +26,9 @@ ABWeapon::ABWeapon()
 	WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
 	WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
+	WeaponMeshComp->MarkRenderStateDirty();
+	EnableCustomDepth(true);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	SphereComp->SetupAttachment(RootComponent);
@@ -147,6 +150,8 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 			WeaponMeshComp->SetEnableGravity(true);
 			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		}
+
+		EnableCustomDepth(false);
 		break;
 	case EBWeaponState::EWS_Dropped:
 		if(HasAuthority())
@@ -159,6 +164,10 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
 		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+		WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
+		WeaponMeshComp->MarkRenderStateDirty();
+		EnableCustomDepth(true);
 		break;
 	default:
 		break;
@@ -181,6 +190,8 @@ void ABWeapon::OnRep_WeaponState()
 			WeaponMeshComp->SetEnableGravity(true);
 			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		}
+		
+		EnableCustomDepth(false);
 		break;
 	case EBWeaponState::EWS_Dropped:
 		WeaponMeshComp->SetSimulatePhysics(true);
@@ -189,6 +200,10 @@ void ABWeapon::OnRep_WeaponState()
 		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
 		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+		WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
+		WeaponMeshComp->MarkRenderStateDirty();
+		EnableCustomDepth(true);
 		break;
 	default:
 		break;
@@ -315,6 +330,14 @@ void ABWeapon::AddAmmo(int32 AmmoToAdd)
 {
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
 	SetHUDAmmo();
+}
+
+void ABWeapon::EnableCustomDepth(bool bEnable)
+{
+	if(WeaponMeshComp)
+	{
+		WeaponMeshComp->SetRenderCustomDepth(bEnable);
+	}
 }
 
 bool ABWeapon::IsMagEmpty() const

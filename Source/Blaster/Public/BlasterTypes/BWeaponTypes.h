@@ -10,6 +10,13 @@ namespace Combat
 	
 }
 
+namespace BlasterStencil
+{
+	static constexpr int32 Purple = 250;
+	static constexpr int32 Blue = 251;
+	static constexpr int32 Red = 252;
+}
+
 UENUM(BlueprintType)
 enum class EBWeaponType : uint8
 {

@@ -48,6 +48,15 @@ public:
 	virtual void ChangeFiringMode();
 	void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
+
+	/**
+	 * Enable or disable custom depth to display the outline effect
+	 */
+	void EnableCustomDepth(bool bEnable);
+	
+	/**
+	 * 
+	 */
 	
 	USphereComponent* GetWeaponSphereComp() const {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() const {return  WeaponMeshComp;}
