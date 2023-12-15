@@ -68,6 +68,7 @@ public:
 	bool IsDead() const {return bDead;}
 	bool GetDisableGameplay() const {return bDisableGameplay;}
 	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
+	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
 	
 	/**
 	 * Attributes Getters
@@ -83,6 +84,13 @@ public:
 	bool IsAiming();
 
 	virtual void Destroyed() override;
+
+	/**
+	* Grenades mesh
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Grenades")
+	TObjectPtr<UStaticMesh> FragGrenade;
 
 public:
 	UPROPERTY(Replicated)

@@ -40,8 +40,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void ThrowGrenadeFinished();
 
-	void DropEquippedWeapon();
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
+	void LaunchGrenade();
+	void ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh = nullptr);
 	
+	void DropEquippedWeapon();
+
 public:
 	
 protected:

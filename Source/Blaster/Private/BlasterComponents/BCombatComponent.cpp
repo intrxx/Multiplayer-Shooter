@@ -370,6 +370,8 @@ void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
 			const FName ThrowingSocket = EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Pistol ||
 				EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
 			AttachActorToHand(EquippedWeapon, ThrowingSocket);
+
+			ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
 		}
 	}
 	
@@ -387,6 +389,7 @@ void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeType Gr
 	{
 		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
 		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
+		ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
 	}
 }
 
@@ -523,6 +526,8 @@ void UBCombatComponent::OnRep_CombatState()
 					EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
 				AttachActorToHand(EquippedWeapon, ThrowingSocket);
 			}
+
+			ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
 		}
 		break;
 	default:
@@ -574,6 +579,23 @@ void UBCombatComponent::DropEquippedWeapon()
 	{
 		EquippedWeapon->Dropped();
 	}
+}
+
+void UBCombatComponent::ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh)
+{
+	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade())
+	{
+		if(bShow && GrenadeMesh)
+		{
+			BlasterCharacter->GetAttachedGrenade()->SetStaticMesh(GrenadeMesh);
+		}
+		BlasterCharacter->GetAttachedGrenade()->SetVisibility(bShow);
+	}
+}
+
+void UBCombatComponent::LaunchGrenade()
+{
+	ShowAttachedGrenade(false);
 }
 
 void UBCombatComponent::Fire()
