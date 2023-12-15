@@ -30,6 +30,8 @@
 ABlasterCharacter::ABlasterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArmComponent->SetupAttachment(GetMesh());
@@ -62,8 +64,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	
-	NetUpdateFrequency = 66.f;
-	MinNetUpdateFrequency = 33.f;
+	AttachedGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AttachedGrenade"));
+	AttachedGrenade->SetupAttachment(GetMesh(), FName("GrenadeRightHandSocket"));
+	AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

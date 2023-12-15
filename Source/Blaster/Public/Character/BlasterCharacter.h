@@ -280,8 +280,11 @@ private:
 	float DeathBotSpawnZOffset = 115.f;
 	
 	/**
-	 * 
+	 * Grenades
 	 */
+
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UStaticMeshComponent> AttachedGrenade;
 	
 private:
 	UFUNCTION()
