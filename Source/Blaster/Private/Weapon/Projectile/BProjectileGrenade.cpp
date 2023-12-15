@@ -46,7 +46,8 @@ void ABProjectileGrenade::Destroyed()
 void ABProjectileGrenade::OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
 {
 	UGameplayStatics::PlaySoundAtLocation(this, BounceSound, GetActorLocation());
-	if(Cast<ABlasterCharacter>(ImpactResult.GetActor()))
+	
+	if(bShouldExplodeOnEnemy && Cast<ABlasterCharacter>(ImpactResult.GetActor()))
 	{
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 		Destroy();

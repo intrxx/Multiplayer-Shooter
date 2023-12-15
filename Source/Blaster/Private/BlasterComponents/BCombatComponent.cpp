@@ -13,6 +13,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/Sniper/BSniperRifle.h"
+#include "Weapon/Projectile/BProjectile.h"
 
 UBCombatComponent::UBCombatComponent()
 {
@@ -355,7 +356,7 @@ int32 UBCombatComponent::CalculateAmountToReload()
 
 void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
 {
-	if(CombatState != EBCombatState::ECS_Unoccupied)
+	if(CombatState != EBCombatState::ECS_Unoccupied || EquippedWeapon == nullptr)
 	{
 		return;
 	}
@@ -596,6 +597,29 @@ void UBCombatComponent::ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh
 void UBCombatComponent::LaunchGrenade()
 {
 	ShowAttachedGrenade(false);
+
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
+	{
+		ServerLaunchGrenade(HitTarget);
+	}
+}
+
+void UBCombatComponent::ServerLaunchGrenade_Implementation(const FVector_NetQuantize& Target)
+{
+	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade() && FragGrenadeClass)
+	{
+		const FVector StartingLocation = BlasterCharacter->GetAttachedGrenade()->GetComponentLocation();
+		FVector ToTarget = Target - StartingLocation;
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = BlasterCharacter;
+		SpawnParameters.Instigator = BlasterCharacter;
+		
+		UWorld* World = GetWorld();
+		if(World)
+		{
+			World->SpawnActor<ABProjectile>(FragGrenadeClass, StartingLocation, ToTarget.Rotation(), SpawnParameters);
+		}
+	}
 }
 
 void UBCombatComponent::Fire()

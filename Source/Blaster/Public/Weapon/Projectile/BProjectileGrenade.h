@@ -32,5 +32,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Grenade")
 	TObjectPtr<USoundCue> BounceSound;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Grenade")
+	bool bShouldExplodeOnEnemy = true;
 	
 };

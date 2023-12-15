@@ -9,6 +9,7 @@
 #include "Components/ActorComponent.h"
 #include "BCombatComponent.generated.h"
 
+class ABProjectile;
 class ABlasterHUD;
 class ABPlayerController;
 class ABlasterCharacter;
@@ -83,6 +84,9 @@ protected:
 	void UpdateCarriedAmmo();
 	void PlayEquipWeaponSound();
 	void ReloadEmptyWeapon();
+
+	UFUNCTION(Server, Reliable)
+	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
@@ -175,6 +179,16 @@ private:
 
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
 
+	/**
+	 * Grenades
+	 */
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	TSubclassOf<ABProjectile> FragGrenadeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	TSubclassOf<ABProjectile> SemtexGrenadeClass;
+	
 private:
 	void Fire();
 	void StartFireTimer();
