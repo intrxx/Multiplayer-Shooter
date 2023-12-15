@@ -31,4 +31,13 @@ enum class EBWeaponType : uint8
 	EWT_MAX UMETA(DisplayName = "Default MAX")
 };
 
+UENUM(BlueprintType)
+enum class EBGrenadeType : uint8
+{
+	EGT_None UMETA(DisplayName = "None"),
+	EGT_Tactical UMETA(DisplayName = "Tactical"),
+	EGT_Lethal UMETA(DisplayName = "Lethal"),
+	
+	EWT_MAX UMETA(DisplayName = "Default MAX")
+};
 

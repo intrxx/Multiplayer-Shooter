@@ -8,6 +8,7 @@
 #include "BlasterInterfaces/BCrosshairInteractionInterface.h"
 #include "BlasterTypes/BCombatState.h"
 #include "BlasterTypes/BTurningInPlace.h"
+#include "BlasterTypes/BWeaponTypes.h"
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
@@ -43,6 +44,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
 	void PlayReloadMontage();
+	void PlayThrowGrenadeMontage(const EBGrenadeType GrenadeType);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowScopeWidget(bool bShowScope);
@@ -117,6 +119,8 @@ protected:
 	void ChangeFiringModeButtonPressed();
 	void ToggleScoreBoard();
 	void ToggleInventory();
+	void LethalGrenadeButtonPressed();
+	void TacticalGrenadeButtonPressed();
 	
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
@@ -177,6 +181,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UAnimMontage> ThrowGrenadeMontage;
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TObjectPtr<UAnimMontage> RareDeathMontage;
@@ -190,7 +197,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Aim;
-
+	
 	/**
 	 * 
 	 */

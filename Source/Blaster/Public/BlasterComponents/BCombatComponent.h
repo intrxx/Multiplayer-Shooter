@@ -36,6 +36,9 @@ public:
 	void JumpToShotGunMontageEnd();
 	
 	void FireButtonPressed(bool bPressed);
+
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
+	void ThrowGrenadeFinished();
 	
 public:
 	
@@ -58,6 +61,10 @@ protected:
 	void HandleReload();
 	int32 CalculateAmountToReload();
 
+	UFUNCTION(Server, Reliable)
+	void ServerThrowGrenade(const EBGrenadeType GrenadeType);
+	void ThrowGrenade(const EBGrenadeType GrenadeType);
+	
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
@@ -76,6 +83,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	EBCombatState CombatState = EBCombatState::ECS_Unoccupied;
+
+	UPROPERTY(Replicated)
+	EBGrenadeType GrenadeTypeThrowing = EBGrenadeType::EGT_None;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;

@@ -328,6 +328,10 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::FireWeaponPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Fire, ETriggerEvent::Completed, this,
 		&ThisClass::FireWeaponReleased);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ThrowTacGrenade, ETriggerEvent::Triggered, this,
+		&ThisClass::TacticalGrenadeButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ThrowLethalGrenade, ETriggerEvent::Triggered, this,
+		&ThisClass::LethalGrenadeButtonPressed);
 }
 
 void ABlasterCharacter::Move(const FInputActionValue& Value)
@@ -495,6 +499,24 @@ void ABlasterCharacter::ToggleInventory()
 	}
 }
 
+void ABlasterCharacter::LethalGrenadeButtonPressed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Throwing Lethal Grenade"));
+	if(CombatComp)
+	{
+		CombatComp->ThrowGrenade(EBGrenadeType::EGT_Lethal);
+	}
+}
+
+void ABlasterCharacter::TacticalGrenadeButtonPressed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Throwing Tactical Grenade"));
+	if(CombatComp)
+	{
+		CombatComp->ThrowGrenade(EBGrenadeType::EGT_Tactical);
+	}
+}
+
 EBCombatState ABlasterCharacter::GetCombatState() const
 {
 	if(CombatComp)
@@ -648,6 +670,28 @@ void ABlasterCharacter::PlayReloadMontage()
 			break;
 		}
 		
+	}
+}
+
+void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeType GrenadeType)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(!AnimInstance)
+	{
+		return;
+	}
+	AnimInstance->Montage_Play(ThrowGrenadeMontage);
+	
+	switch(GrenadeType)
+	{
+		case EBGrenadeType::EGT_Lethal:
+			AnimInstance->Montage_JumpToSection(FName("Lethal"));
+			break;
+		case EBGrenadeType::EGT_Tactical:
+			AnimInstance->Montage_JumpToSection(FName("Tactical"));
+			break;
+		default:
+			break;
 	}
 }
 

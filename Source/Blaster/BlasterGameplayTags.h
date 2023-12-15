@@ -21,6 +21,8 @@ public:
 	FGameplayTag Input_Aim;
 	FGameplayTag Input_Fire;
 	FGameplayTag Input_Reload;
+	FGameplayTag Input_ThrowTacGrenade;
+	FGameplayTag Input_ThrowLethalGrenade;
 	FGameplayTag Input_ChangeFiringType;
 	FGameplayTag Input_ToggleScoreboard;
 	FGameplayTag Input_ToggleInventory;

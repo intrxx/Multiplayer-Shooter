@@ -26,6 +26,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
 	DOREPLIFETIME(UBCombatComponent, CombatState);
+	DOREPLIFETIME(UBCombatComponent, GrenadeTypeThrowing);
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedAmmo, COND_OwnerOnly);
 }
 
@@ -229,6 +230,11 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	{
 		return;
 	}
+
+	if(CombatState != EBCombatState::ECS_Unoccupied)
+	{
+		return;
+	}
 	
 	if(EquippedWeapon)
 	{
@@ -303,7 +309,7 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 
 void UBCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState != EBCombatState::ECS_Reloading && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity())
+	if(CarriedAmmo > 0 && CombatState == EBCombatState::ECS_Unoccupied && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity())
 	{
 		ServerReload();
 	}
@@ -324,6 +330,36 @@ int32 UBCombatComponent::CalculateAmountToReload()
 		return FMath::Clamp(RoomInMag, 0, LeastToReload);
 	}
 	return 0;
+}
+
+void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
+{
+	if(CombatState != EBCombatState::ECS_Unoccupied)
+	{
+		return;
+	}
+	
+	GrenadeTypeThrowing = GrenadeType;
+	CombatState = EBCombatState::ECS_ThrowingGrenade;
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+	}
+	
+	if(BlasterCharacter && !BlasterCharacter->HasAuthority())
+	{
+		ServerThrowGrenade(GrenadeType);
+	}
+}
+
+void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeType GrenadeType)
+{
+	GrenadeTypeThrowing = GrenadeType;
+	CombatState = EBCombatState::ECS_ThrowingGrenade;
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+	}
 }
 
 void UBCombatComponent::ServerReload_Implementation()
@@ -449,6 +485,12 @@ void UBCombatComponent::OnRep_CombatState()
 			Fire();
 		}
 		break;
+	case EBCombatState::ECS_ThrowingGrenade:
+		if(BlasterCharacter && !BlasterCharacter->IsLocallyControlled())
+		{
+			BlasterCharacter->PlayThrowGrenadeMontage(GrenadeTypeThrowing);
+		}
+		break;
 	default:
 		break;
 	}
@@ -483,6 +525,11 @@ void UBCombatComponent::FireButtonPressed(bool bPressed)
 			UE_LOG(LogTemp, Error, TEXT("Weapon %s has Burst mode avaible but no Burst Mode logic"), *EquippedWeapon->GetName());
 		}
 	}
+}
+
+void UBCombatComponent::ThrowGrenadeFinished()
+{
+	CombatState = EBCombatState::ECS_Unoccupied;
 }
 
 void UBCombatComponent::Fire()

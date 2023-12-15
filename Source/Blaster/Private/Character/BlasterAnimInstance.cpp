@@ -86,7 +86,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget()));
 	}
 
-	bUseFABRIK = BlasterCharacter->GetCombatState() != EBCombatState::ECS_Reloading;
-	bUseAimOffsets = BlasterCharacter->GetCombatState() != EBCombatState::ECS_Reloading && !BlasterCharacter->GetDisableGameplay();
-	bTransformRightHand = BlasterCharacter->GetCombatState() != EBCombatState::ECS_Reloading && !BlasterCharacter->GetDisableGameplay();
+	bUseFABRIK = BlasterCharacter->GetCombatState() == EBCombatState::ECS_Unoccupied;
+	bUseAimOffsets = BlasterCharacter->GetCombatState() == EBCombatState::ECS_Unoccupied && !BlasterCharacter->GetDisableGameplay();
+	bTransformRightHand = BlasterCharacter->GetCombatState() == EBCombatState::ECS_Unoccupied && !BlasterCharacter->GetDisableGameplay();
 }
