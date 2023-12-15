@@ -74,4 +74,21 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	TObjectPtr<UTexture2D> AutomaticAmmoImage;
+
+	/**
+	 * Grenades
+	 */
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> LethalGrenadeImage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> LethalGrenadesNumber;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> TacticalGrenadeImage;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> TacticalGrenadesNumber;
+	
 };

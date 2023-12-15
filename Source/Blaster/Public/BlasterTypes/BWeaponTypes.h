@@ -32,12 +32,22 @@ enum class EBWeaponType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EBGrenadeCategory : uint8
+{
+	EGC_None UMETA(DisplayName = "None"),
+	EGC_Tactical UMETA(DisplayName = "Tactical"),
+	EGC_Lethal UMETA(DisplayName = "Lethal"),
+	
+	EWC_MAX UMETA(DisplayName = "Default MAX")
+};
+
+UENUM(BlueprintType)
 enum class EBGrenadeType : uint8
 {
-	EGT_None UMETA(DisplayName = "None"),
-	EGT_Tactical UMETA(DisplayName = "Tactical"),
-	EGT_Lethal UMETA(DisplayName = "Lethal"),
+	EGT_Frag UMETA(DisplayName = "Frag"),
+	EGT_Semtex UMETA(DisplayName = "Semtex"),
+	EGT_Flash UMETA(DisplayName = "Flash"),
 	
-	EWT_MAX UMETA(DisplayName = "Default MAX")
+	EGT_MAX UMETA(DisplayName = "Default MAX")
 };
 

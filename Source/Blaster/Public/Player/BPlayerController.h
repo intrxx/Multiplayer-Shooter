@@ -66,6 +66,8 @@ public:
 	void SetHUDGameTimer(float CountdownTime);
 	void SetHUDAnnouncementTimer(float CountdownTime);
 	void SetDeathScreenVisibility(bool bSetVisibility);
+	void SetHUDGrenadesNumber(int32 Grenades, EBGrenadeCategory GrenadeCategory);
+	void SetHUDGrenadesImage(UTexture2D* GrenadeImage, EBGrenadeCategory GrenadeCategory);
 	
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
@@ -153,6 +155,9 @@ private:
 	TArray<FPlayerStats> LocalPlayerStats;
 	float HUDHealth;
 	float HUDMaxHealth;
+
+	int32 HUDLethalGrenades;
+	int32 HUDTacticalGrenades;
 	
 };
 

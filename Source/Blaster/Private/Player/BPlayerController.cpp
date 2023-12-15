@@ -69,6 +69,15 @@ void ABPlayerController::PollInit()
 			if(CharacterOverlay)
 			{
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
+				
+				if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn()))
+				{
+					if(BlasterCharacter->GetCombatComp())
+					{
+						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetLethalGrenades(), EBGrenadeCategory::EGC_Lethal);
+						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetTacticalGrenades(), EBGrenadeCategory::EGC_Tactical);
+					}
+				}
 			}
 		}
 	}
@@ -359,6 +368,72 @@ void ABPlayerController::SetDeathScreenVisibility(bool bSetVisibility)
 		else
 		{
 			BlasterHUD->CharacterOverlay->DeathInfoOverlay->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
+void ABPlayerController::SetHUDGrenadesNumber(int32 Grenades, EBGrenadeCategory GrenadeCategory)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->LethalGrenadesNumber &&
+		BlasterHUD->CharacterOverlay->TacticalGrenadesNumber;
+		
+	if(bHUDValid)
+	{
+		FString GrenadesText = FString::Printf(TEXT("%d"), Grenades);
+
+		switch (GrenadeCategory)
+		{
+		case EBGrenadeCategory::EGC_Lethal:
+			BlasterHUD->CharacterOverlay->LethalGrenadesNumber->SetText(FText::FromString(GrenadesText));
+			break;
+		case EBGrenadeCategory::EGC_Tactical:
+			BlasterHUD->CharacterOverlay->TacticalGrenadesNumber->SetText(FText::FromString(GrenadesText));
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (GrenadeCategory)
+		{
+		case EBGrenadeCategory::EGC_Lethal:
+			HUDLethalGrenades = Grenades;
+			break;
+		case EBGrenadeCategory::EGC_Tactical:
+			HUDTacticalGrenades = Grenades;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void ABPlayerController::SetHUDGrenadesImage(UTexture2D* GrenadeImage, EBGrenadeCategory GrenadeCategory)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->LethalGrenadeImage &&
+		BlasterHUD->CharacterOverlay->TacticalGrenadeImage;
+		
+	if(bHUDValid)
+	{
+		switch (GrenadeCategory)
+		{
+		case EBGrenadeCategory::EGC_Lethal:
+			BlasterHUD->CharacterOverlay->LethalGrenadeImage->SetBrushFromTexture(GrenadeImage);
+			break;
+		case EBGrenadeCategory::EGC_Tactical:
+			BlasterHUD->CharacterOverlay->TacticalGrenadeImage->SetBrushFromTexture(GrenadeImage);
+			break;
+		default:
+			break;
 		}
 	}
 }

@@ -44,7 +44,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
 	void PlayReloadMontage();
-	void PlayThrowGrenadeMontage(const EBGrenadeType GrenadeType);
+	void PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowScopeWidget(bool bShowScope);

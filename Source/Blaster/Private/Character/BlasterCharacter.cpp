@@ -509,19 +509,17 @@ void ABlasterCharacter::ToggleInventory()
 
 void ABlasterCharacter::LethalGrenadeButtonPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Throwing Lethal Grenade"));
 	if(CombatComp)
 	{
-		CombatComp->ThrowGrenade(EBGrenadeType::EGT_Lethal);
+		CombatComp->ThrowGrenade(EBGrenadeCategory::EGC_Lethal);
 	}
 }
 
 void ABlasterCharacter::TacticalGrenadeButtonPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Throwing Tactical Grenade"));
 	if(CombatComp)
 	{
-		CombatComp->ThrowGrenade(EBGrenadeType::EGT_Tactical);
+		CombatComp->ThrowGrenade(EBGrenadeCategory::EGC_Tactical);
 	}
 }
 
@@ -681,7 +679,7 @@ void ABlasterCharacter::PlayReloadMontage()
 	}
 }
 
-void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeType GrenadeType)
+void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(!AnimInstance)
@@ -690,12 +688,12 @@ void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeType GrenadeType)
 	}
 	AnimInstance->Montage_Play(ThrowGrenadeMontage);
 	
-	switch(GrenadeType)
+	switch(GrenadeCategory)
 	{
-		case EBGrenadeType::EGT_Lethal:
+		case EBGrenadeCategory::EGC_Lethal:
 			AnimInstance->Montage_JumpToSection(FName("Lethal"));
 			break;
-		case EBGrenadeType::EGT_Tactical:
+		case EBGrenadeCategory::EGC_Tactical:
 			AnimInstance->Montage_JumpToSection(FName("Tactical"));
 			break;
 		default:
@@ -722,6 +720,11 @@ void ABlasterCharacter::PlayHitReactMontage()
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                       AController* InstigatorController, AActor* DamageCauser)
 {
+	if(bDead)
+	{
+		return;
+	}
+	
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	
 	UpdateHUDHealth();

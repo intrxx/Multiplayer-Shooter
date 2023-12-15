@@ -27,6 +27,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void UpdateHUDGrenades();
+	
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	void Reload();
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
@@ -46,6 +48,9 @@ public:
 	void ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh = nullptr);
 	
 	void DropEquippedWeapon();
+
+	int32 GetLethalGrenades() const {return CarriedLethalGrenades;}
+	int32 GetTacticalGrenades() const {return CarriedTacticalGrenades;}
 
 public:
 	
@@ -69,8 +74,8 @@ protected:
 	int32 CalculateAmountToReload();
 
 	UFUNCTION(Server, Reliable)
-	void ServerThrowGrenade(const EBGrenadeType GrenadeType);
-	void ThrowGrenade(const EBGrenadeType GrenadeType);
+	void ServerThrowGrenade(const EBGrenadeCategory GrenadeCategory);
+	void ThrowGrenade(const EBGrenadeCategory GrenadeCategory);
 	
 	// When called on server it will run on all clients and server
 	UFUNCTION(NetMulticast, Reliable)
@@ -87,6 +92,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
+	
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
@@ -99,7 +105,7 @@ private:
 	EBCombatState CombatState = EBCombatState::ECS_Unoccupied;
 
 	UPROPERTY(Replicated)
-	EBGrenadeType GrenadeTypeThrowing = EBGrenadeType::EGT_None;
+	EBGrenadeCategory GrenadeTypeThrowing = EBGrenadeCategory::EGC_None;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;
@@ -177,7 +183,26 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
 	int32 StartingGrenadeLauncherAmmo = 10;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedTacticalGrenades)
+	int32 CarriedTacticalGrenades = 3;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedLethalGrenades)
+	int32 CarriedLethalGrenades = 2;
+
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	int32 MaxGrenades = 3;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	int32 StartingFragGrenades = 1;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	int32 StartingFlashGrenades = 2;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	int32 StartingSemtexGrenades = 1;
+	
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
+	TMap<EBGrenadeType, int32> CarriedGrenadesMap;
 
 	/**
 	 * Grenades
@@ -203,8 +228,16 @@ private:
 	void InitializeCarriedAmmo();
 
 	UFUNCTION()
+	void OnRep_CarriedLethalGrenades();
+	UFUNCTION()
+	void OnRep_CarriedTacticalGrenades();
+	void InitializeCarriedGrenades();
+
+	UFUNCTION()
 	void OnRep_CombatState();
 
 	void UpdateAmmoValues();
 	void UpdateShotgunAmmoValues();
+	void UpdateGrenadesValues(const EBGrenadeCategory GrenadeCategory);
 };
+

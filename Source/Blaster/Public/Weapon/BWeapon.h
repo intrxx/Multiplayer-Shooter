@@ -52,6 +52,7 @@ public:
 	/**
 	 * Enable or disable custom depth to display the outline effect
 	 */
+	
 	void EnableCustomDepth(bool bEnable);
 	
 	/**

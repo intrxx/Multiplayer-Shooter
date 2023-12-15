@@ -28,6 +28,8 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UBCombatComponent, bAiming);
 	DOREPLIFETIME(UBCombatComponent, CombatState);
 	DOREPLIFETIME(UBCombatComponent, GrenadeTypeThrowing);
+	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedTacticalGrenades, COND_OwnerOnly)
+	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedLethalGrenades, COND_OwnerOnly)
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedAmmo, COND_OwnerOnly);
 }
 
@@ -354,18 +356,22 @@ int32 UBCombatComponent::CalculateAmountToReload()
 	return 0;
 }
 
-void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
+void UBCombatComponent::ThrowGrenade(const EBGrenadeCategory GrenadeCategory)
 {
+	if((GrenadeCategory == EBGrenadeCategory::EGC_Lethal && CarriedLethalGrenades == 0) || GrenadeCategory == EBGrenadeCategory::EGC_Tactical && CarriedTacticalGrenades == 0)
+	{
+		return;
+	}
 	if(CombatState != EBCombatState::ECS_Unoccupied || EquippedWeapon == nullptr)
 	{
 		return;
 	}
 	
-	GrenadeTypeThrowing = GrenadeType;
+	GrenadeTypeThrowing = GrenadeCategory;
 	CombatState = EBCombatState::ECS_ThrowingGrenade;
 	if(BlasterCharacter)
 	{
-		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeCategory);
 		if(EquippedWeapon)
 		{
 			const FName ThrowingSocket = EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Pistol ||
@@ -378,19 +384,43 @@ void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
 	
 	if(BlasterCharacter && !BlasterCharacter->HasAuthority())
 	{
-		ServerThrowGrenade(GrenadeType);
+		ServerThrowGrenade(GrenadeCategory);
+	}
+
+	if(BlasterCharacter && BlasterCharacter->HasAuthority())
+	{
+		UpdateGrenadesValues(GrenadeCategory);
+		UpdateHUDGrenades();
 	}
 }
 
-void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeType GrenadeType)
+void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeCategory GrenadeCategory)
 {
-	GrenadeTypeThrowing = GrenadeType;
+	if((GrenadeCategory == EBGrenadeCategory::EGC_Lethal && CarriedLethalGrenades == 0) || GrenadeCategory == EBGrenadeCategory::EGC_Tactical && CarriedTacticalGrenades == 0)
+	{
+		return;
+	}
+	
+	GrenadeTypeThrowing = GrenadeCategory;
 	CombatState = EBCombatState::ECS_ThrowingGrenade;
 	if(BlasterCharacter)
 	{
-		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeCategory);
 		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
 		ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
+	}
+	UpdateGrenadesValues(GrenadeCategory);
+	UpdateHUDGrenades();
+}
+
+void UBCombatComponent::UpdateHUDGrenades()
+{
+	//TODO Update when different grenades will be an option
+	
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDGrenadesNumber(CarriedLethalGrenades, EBGrenadeCategory::EGC_Lethal);
 	}
 }
 
@@ -458,6 +488,22 @@ void UBCombatComponent::UpdateShotgunAmmoValues()
 	if(EquippedWeapon->IsMagFull() || CarriedAmmo == 0)
 	{
 		JumpToShotGunMontageEnd();
+	}
+}
+
+void UBCombatComponent::UpdateGrenadesValues(const EBGrenadeCategory GrenadeCategory)
+{
+	//TODO Update when different grenades will be an option
+	
+	switch (GrenadeCategory)
+	{
+	case EBGrenadeCategory::EGC_Lethal:
+		CarriedLethalGrenades = FMath::Clamp(CarriedLethalGrenades - 1, 0, MaxGrenades);
+		break;
+	case EBGrenadeCategory::EGC_Tactical:
+		CarriedTacticalGrenades = FMath::Clamp(CarriedTacticalGrenades -1, 0, MaxGrenades);
+	default:
+		break;
 	}
 }
 
@@ -710,6 +756,22 @@ void UBCombatComponent::InitializeCarriedAmmo()
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Shotgun, StartingShotgunAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_Sniper, StartingSniperAmmo);
 	CarriedAmmoMap.Emplace(EBWeaponType::EWT_GrenadeLauncher, StartingGrenadeLauncherAmmo);
+}
+
+void UBCombatComponent::OnRep_CarriedLethalGrenades()
+{
+	UpdateHUDGrenades();
+}
+
+void UBCombatComponent::OnRep_CarriedTacticalGrenades()
+{
+}
+
+void UBCombatComponent::InitializeCarriedGrenades()
+{
+	CarriedGrenadesMap.Emplace(EBGrenadeType::EGT_Frag, StartingFragGrenades);
+	CarriedGrenadesMap.Emplace(EBGrenadeType::EGT_Flash, StartingFlashGrenades);
+	CarriedGrenadesMap.Emplace(EBGrenadeType::EGT_Semtex, StartingSemtexGrenades);
 }
 
 void UBCombatComponent::ShrinkCrosshairWhileShooting()
