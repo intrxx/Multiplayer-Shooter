@@ -224,6 +224,57 @@ void UBCombatComponent::InterpFOV(float DeltaTime)
 	}
 }
 
+void UBCombatComponent::AttachActorToHand(AActor* ActorToAttach, const FName SocketName)
+{
+	if(BlasterCharacter == nullptr || BlasterCharacter->GetMesh() == nullptr || ActorToAttach == nullptr)
+	{
+		return;
+	}
+	
+	const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(SocketName);
+	if(HandSocket)
+	{
+		HandSocket->AttachActor(ActorToAttach, BlasterCharacter->GetMesh());
+	}
+}
+
+void UBCombatComponent::UpdateCarriedAmmo()
+{
+	if(EquippedWeapon == nullptr)
+	{
+		return;
+	}
+	
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
+		BlasterPC->SetHUDInventoryCarriedAmmo(EquippedWeapon->GetWeaponType(), CarriedAmmo);
+		BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
+	}
+}
+
+void UBCombatComponent::PlayEquipWeaponSound()
+{
+	if(EquippedWeapon && EquippedWeapon->EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
+	}
+}
+
+void UBCombatComponent::ReloadEmptyWeapon()
+{
+	if(EquippedWeapon && EquippedWeapon->IsMagEmpty())
+	{
+		Reload();
+	}
+}
+
 void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 {
 	if(BlasterCharacter == nullptr || WeaponToEquip == nullptr)
@@ -235,46 +286,22 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	{
 		return;
 	}
-	
-	if(EquippedWeapon)
-	{
-		EquippedWeapon->Dropped();
-	}
+
+	// If we hold a weapon we should drop it first
+	DropEquippedWeapon();
 	
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
-
-	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
-	{
-		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
-	}
 	
-	const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-	if(HandSocket)
-	{
-		HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
-	}
+	AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+	
 	EquippedWeapon->SetOwner(BlasterCharacter);
 	EquippedWeapon->SetHUDAmmo();
 	EquippedWeapon->SetHUDAmmoImage();
 
-	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
-	if(BlasterPC)
-	{
-		BlasterPC->SetHUDCarriedAmmo(CarriedAmmo);
-		BlasterPC->SetHUDInventoryCarriedAmmo(EquippedWeapon->GetWeaponType(), CarriedAmmo);
-		BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
-	}
-
-	if(EquippedWeapon->EquipSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
-	}
-
-	if(EquippedWeapon->IsMagEmpty())
-	{
-		Reload();
-	}
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound();
+	ReloadEmptyWeapon();
 	
 	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 	BlasterCharacter->bUseControllerRotationYaw = true;
@@ -285,11 +312,8 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 	if(EquippedWeapon && BlasterCharacter)
 	{
 		EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
-		const USkeletalMeshSocket* HandSocket = BlasterCharacter->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-		if(HandSocket)
-		{
-			HandSocket->AttachActor(EquippedWeapon, BlasterCharacter->GetMesh());
-		}
+		
+		AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
 
 		BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
 		if(BlasterPC)
@@ -297,10 +321,7 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 			BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
 		}
 		
-		if(EquippedWeapon->EquipSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
-		}
+		PlayEquipWeaponSound();
 		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BlasterCharacter->bUseControllerRotationYaw = true;
@@ -344,6 +365,12 @@ void UBCombatComponent::ThrowGrenade(const EBGrenadeType GrenadeType)
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+		if(EquippedWeapon)
+		{
+			const FName ThrowingSocket = EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Pistol ||
+				EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
+			AttachActorToHand(EquippedWeapon, ThrowingSocket);
+		}
 	}
 	
 	if(BlasterCharacter && !BlasterCharacter->HasAuthority())
@@ -359,6 +386,7 @@ void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeType Gr
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeType);
+		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
 	}
 }
 
@@ -489,6 +517,12 @@ void UBCombatComponent::OnRep_CombatState()
 		if(BlasterCharacter && !BlasterCharacter->IsLocallyControlled())
 		{
 			BlasterCharacter->PlayThrowGrenadeMontage(GrenadeTypeThrowing);
+			if(EquippedWeapon)
+			{
+				const FName ThrowingSocket = EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Pistol ||
+					EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
+				AttachActorToHand(EquippedWeapon, ThrowingSocket);
+			}
 		}
 		break;
 	default:
@@ -530,6 +564,16 @@ void UBCombatComponent::FireButtonPressed(bool bPressed)
 void UBCombatComponent::ThrowGrenadeFinished()
 {
 	CombatState = EBCombatState::ECS_Unoccupied;
+
+	AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+}
+
+void UBCombatComponent::DropEquippedWeapon()
+{
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Dropped();
+	}
 }
 
 void UBCombatComponent::Fire()
@@ -586,10 +630,7 @@ void UBCombatComponent::FireTimerFinished()
 		Fire();
 	}
 
-	if(EquippedWeapon->IsMagEmpty())
-	{
-		Reload();
-	}
+	ReloadEmptyWeapon();
 }
 
 void UBCombatComponent::OnRep_CarriedAmmo()

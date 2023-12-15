@@ -39,6 +39,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void ThrowGrenadeFinished();
+
+	void DropEquippedWeapon();
 	
 public:
 	
@@ -73,6 +75,10 @@ protected:
 	void SetHUDCrosshair(float DeltaTime);
 	void InterpFOV(float DeltaTime);
 
+	void AttachActorToHand(AActor* ActorToAttach, const FName SocketName);
+	void UpdateCarriedAmmo();
+	void PlayEquipWeaponSound();
+	void ReloadEmptyWeapon();
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
