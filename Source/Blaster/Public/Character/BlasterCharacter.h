@@ -85,13 +85,6 @@ public:
 
 	virtual void Destroyed() override;
 
-	/**
-	* Grenades mesh
-	*/
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Grenades")
-	TObjectPtr<UStaticMesh> FragGrenade;
-
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;

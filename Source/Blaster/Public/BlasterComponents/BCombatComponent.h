@@ -9,6 +9,7 @@
 #include "Components/ActorComponent.h"
 #include "BCombatComponent.generated.h"
 
+class ABGrenade;
 class ABProjectile;
 class ABlasterHUD;
 class ABPlayerController;
@@ -27,7 +28,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void UpdateHUDGrenades();
+	void UpdateHUDGrenades(const EBGrenadeCategory GrenadeCategory);
+	void UpdateHUDGrenadeImage(const EBGrenadeCategory GrenadeCategory);
 	
 	void EquipWeapon(ABWeapon* WeaponToEquip);
 	void Reload();
@@ -51,6 +53,8 @@ public:
 
 	int32 GetLethalGrenades() const {return CarriedLethalGrenades;}
 	int32 GetTacticalGrenades() const {return CarriedTacticalGrenades;}
+	ABGrenade* GetEquippedLethalGrenade() const {return EquippedLethalGrenade;}
+	ABGrenade* GetEquippedTacticalGrenade() const {return EquippedTacticalGrenade;}
 
 public:
 	
@@ -63,6 +67,12 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_EquippedLethalGrenade();
+
+	UFUNCTION()
+	void OnRep_EquippedTacticalGrenade();
 	
 	// Server RPC, when called on client will execute on server
 	UFUNCTION(Server, Reliable)
@@ -92,6 +102,8 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
+
+	void AddDefaultGrenades();
 	
 private:
 	UPROPERTY()
@@ -109,6 +121,18 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedLethalGrenade)
+	TObjectPtr<ABGrenade> EquippedLethalGrenade;
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedTacticalGrenade)
+	TObjectPtr<ABGrenade> EquippedTacticalGrenade;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Defaults")
+	TSubclassOf<ABGrenade> DefaultLethalGrenade;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Defaults")
+	TSubclassOf<ABGrenade> DefaultTacticalGrenade;
 
 	UPROPERTY(Replicated)
 	bool bAiming;
@@ -188,9 +212,6 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedLethalGrenades)
 	int32 CarriedLethalGrenades = 2;
-
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
-	int32 MaxGrenades = 3;
 	
 	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
 	int32 StartingFragGrenades = 1;
@@ -209,10 +230,13 @@ private:
 	 */
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
-	TSubclassOf<ABProjectile> FragGrenadeClass;
+	TSubclassOf<ABGrenade> FragGrenadeClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
-	TSubclassOf<ABProjectile> SemtexGrenadeClass;
+	TSubclassOf<ABGrenade> SemtexGrenadeClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	TSubclassOf<ABGrenade> FlashGrenadeClass;
 	
 private:
 	void Fire();

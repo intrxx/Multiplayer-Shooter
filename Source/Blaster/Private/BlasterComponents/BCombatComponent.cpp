@@ -12,8 +12,8 @@
 #include "Weapon/BWeapon.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/BGrenade.h"
 #include "Weapon/Sniper/BSniperRifle.h"
-#include "Weapon/Projectile/BProjectile.h"
 
 UBCombatComponent::UBCombatComponent()
 {
@@ -25,6 +25,8 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UBCombatComponent, EquippedLethalGrenade);
+	DOREPLIFETIME(UBCombatComponent, EquippedTacticalGrenade);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
 	DOREPLIFETIME(UBCombatComponent, CombatState);
 	DOREPLIFETIME(UBCombatComponent, GrenadeTypeThrowing);
@@ -52,6 +54,7 @@ void UBCombatComponent::BeginPlay()
 		if(BlasterCharacter->HasAuthority())
 		{
 			InitializeCarriedAmmo();
+			AddDefaultGrenades();
 		}
 	}
 }
@@ -278,6 +281,21 @@ void UBCombatComponent::ReloadEmptyWeapon()
 	}
 }
 
+void UBCombatComponent::AddDefaultGrenades()
+{
+	if(DefaultLethalGrenade)
+	{
+		EquippedLethalGrenade = DefaultLethalGrenade.GetDefaultObject();
+		UpdateHUDGrenadeImage(EBGrenadeCategory::EGC_Lethal);
+	}
+
+	if(DefaultTacticalGrenade)
+	{
+		EquippedTacticalGrenade = DefaultTacticalGrenade.GetDefaultObject();
+		UpdateHUDGrenadeImage(EBGrenadeCategory::EGC_Tactical);
+	}
+}
+
 void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 {
 	if(BlasterCharacter == nullptr || WeaponToEquip == nullptr)
@@ -331,6 +349,16 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UBCombatComponent::OnRep_EquippedLethalGrenade()
+{
+	UpdateHUDGrenadeImage(EBGrenadeCategory::EGC_Lethal);
+}
+
+void UBCombatComponent::OnRep_EquippedTacticalGrenade()
+{
+	UpdateHUDGrenadeImage(EBGrenadeCategory::EGC_Tactical);
+}
+
 void UBCombatComponent::Reload()
 {
 	if(CarriedAmmo > 0 && CombatState == EBCombatState::ECS_Unoccupied && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity())
@@ -378,7 +406,17 @@ void UBCombatComponent::ThrowGrenade(const EBGrenadeCategory GrenadeCategory)
 				EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
 			AttachActorToHand(EquippedWeapon, ThrowingSocket);
 
-			ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
+			switch (GrenadeCategory)
+			{
+			case EBGrenadeCategory::EGC_Lethal:
+				ShowAttachedGrenade(true, EquippedLethalGrenade->GetGrenadeMesh());
+				break;
+			case EBGrenadeCategory::EGC_Tactical:
+				ShowAttachedGrenade(true, EquippedTacticalGrenade->GetGrenadeMesh());
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	
@@ -390,7 +428,7 @@ void UBCombatComponent::ThrowGrenade(const EBGrenadeCategory GrenadeCategory)
 	if(BlasterCharacter && BlasterCharacter->HasAuthority())
 	{
 		UpdateGrenadesValues(GrenadeCategory);
-		UpdateHUDGrenades();
+		UpdateHUDGrenades(GrenadeCategory);
 	}
 }
 
@@ -407,20 +445,55 @@ void UBCombatComponent::ServerThrowGrenade_Implementation(const EBGrenadeCategor
 	{
 		BlasterCharacter->PlayThrowGrenadeMontage(GrenadeCategory);
 		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
-		ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
+		ShowAttachedGrenade(true, EquippedLethalGrenade->GetGrenadeMesh());
 	}
 	UpdateGrenadesValues(GrenadeCategory);
-	UpdateHUDGrenades();
+	UpdateHUDGrenades(GrenadeCategory);
 }
 
-void UBCombatComponent::UpdateHUDGrenades()
+void UBCombatComponent::UpdateHUDGrenades(const EBGrenadeCategory GrenadeCategory)
 {
-	//TODO Update when different grenades will be an option
-	
 	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
 	if(BlasterPC)
 	{
-		BlasterPC->SetHUDGrenadesNumber(CarriedLethalGrenades, EBGrenadeCategory::EGC_Lethal);
+		switch (GrenadeCategory)
+		{
+		case EBGrenadeCategory::EGC_Lethal:
+			BlasterPC->SetHUDGrenadesNumber(CarriedLethalGrenades, EBGrenadeCategory::EGC_Lethal);
+			break;
+		case EBGrenadeCategory::EGC_Tactical:
+			BlasterPC->SetHUDGrenadesNumber(CarriedTacticalGrenades, EBGrenadeCategory::EGC_Tactical);
+			break;
+		default:
+			break;
+		}
+		
+	}
+}
+
+void UBCombatComponent::UpdateHUDGrenadeImage(const EBGrenadeCategory GrenadeCategory)
+{
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(BlasterCharacter->Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		switch (GrenadeCategory)
+		{
+		case EBGrenadeCategory::EGC_Lethal:
+			if(EquippedLethalGrenade)
+			{
+				BlasterPC->SetHUDGrenadesImage(EquippedLethalGrenade->GrenadeHUDImage, EBGrenadeCategory::EGC_Lethal);
+			}
+			break;
+		case EBGrenadeCategory::EGC_Tactical:
+			if(EquippedTacticalGrenade)
+			{
+				BlasterPC->SetHUDGrenadesImage(EquippedTacticalGrenade->GrenadeHUDImage, EBGrenadeCategory::EGC_Tactical);
+			}
+			break;
+		default:
+			break;
+		}
+		
 	}
 }
 
@@ -498,10 +571,16 @@ void UBCombatComponent::UpdateGrenadesValues(const EBGrenadeCategory GrenadeCate
 	switch (GrenadeCategory)
 	{
 	case EBGrenadeCategory::EGC_Lethal:
-		CarriedLethalGrenades = FMath::Clamp(CarriedLethalGrenades - 1, 0, MaxGrenades);
+		if(EquippedLethalGrenade)
+		{
+			CarriedLethalGrenades = FMath::Clamp(CarriedLethalGrenades - 1, 0, EquippedLethalGrenade->GetMaxGrenades());
+		}
 		break;
 	case EBGrenadeCategory::EGC_Tactical:
-		CarriedTacticalGrenades = FMath::Clamp(CarriedTacticalGrenades -1, 0, MaxGrenades);
+		if(EquippedTacticalGrenade)
+		{
+			CarriedTacticalGrenades = FMath::Clamp(CarriedTacticalGrenades -1, 0, EquippedTacticalGrenade->GetMaxGrenades());
+		}
 	default:
 		break;
 	}
@@ -573,8 +652,17 @@ void UBCombatComponent::OnRep_CombatState()
 					EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_SubMachineGun ? FName("SmallWeaponLeftHandSocket") : FName("LeftHandSocket");
 				AttachActorToHand(EquippedWeapon, ThrowingSocket);
 			}
-
-			ShowAttachedGrenade(true, BlasterCharacter->FragGrenade);
+			switch (GrenadeTypeThrowing)
+			{
+			case EBGrenadeCategory::EGC_Lethal:
+				ShowAttachedGrenade(true, EquippedLethalGrenade->GetGrenadeMesh());
+				break;
+			case EBGrenadeCategory::EGC_Tactical:
+				ShowAttachedGrenade(true, EquippedTacticalGrenade->GetGrenadeMesh());
+				break;
+			default:
+				break;
+			}
 		}
 		break;
 	default:
@@ -652,18 +740,28 @@ void UBCombatComponent::LaunchGrenade()
 
 void UBCombatComponent::ServerLaunchGrenade_Implementation(const FVector_NetQuantize& Target)
 {
-	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade() && FragGrenadeClass)
+	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade())
 	{
 		const FVector StartingLocation = BlasterCharacter->GetAttachedGrenade()->GetComponentLocation();
 		FVector ToTarget = Target - StartingLocation;
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = BlasterCharacter;
 		SpawnParameters.Instigator = BlasterCharacter;
-		
+
 		UWorld* World = GetWorld();
 		if(World)
 		{
-			World->SpawnActor<ABProjectile>(FragGrenadeClass, StartingLocation, ToTarget.Rotation(), SpawnParameters);
+			switch (GrenadeTypeThrowing)
+			{
+			case EBGrenadeCategory::EGC_Lethal:
+				World->SpawnActor<ABGrenade>(EquippedLethalGrenade->GetClass(), StartingLocation, ToTarget.Rotation(), SpawnParameters);
+				break;
+			case EBGrenadeCategory::EGC_Tactical:
+				World->SpawnActor<ABGrenade>(EquippedTacticalGrenade->GetClass(), StartingLocation, ToTarget.Rotation(), SpawnParameters);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
@@ -760,11 +858,12 @@ void UBCombatComponent::InitializeCarriedAmmo()
 
 void UBCombatComponent::OnRep_CarriedLethalGrenades()
 {
-	UpdateHUDGrenades();
+	UpdateHUDGrenades(EBGrenadeCategory::EGC_Lethal);
 }
 
 void UBCombatComponent::OnRep_CarriedTacticalGrenades()
 {
+	UpdateHUDGrenades(EBGrenadeCategory::EGC_Tactical);
 }
 
 void UBCombatComponent::InitializeCarriedGrenades()

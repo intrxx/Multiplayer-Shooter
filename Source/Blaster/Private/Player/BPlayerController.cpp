@@ -19,6 +19,7 @@
 #include "BlasterComponents/BCombatComponent.h"
 #include "Game/BlasterGameState.h"
 #include "Player/BPlayerState.h"
+#include "Weapon/BGrenade.h"
 
 void ABPlayerController::BeginPlay()
 {
@@ -76,6 +77,15 @@ void ABPlayerController::PollInit()
 					{
 						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetLethalGrenades(), EBGrenadeCategory::EGC_Lethal);
 						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetTacticalGrenades(), EBGrenadeCategory::EGC_Tactical);
+
+						if(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade())
+						{
+							SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Lethal);
+						}
+						if(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade())
+						{
+							SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Tactical);
+						}
 					}
 				}
 			}
@@ -372,7 +382,7 @@ void ABPlayerController::SetDeathScreenVisibility(bool bSetVisibility)
 	}
 }
 
-void ABPlayerController::SetHUDGrenadesNumber(int32 Grenades, EBGrenadeCategory GrenadeCategory)
+void ABPlayerController::SetHUDGrenadesNumber(int32 Grenades, const EBGrenadeCategory GrenadeCategory)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
@@ -413,7 +423,7 @@ void ABPlayerController::SetHUDGrenadesNumber(int32 Grenades, EBGrenadeCategory 
 	}
 }
 
-void ABPlayerController::SetHUDGrenadesImage(UTexture2D* GrenadeImage, EBGrenadeCategory GrenadeCategory)
+void ABPlayerController::SetHUDGrenadesImage(UTexture2D* GrenadeImage, const EBGrenadeCategory GrenadeCategory)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 

@@ -66,8 +66,8 @@ public:
 	void SetHUDGameTimer(float CountdownTime);
 	void SetHUDAnnouncementTimer(float CountdownTime);
 	void SetDeathScreenVisibility(bool bSetVisibility);
-	void SetHUDGrenadesNumber(int32 Grenades, EBGrenadeCategory GrenadeCategory);
-	void SetHUDGrenadesImage(UTexture2D* GrenadeImage, EBGrenadeCategory GrenadeCategory);
+	void SetHUDGrenadesNumber(int32 Grenades, const EBGrenadeCategory GrenadeCategory);
+	void SetHUDGrenadesImage(UTexture2D* GrenadeImage, const EBGrenadeCategory GrenadeCategory);
 	
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
