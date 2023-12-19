@@ -716,6 +716,21 @@ void UBCombatComponent::DropEquippedWeapon()
 	}
 }
 
+void UBCombatComponent::PickupAmmo(EBWeaponType WeaponType, int32 AmmoToAdd)
+{
+	if(CarriedAmmoMap.Contains(WeaponType) && MaxCarriedAmmoMap.Contains(WeaponType))
+	{
+		CarriedAmmoMap[WeaponType] += FMath::Clamp(AmmoToAdd, 0.f, MaxCarriedAmmoMap[WeaponType]);
+
+		UpdateCarriedAmmo();
+	}
+
+	if(EquippedWeapon && EquippedWeapon->IsMagEmpty() && EquippedWeapon->GetWeaponType() == WeaponType)
+	{
+		Reload();
+	}
+}
+
 void UBCombatComponent::ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh)
 {
 	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade())

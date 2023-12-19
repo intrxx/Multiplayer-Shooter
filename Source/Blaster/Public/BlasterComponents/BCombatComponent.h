@@ -51,6 +51,8 @@ public:
 	
 	void DropEquippedWeapon();
 
+	void PickupAmmo(EBWeaponType WeaponType, int32 AmmoToAdd);
+
 	int32 GetLethalGrenades() const {return CarriedLethalGrenades;}
 	int32 GetTacticalGrenades() const {return CarriedTacticalGrenades;}
 	ABGrenade* GetEquippedLethalGrenade() const {return EquippedLethalGrenade;}
@@ -128,10 +130,10 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedTacticalGrenade)
 	TObjectPtr<ABGrenade> EquippedTacticalGrenade;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Defaults")
 	TSubclassOf<ABGrenade> DefaultLethalGrenade;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Defaults")
 	TSubclassOf<ABGrenade> DefaultTacticalGrenade;
 
 	UPROPERTY(Replicated)
@@ -186,25 +188,25 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
 	int32 CarriedAmmo;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingRifleAmmo = 30;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingRocketAmmo = 4;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingPistolAmmo = 20;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingSmgAmmo = 40;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingShotgunAmmo = 12;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingSniperAmmo = 10;
 
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
 	int32 StartingGrenadeLauncherAmmo = 10;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedTacticalGrenades)
@@ -213,29 +215,34 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedLethalGrenades)
 	int32 CarriedLethalGrenades = 2;
 	
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Grenades")
 	int32 StartingFragGrenades = 1;
 	
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Grenades")
 	int32 StartingFlashGrenades = 2;
 	
-	UPROPERTY(EditAnywhere, Category = "Combat|Ammo|Grenades")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Grenades")
 	int32 StartingSemtexGrenades = 1;
 	
 	TMap<EBWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo")
+	TMap<EBWeaponType, int32> MaxCarriedAmmoMap;
+	
 	TMap<EBGrenadeType, int32> CarriedGrenadesMap;
+	
 
 	/**
 	 * Grenades
 	 */
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Grenades")
 	TSubclassOf<ABGrenade> FragGrenadeClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Grenades")
 	TSubclassOf<ABGrenade> SemtexGrenadeClass;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Combat|Grenades")
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Grenades")
 	TSubclassOf<ABGrenade> FlashGrenadeClass;
 	
 private:

@@ -28,6 +28,12 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Rotate")
+	float BaseRotateSpeed = 45.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Rotate")
+	bool bShouldRotate = true;
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Pickup")

@@ -15,7 +15,8 @@ ABPickup::ABPickup()
 
 	OverlapSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphereComp->SetupAttachment(RootComponent);
-	OverlapSphereComp->SetSphereRadius(150.f);
+	OverlapSphereComp->SetSphereRadius(110.f);
+	//OverlapSphereComp->AddLocalOffset(FVector(0.f, 0.f, 85.f));
 	OverlapSphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OverlapSphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapSphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
@@ -38,7 +39,11 @@ void ABPickup::BeginPlay()
 void ABPickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	if(PickupMeshComp && bShouldRotate)
+	{
+		PickupMeshComp->AddLocalRotation(FRotator(0.f, BaseRotateSpeed * DeltaTime, 0.f));
+	}
 }
 
 void ABPickup::Destroyed()
