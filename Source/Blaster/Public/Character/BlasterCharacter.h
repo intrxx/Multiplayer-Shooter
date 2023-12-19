@@ -12,6 +12,7 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+class UBlasterBuffComponent;
 class ABPlayerState;
 class ABlasterHUD;
 class USoundCue;
@@ -167,8 +168,11 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess), Category = "Blaster|Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|Combat")
 	TObjectPtr<UBCombatComponent> CombatComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|Combat")
+	TObjectPtr<UBlasterBuffComponent> BuffComponent;
 
 	/**
 	 * Anim Montages 

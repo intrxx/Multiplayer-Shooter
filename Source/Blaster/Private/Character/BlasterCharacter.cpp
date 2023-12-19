@@ -10,6 +10,7 @@
 #include "Blaster/BlasterGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "BlasterComponents/BCombatComponent.h"
+#include "BlasterComponents/BlasterBuffComponent.h"
 #include "Character/BlasterAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
@@ -55,6 +56,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	CombatComp = CreateDefaultSubobject<UBCombatComponent>(TEXT("CombatComponen"));
 	CombatComp->SetIsReplicated(true);
+
+	BuffComponent = CreateDefaultSubobject<UBlasterBuffComponent>(TEXT("BuffComponent"));
+	BuffComponent->SetIsReplicated(true);
 	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
@@ -85,6 +89,11 @@ void ABlasterCharacter::PostInitializeComponents()
 	if(CombatComp)
 	{
 		CombatComp->BlasterCharacter = this;
+	}
+	
+	if(BuffComponent)
+	{
+		BuffComponent->BlasterCharacter = this;
 	}
 }
 
