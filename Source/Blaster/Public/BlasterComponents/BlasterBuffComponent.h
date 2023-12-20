@@ -18,12 +18,19 @@ public:
 	friend class ABlasterCharacter;
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void HealBuff(float HealAmount, float HealTime = 0.f);
 	
 protected:
 	virtual void BeginPlay() override;
 
+	void HealOverTime(float DeltaTime);
 private:
 	UPROPERTY()
-	TObjectPtr<ABlasterCharacter> BlasterCharacter;	
+	TObjectPtr<ABlasterCharacter> BlasterCharacter;
+
+	bool bHealing = false;
+	float HealingRate = 0.f;
+	float AmountToHeal = 0.f;
 	
 };

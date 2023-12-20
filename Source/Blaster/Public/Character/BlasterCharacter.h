@@ -63,6 +63,7 @@ public:
 	ABWeapon* GetEquippedWeapon();
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	UBCombatComponent* GetCombatComp() const {return CombatComp;}
+	UBlasterBuffComponent* GetBuffComp() const {return BuffComponent;}
 	FVector GetHitTarget() const;
 	TArray<UInputMappingContext*> GetGameplayMappingContexts() const {return GameplayMappingContexts;};
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
@@ -72,12 +73,13 @@ public:
 	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
 	
 	/**
-	 * Attributes Getters
+	 * Attributes Getters / Setters
 	 */
 
 	float GetHeath() const {return Health;}
 	float GetMaxHeath() const {return MaxHealth;}
-	
+
+	void SetHealth(float Amount) {Health = Amount;}
 	/**
 	 **
 	 */
@@ -85,6 +87,8 @@ public:
 	bool IsAiming();
 
 	virtual void Destroyed() override;
+
+	void UpdateHUDHealth();
 
 public:
 	UPROPERTY(Replicated)
@@ -129,8 +133,7 @@ protected:
 	void TurnInPlace(float DeltaTime);
 	void CalculateAO_Pitch();
 	float CalculateSpeed();
-
-	void UpdateHUDHealth();
+	
 	void PlayHitReactMontage();
 
 	void RotateInPlace(float DeltaTime);
@@ -296,7 +299,7 @@ private:
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float LastHealth);
 	
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();

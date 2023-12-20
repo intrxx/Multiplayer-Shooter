@@ -34,6 +34,7 @@ ABWeapon::ABWeapon()
 	SphereComp->SetupAttachment(RootComponent);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereComp->SetSphereRadius(64.f);
 
 	PickUpWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
 	PickUpWidgetComp->SetupAttachment(RootComponent);

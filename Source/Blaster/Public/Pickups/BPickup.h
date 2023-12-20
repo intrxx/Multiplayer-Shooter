@@ -29,10 +29,10 @@ protected:
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Rotate")
+	UPROPERTY(EditAnywhere, Category = "Blaster|FX")
 	float BaseRotateSpeed = 45.f;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|Ammo|Rotate")
+	UPROPERTY(EditAnywhere, Category = "Blaster|FX")
 	bool bShouldRotate = true;
 	
 private:
