@@ -27,8 +27,8 @@ ABPickup::ABPickup()
 	PickupMeshComp->SetupAttachment(OverlapSphereComp);
 	PickupMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	HealthPickupComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HealthPickupEffectComp"));
-	HealthPickupComp->SetupAttachment(RootComponent);
+	PickupNiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PickupEffectComp"));
+	PickupNiagaraComp->SetupAttachment(RootComponent);
 }
 
 void ABPickup::BeginPlay()
@@ -60,9 +60,9 @@ void ABPickup::Destroyed()
 		UGameplayStatics::PlaySound2D(this, PickupSound);
 	}
 
-	if(HealthPickupEffect)
+	if(PickupEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HealthPickupEffect, GetActorLocation(),
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, GetActorLocation(),
 			GetActorRotation());
 	}
 }

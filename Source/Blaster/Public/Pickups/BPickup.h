@@ -48,9 +48,9 @@ private:
 	TObjectPtr<UStaticMeshComponent> PickupMeshComp;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Pickup|FX")
-	TObjectPtr<UNiagaraComponent> HealthPickupComp;
+	TObjectPtr<UNiagaraComponent> PickupNiagaraComp;
     
 	UPROPERTY(EditAnywhere, Category = "Blaster|Pickup|FX")
-	TObjectPtr<UNiagaraSystem> HealthPickupEffect;
+	TObjectPtr<UNiagaraSystem> PickupEffect;
 	
 };

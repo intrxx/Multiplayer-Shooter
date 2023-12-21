@@ -675,7 +675,7 @@ void UBCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 	bAiming = bIsAiming;
 	if(BlasterCharacter)
 	{
-		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? BaseWalkSpeed * AimWalkSpeedMultiplier : BaseWalkSpeed;
 	}
 }
 
@@ -933,7 +933,7 @@ void UBCombatComponent::SetAiming(bool bIsAiming)
 	
 	ServerSetAiming(bIsAiming);
 	
-	BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? BaseWalkSpeed * AimWalkSpeedMultiplier : BaseWalkSpeed;
 	
 	if(EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Sniper)
 	{
@@ -1017,6 +1017,7 @@ void UBCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseD
 #endif	// ENABLE_DRAW_DEBUG
 	}
 }
+
 
 
 

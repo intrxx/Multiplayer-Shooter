@@ -58,6 +58,8 @@ public:
 	ABGrenade* GetEquippedLethalGrenade() const {return EquippedLethalGrenade;}
 	ABGrenade* GetEquippedTacticalGrenade() const {return EquippedTacticalGrenade;}
 
+	void SetBuffedSpeed(float BaseSpeed) {BaseWalkSpeed = BaseSpeed;}
+
 public:
 	
 protected:
@@ -143,7 +145,7 @@ private:
 	float BaseWalkSpeed = 600.f;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
-	float AimWalkSpeed = 425.f;
+	float AimWalkSpeedMultiplier = 0.8f;
 
 	bool bFireButtonPressed;
 

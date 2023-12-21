@@ -94,6 +94,8 @@ void ABlasterCharacter::PostInitializeComponents()
 	if(BuffComponent)
 	{
 		BuffComponent->BlasterCharacter = this;
+		BuffComponent->SetInitialSpeed(GetCharacterMovement()->MaxWalkSpeed,
+			GetCharacterMovement()->MaxWalkSpeedCrouched);
 	}
 }
 
@@ -243,7 +245,7 @@ float ABlasterCharacter::CalculateSpeed()
 {
 	FVector Velocity = GetVelocity();
 	Velocity.Z = 0.0f;
-	return  Velocity.Size();
+	return Velocity.Size();
 }
 
 void ABlasterCharacter::SimProxiesTurn()

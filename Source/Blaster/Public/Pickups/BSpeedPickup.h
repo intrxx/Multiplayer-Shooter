@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Pickups/BPickup.h"
-#include "BHealthPickup.generated.h"
+#include "BSpeedPickup.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BLASTER_API ABHealthPickup : public ABPickup
+class BLASTER_API ABSpeedPickup : public ABPickup
 {
 	GENERATED_BODY()
 
@@ -19,9 +19,14 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Blaster|HealthPickup")
-	float HealAmount = 50.f;
+	UPROPERTY(EditAnywhere, Category = "Blaster|SpeedBuff")
+	float BaseSpeedBuff = 1300.f;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|HealthPickup")
-	float HealingTime = 3.f;
+	UPROPERTY(EditAnywhere, Category = "Blaster|SpeedBuff")
+	float CrouchSpeedBuff = 700.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|SpeedBuff")
+	float SpeedBuffTime = 30.f;
+
+	
 };
