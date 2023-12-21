@@ -8,6 +8,8 @@
 
 class USoundCue;
 class USphereComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class BLASTER_API ABPickup : public AActor
@@ -44,5 +46,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Pickup")
 	TObjectPtr<UStaticMeshComponent> PickupMeshComp;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Pickup|FX")
+	TObjectPtr<UNiagaraComponent> HealthPickupComp;
+    
+	UPROPERTY(EditAnywhere, Category = "Blaster|Pickup|FX")
+	TObjectPtr<UNiagaraSystem> HealthPickupEffect;
 	
 };

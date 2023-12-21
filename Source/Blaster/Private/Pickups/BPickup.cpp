@@ -3,6 +3,8 @@
 
 #include "Pickups/BPickup.h"
 #include "Sound/SoundCue.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 
@@ -24,6 +26,9 @@ ABPickup::ABPickup()
 	PickupMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMeshComp"));
 	PickupMeshComp->SetupAttachment(OverlapSphereComp);
 	PickupMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	HealthPickupComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HealthPickupEffectComp"));
+	HealthPickupComp->SetupAttachment(RootComponent);
 }
 
 void ABPickup::BeginPlay()
@@ -53,6 +58,12 @@ void ABPickup::Destroyed()
 	if(PickupSound)
 	{
 		UGameplayStatics::PlaySound2D(this, PickupSound);
+	}
+
+	if(HealthPickupEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HealthPickupEffect, GetActorLocation(),
+			GetActorRotation());
 	}
 }
 

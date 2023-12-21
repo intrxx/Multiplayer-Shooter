@@ -792,11 +792,7 @@ void UBCombatComponent::Fire()
 		ShrinkCrosshairWhileShooting();
 		StartFireTimer();
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Cant fire"));
-	}
-
+	
 	if(BlasterCharacter && EquippedWeapon && EquippedWeapon->IsMagEmpty() && EquippedWeapon->EmptyMagSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EmptyMagSound, BlasterCharacter->GetActorLocation());

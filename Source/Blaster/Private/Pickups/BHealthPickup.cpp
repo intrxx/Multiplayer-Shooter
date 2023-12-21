@@ -2,18 +2,12 @@
 
 
 #include "Pickups/BHealthPickup.h"
-
-#include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "Character/BlasterCharacter.h"
 #include "BlasterComponents/BlasterBuffComponent.h"
 
 ABHealthPickup::ABHealthPickup()
 {
 	bReplicates = true;
-
-	HealthPickupComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HealthPickupEffectComp"));
-	HealthPickupComp->SetupAttachment(RootComponent);
 }
 
 void ABHealthPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -32,15 +26,4 @@ void ABHealthPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 	
 	Destroy();
-}
-
-void ABHealthPickup::Destroyed()
-{
-	if(HealthPickupEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HealthPickupEffect, GetActorLocation(),
-			GetActorRotation());
-	}
-	
-	Super::Destroyed();
 }
