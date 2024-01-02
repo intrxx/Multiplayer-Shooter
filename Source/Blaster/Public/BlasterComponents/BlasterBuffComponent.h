@@ -21,8 +21,10 @@ public:
 
 	void HealBuff(float HealAmount, float HealTime = 0.f);
 	void SpeedBuff(float BaseSpeedMultiplier, float CrouchSpeedMultiplier, float BuffTime);
+	void JumpBuff(float BuffJumpVelocity, float BuffTime);
 
 	void SetInitialSpeed(float BaseSpeedBuff, float CrouchSpeedBuff);
+	void SetInitialJumpVelocity(float BaseJumpVelocity);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -32,6 +34,9 @@ protected:
 private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastJumpBuff(float JumpVelocity);
 	
 private:
 	UPROPERTY()
@@ -53,4 +58,13 @@ private:
 
 	float InitialBaseSpeed;
 	float InitialCrouchSpeed;
+
+	/**
+	 * Speed Buff
+	*/
+	FTimerHandle JumpBuffTimerHandle;
+
+	void ResetJumpBuff();
+
+	float InitialJumpVelocity;
 };

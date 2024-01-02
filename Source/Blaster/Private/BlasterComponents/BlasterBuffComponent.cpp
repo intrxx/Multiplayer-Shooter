@@ -2,7 +2,6 @@
 
 
 #include "BlasterComponents/BlasterBuffComponent.h"
-
 #include "BlasterComponents/BCombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/BlasterCharacter.h"
@@ -47,10 +46,33 @@ void UBlasterBuffComponent::SpeedBuff(float BaseSpeedBuff, float CrouchSpeedBuff
 	}
 }
 
+void UBlasterBuffComponent::JumpBuff(float BuffJumpVelocity, float BuffTime)
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+
+	BlasterCharacter->GetWorldTimerManager().SetTimer(JumpBuffTimerHandle, this, &ThisClass::ResetJumpBuff,
+		BuffTime);
+	
+	MulticastJumpBuff_Implementation(BuffJumpVelocity);
+}
+
+void UBlasterBuffComponent::ResetJumpBuff()
+{
+	MulticastJumpBuff_Implementation(InitialJumpVelocity);
+}
+
 void UBlasterBuffComponent::SetInitialSpeed(float BaseSpeed, float CrouchSpeed)
 {
 	InitialBaseSpeed = BaseSpeed;
 	InitialCrouchSpeed = CrouchSpeed;
+}
+
+void UBlasterBuffComponent::SetInitialJumpVelocity(float BaseJumpVelocity)
+{
+	InitialJumpVelocity = BaseJumpVelocity;
 }
 
 void UBlasterBuffComponent::ResetSpeedBuff()
@@ -86,14 +108,25 @@ void UBlasterBuffComponent::HealOverTime(float DeltaTime)
 	}
 }
 
+void UBlasterBuffComponent::MulticastJumpBuff_Implementation(float JumpVelocity)
+{
+	if(BlasterCharacter && BlasterCharacter->GetCharacterMovement())
+	{
+		BlasterCharacter->GetCharacterMovement()->JumpZVelocity = JumpVelocity;
+	}
+}
+
 void UBlasterBuffComponent::MulticastSpeedBuff_Implementation(float BaseSpeed, float CrouchSpeed)
 {
-	BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
-	BlasterCharacter->GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
-
-	if(BlasterCharacter->GetCombatComp())
+	if(BlasterCharacter && BlasterCharacter->GetCharacterMovement())
 	{
-		BlasterCharacter->GetCombatComp()->SetBuffedSpeed(BaseSpeed);
+		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
+		BlasterCharacter->GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
+
+		if(BlasterCharacter->GetCombatComp())
+		{
+			BlasterCharacter->GetCombatComp()->SetBuffedSpeed(BaseSpeed);
+		}
 	}
 }
 
