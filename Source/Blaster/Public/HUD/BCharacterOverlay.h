@@ -32,6 +32,12 @@ public:
 	TObjectPtr<UTextBlock> HealthText;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UProgressBar> ShieldProgressBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> ShieldText;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GameTimerText;
 	
 	/**

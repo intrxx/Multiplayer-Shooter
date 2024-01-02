@@ -58,6 +58,7 @@ public:
 	virtual float GetServerTimeSeconds();
 	
 	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDShield(float Shield, float MaxShield);
 	void SetHUDCarriedAmmo(int32 CarriedAmmo);
 	void SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo);
 	void SetHUDWeaponAmmo(int32 Ammo);
@@ -153,8 +154,15 @@ private:
 	bool bInitScoreboard = false;
 
 	TArray<FPlayerStats> LocalPlayerStats;
+
+	/**
+	 * For Poll Init
+	*/
 	float HUDHealth;
 	float HUDMaxHealth;
+
+	float HUDShield;
+	float HUDMaxShield;
 
 	int32 HUDLethalGrenades;
 	int32 HUDTacticalGrenades;

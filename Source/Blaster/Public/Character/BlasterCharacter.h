@@ -79,9 +79,14 @@ public:
 	float GetHeath() const {return Health;}
 	float GetMaxHeath() const {return MaxHealth;}
 
+	float GetShield() const {return Shield;}
+	float GetMaxShield() const {return MaxShield;}
+
 	void SetHealth(float Amount) {Health = Amount;}
+	void SetShield(float Amount) {Shield = Amount;}
+	
 	/**
-	 **
+	 *
 	 */
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -89,6 +94,7 @@ public:
 	virtual void Destroyed() override;
 
 	void UpdateHUDHealth();
+	void UpdateHUDShield();
 
 public:
 	UPROPERTY(Replicated)
@@ -224,7 +230,7 @@ private:
 	float TimeSinceLastMovementRep;
 
 	/**
-	 * Player health
+	 * Player attributes
 	 */
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
@@ -232,6 +238,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Health, Category = "Blaster|Attributes")
 	float Health = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
+	float MaxShield = 50.f;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Shield, Category = "Blaster|Attributes")
+	float Shield = 50.f;
 	
 	bool bDead = false;
 
@@ -300,6 +312,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
 	
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();

@@ -57,6 +57,7 @@ void ABPlayerController::OnPossess(APawn* InPawn)
 	if(BlasterCharacter)
 	{
 		SetHUDHealth(BlasterCharacter->GetHeath(), BlasterCharacter->GetMaxHeath());
+		SetHUDShield(BlasterCharacter->GetShield(), BlasterCharacter->GetMaxShield());
 	}
 }
 
@@ -70,6 +71,7 @@ void ABPlayerController::PollInit()
 			if(CharacterOverlay)
 			{
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
+				SetHUDShield(HUDShield, HUDMaxShield);
 				
 				if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn()))
 				{
@@ -164,6 +166,30 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 		bInitCharacterOverlay = true;
 		HUDHealth = Health;
 		HUDMaxHealth = MaxHealth;
+	}
+}
+
+void ABPlayerController::SetHUDShield(float Shield, float MaxShield)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->ShieldProgressBar &&
+		BlasterHUD->CharacterOverlay->ShieldText;
+	if(bHUDValid)
+	{
+		const float ShieldPercent = Shield / MaxShield;
+		BlasterHUD->CharacterOverlay->ShieldProgressBar->SetPercent(ShieldPercent);
+
+		FString ShieldText = FString::Printf(TEXT("%d"), FMath::CeilToInt(Shield));
+		BlasterHUD->CharacterOverlay->ShieldText->SetText(FText::FromString(ShieldText));
+	}
+	else
+	{
+		bInitCharacterOverlay = true;
+		HUDShield = Shield;
+		HUDMaxShield = MaxShield;
 	}
 }
 
