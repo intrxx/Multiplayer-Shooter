@@ -70,23 +70,33 @@ void ABPlayerController::PollInit()
 			CharacterOverlay = BlasterHUD->CharacterOverlay;
 			if(CharacterOverlay)
 			{
-				SetHUDHealth(HUDHealth, HUDMaxHealth);
-				SetHUDShield(HUDShield, HUDMaxShield);
-				
-				if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn()))
+				if(bInitHealth)
 				{
-					if(BlasterCharacter->GetCombatComp())
-					{
-						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetLethalGrenades(), EBGrenadeCategory::EGC_Lethal);
-						SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetTacticalGrenades(), EBGrenadeCategory::EGC_Tactical);
+					SetHUDHealth(HUDHealth, HUDMaxHealth);
+				}
 
-						if(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade())
+				if(bInitShield)
+				{
+					SetHUDShield(HUDShield, HUDMaxShield);
+				}
+				
+				if(bInitGrenades)
+				{
+					if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn()))
+					{
+						if(BlasterCharacter->GetCombatComp())
 						{
-							SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Lethal);
-						}
-						if(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade())
-						{
-							SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Tactical);
+							SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetLethalGrenades(), EBGrenadeCategory::EGC_Lethal);
+							SetHUDGrenadesNumber(BlasterCharacter->GetCombatComp()->GetTacticalGrenades(), EBGrenadeCategory::EGC_Tactical);
+
+							if(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade())
+							{
+								SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedLethalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Lethal);
+							}
+							if(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade())
+							{
+								SetHUDGrenadesImage(BlasterCharacter->GetCombatComp()->GetEquippedTacticalGrenade()->GrenadeHUDImage, EBGrenadeCategory::EGC_Tactical);
+							}
 						}
 					}
 				}
@@ -163,7 +173,7 @@ void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 	else
 	{
-		bInitCharacterOverlay = true;
+		bInitHealth = true;
 		HUDHealth = Health;
 		HUDMaxHealth = MaxHealth;
 	}
@@ -187,7 +197,7 @@ void ABPlayerController::SetHUDShield(float Shield, float MaxShield)
 	}
 	else
 	{
-		bInitCharacterOverlay = true;
+		bInitShield = true;
 		HUDShield = Shield;
 		HUDMaxShield = MaxShield;
 	}
@@ -435,6 +445,7 @@ void ABPlayerController::SetHUDGrenadesNumber(int32 Grenades, const EBGrenadeCat
 	}
 	else
 	{
+		bInitGrenades = true;
 		switch (GrenadeCategory)
 		{
 		case EBGrenadeCategory::EGC_Lethal:

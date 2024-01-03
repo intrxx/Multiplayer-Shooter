@@ -738,10 +738,31 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	{
 		return;
 	}
+
+	float DamageToHealth = Damage;
 	
-	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	if(Shield > 0)
+	{
+		float DamageToShield = FMath::RoundToFloat(Damage * Combat::DamagePassedToShield);
+		float DamageToHealthThroughShield = FMath::RoundToFloat(Damage * Combat::DamagePassedToHealth);
+		
+		if(Shield >= DamageToShield)
+		{
+			Shield = FMath::Clamp(Shield - DamageToShield, 0.f, MaxShield);
+			DamageToHealth = DamageToHealthThroughShield;
+		}
+		else
+		{
+			DamageToHealth = FMath::Clamp(DamageToShield - Shield, 0.f, DamageToShield) + DamageToHealthThroughShield;
+			Shield = 0.f;
+		}
+	}
+	
+	Health = FMath::Clamp(Health - DamageToHealth, 0.f, MaxHealth);
 	
 	UpdateHUDHealth();
+	UpdateHUDShield();
+	
 	PlayHitReactMontage();
 
 	if(Health == 0.f)

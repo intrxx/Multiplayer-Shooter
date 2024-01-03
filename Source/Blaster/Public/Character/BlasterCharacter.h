@@ -240,10 +240,10 @@ private:
 	float Health = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
-	float MaxShield = 50.f;
+	float MaxShield = 100.f;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Shield, Category = "Blaster|Attributes")
-	float Shield = 50.f;
+	float Shield = 100.f;
 	
 	bool bDead = false;
 

@@ -150,7 +150,9 @@ private:
 	UPROPERTY()
 	UBAnnouncement* Announcement;
 
-	bool bInitCharacterOverlay = false;
+	bool bInitHealth = false;
+	bool bInitShield = false;
+	bool bInitGrenades = false;
 	bool bInitScoreboard = false;
 
 	TArray<FPlayerStats> LocalPlayerStats;

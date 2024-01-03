@@ -7,7 +7,8 @@ namespace Combat
 	static constexpr float TraceLength = 80000.0f;
 	static constexpr float AimShrinkFactor = 0.35f;
 	static constexpr float AimAtPlayerShrinkFactor = 0.25f;
-	
+	static constexpr float DamagePassedToShield = 0.66f;
+	static constexpr float DamagePassedToHealth = 0.33f;
 }
 
 namespace BlasterStencil
