@@ -20,6 +20,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void HealBuff(float HealAmount, float HealTime = 0.f);
+	void ShieldBuff(float ShieldAmount);
 	void SpeedBuff(float BaseSpeedMultiplier, float CrouchSpeedMultiplier, float BuffTime);
 	void JumpBuff(float BuffJumpVelocity, float BuffTime);
 

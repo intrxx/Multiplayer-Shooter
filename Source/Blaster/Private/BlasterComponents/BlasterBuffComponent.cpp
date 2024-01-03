@@ -30,6 +30,20 @@ void UBlasterBuffComponent::HealBuff(float HealAmount, float HealTime)
 	AmountToHeal = HealAmount;
 }
 
+void UBlasterBuffComponent::ShieldBuff(float ShieldAmount)
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+
+	if(!BlasterCharacter->IsDead())
+	{
+		BlasterCharacter->SetShield(FMath::Clamp(BlasterCharacter->GetShield() + ShieldAmount, 0.f, BlasterCharacter->GetMaxShield()));
+		BlasterCharacter->UpdateHUDShield();
+	}
+}
+
 void UBlasterBuffComponent::SpeedBuff(float BaseSpeedBuff, float CrouchSpeedBuff, float BuffTime)
 {
 	if(BlasterCharacter == nullptr)

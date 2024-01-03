@@ -242,8 +242,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Attributes")
 	float MaxShield = 100.f;
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Shield, Category = "Blaster|Attributes")
-	float Shield = 100.f;
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Shield, Category = "Blaster|Attributes")
+	float Shield = 50.f;
 	
 	bool bDead = false;
 
