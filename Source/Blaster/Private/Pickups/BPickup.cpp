@@ -18,7 +18,7 @@ ABPickup::ABPickup()
 	OverlapSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphereComp->SetupAttachment(RootComponent);
 	OverlapSphereComp->SetSphereRadius(110.f);
-	//OverlapSphereComp->AddLocalOffset(FVector(0.f, 0.f, 85.f));
+	OverlapSphereComp->AddLocalOffset(FVector(0.f, 0.f, 55.f));
 	OverlapSphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OverlapSphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapSphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
@@ -37,7 +37,8 @@ void ABPickup::BeginPlay()
 
 	if(HasAuthority())
 	{
-		OverlapSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+		GetWorldTimerManager().SetTimer(BindOverlapTimerHandle, this, &ThisClass::BindOverlapFinished,
+			BindOverlapTime);
 	}
 }
 
@@ -70,6 +71,11 @@ void ABPickup::Destroyed()
 void ABPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+}
+
+void ABPickup::BindOverlapFinished()
+{
+	OverlapSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
 }
 
 

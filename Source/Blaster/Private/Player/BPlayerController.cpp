@@ -80,8 +80,8 @@ void ABPlayerController::PollInit()
 					SetHUDShield(HUDShield, HUDMaxShield);
 				}
 				
-				if(bInitGrenades)
-				{
+				//if(bInitGrenades)
+				//{
 					if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn()))
 					{
 						if(BlasterCharacter->GetCombatComp())
@@ -99,7 +99,7 @@ void ABPlayerController::PollInit()
 							}
 						}
 					}
-				}
+				//}
 			}
 		}
 	}
