@@ -49,6 +49,8 @@ public:
 	void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
 
+	bool bDestroyWeaponOnDeath = false;
+
 	/**
 	 * Enable or disable custom depth to display the outline effect
 	 */

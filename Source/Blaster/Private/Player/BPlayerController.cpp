@@ -79,6 +79,26 @@ void ABPlayerController::PollInit()
 				{
 					SetHUDShield(HUDShield, HUDMaxShield);
 				}
+
+				if(bInitCarriedAmmo)
+				{
+					SetHUDCarriedAmmo(CarriedAmmo);
+				}
+
+				if(bInitInventoryAmmo)
+				{
+					SetHUDInventoryCarriedAmmo(InventoryWeaponType, InventoryAmmo);
+				}
+
+				if(bInitWeaponAmmo)
+				{
+					SetHUDWeaponAmmo(WeaponAmmo);
+				}
+
+				if(bInitWeaponImage)
+				{
+					SetHUDWeaponAmmoImage(FiringMode);
+				}
 				
 				//if(bInitGrenades)
 				//{
@@ -203,7 +223,7 @@ void ABPlayerController::SetHUDShield(float Shield, float MaxShield)
 	}
 }
 
-void ABPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmo)
+void ABPlayerController::SetHUDCarriedAmmo(int32 Ammo)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
@@ -213,18 +233,23 @@ void ABPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmo)
 		
 	if(bHUDValid)
 	{
-		FString AmmoText = FString::Printf(TEXT("%d"), CarriedAmmo);
+		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		BlasterHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(AmmoText));
 	}
+	else
+	{
+		bInitCarriedAmmo = true;
+		CarriedAmmo = Ammo;
+	}	
 }
 
-void ABPlayerController::SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo)
+void ABPlayerController::SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 Ammo)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 	
 	if(BlasterHUD && BlasterHUD->Inventory)
 	{
-		FString AmmoText = FString::Printf(TEXT("%d"), CarriedAmmo);
+		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		switch (WeaponType)
 		{
 		case EBWeaponType::EWT_AssaultRifle:
@@ -236,6 +261,12 @@ void ABPlayerController::SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int
 		default:
 			break;
 		}
+	}
+	else
+	{
+		bInitInventoryAmmo = true;
+		InventoryWeaponType = WeaponType;
+		InventoryAmmo = Ammo;
 	}
 	
 }
@@ -252,6 +283,11 @@ void ABPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 	{
 		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		BlasterHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
+	}
+	else
+	{
+		bInitWeaponAmmo = true;
+		WeaponAmmo = Ammo;
 	}
 }
 
@@ -282,6 +318,11 @@ void ABPlayerController::SetHUDWeaponAmmoImage(EBFiringMode FireMode)
 		default:
 			break;
 		}
+	}
+	else
+	{
+		bInitWeaponImage = true;
+		FiringMode = FireMode;
 	}
 }
 

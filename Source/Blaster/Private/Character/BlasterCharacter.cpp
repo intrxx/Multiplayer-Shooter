@@ -133,9 +133,6 @@ void ABlasterCharacter::BeginPlay()
 		//TODO Look here in case of some weird Death Screen Behaviour
 		PC->SetDeathScreenVisibility(false);
 	}
-
-	UpdateHUDHealth();
-	UpdateHUDShield();
 	
 	if(HasAuthority())
 	{
@@ -146,6 +143,12 @@ void ABlasterCharacter::BeginPlay()
 	{
 		AttachedGrenade->SetVisibility(false);
 	}
+	
+	EquipDefaultWeapon();
+	
+	UpdateHUDAmmo();
+	UpdateHUDHealth();
+	UpdateHUDShield();
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -715,6 +718,25 @@ void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeC
 	}
 }
 
+void ABlasterCharacter::EquipDefaultWeapon()
+{
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+
+	UWorld* World = GetWorld();
+	
+	// Game modes are only on the server if we pass the check we know we are in a map with BlasterGameMode and on a server
+	if(BlasterGameMode && World && !bDead && DefaultWeaponClass)
+	{
+		ABWeapon* StartingWeapon = World->SpawnActor<ABWeapon>(DefaultWeaponClass);
+		StartingWeapon->bDestroyWeaponOnDeath = true;
+		
+		if(CombatComp)
+		{
+			CombatComp->EquipWeapon(StartingWeapon);
+		}
+	}
+}
+
 void ABlasterCharacter::PlayHitReactMontage()
 {
 	if(CombatComp == nullptr || CombatComp->EquippedWeapon == nullptr)
@@ -816,8 +838,31 @@ void ABlasterCharacter::UpdateHUDShield()
 	}
 }
 
+void ABlasterCharacter::UpdateHUDAmmo()
+{
+	BlasterPC =  BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+	if(BlasterPC && CombatComp && CombatComp->EquippedWeapon)
+	{
+		BlasterPC->SetHUDCarriedAmmo(CombatComp->CarriedAmmo);
+		BlasterPC->SetHUDWeaponAmmo(CombatComp->EquippedWeapon->GetAmmo());
+		BlasterPC->SetHUDWeaponAmmoImage(CombatComp->EquippedWeapon->GetFiringMode());
+		BlasterPC->SetHUDInventoryCarriedAmmo(CombatComp->EquippedWeapon->GetWeaponType(), CombatComp->CarriedAmmo);
+	}
+}
+
 void ABlasterCharacter::HandleDeath()
 {
+	if(CombatComp && CombatComp->EquippedWeapon)
+	{
+		if(CombatComp->EquippedWeapon->bDestroyWeaponOnDeath)
+		{
+			CombatComp->EquippedWeapon->Destroy();
+		}
+		else
+		{
+			CombatComp->EquippedWeapon->Dropped();
+		}
+	}
 	MulticastHandleDeath();
 
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::RespawnTimerFinished, RespawnDelay);
@@ -859,12 +904,7 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	// Disable Collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	if(CombatComp && CombatComp->EquippedWeapon)
-	{
-		CombatComp->EquippedWeapon->Dropped();
-	}
-
+	
 	// Spawn Death Bot
 	if(DeathBotEffect)
 	{

@@ -59,8 +59,8 @@ public:
 	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDShield(float Shield, float MaxShield);
-	void SetHUDCarriedAmmo(int32 CarriedAmmo);
-	void SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 CarriedAmmo);
+	void SetHUDCarriedAmmo(int32 Ammo);
+	void SetHUDInventoryCarriedAmmo(EBWeaponType WeaponType, int32 Ammo);
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDWeaponAmmoImage(EBFiringMode FireMode);
 	void SetHUDWeaponTypeText(EBWeaponType WeaponType);
@@ -154,6 +154,10 @@ private:
 	bool bInitShield = false;
 	bool bInitGrenades = false;
 	bool bInitScoreboard = false;
+	bool bInitCarriedAmmo = false;
+	bool bInitWeaponAmmo = false;
+	bool bInitInventoryAmmo = false;
+	bool bInitWeaponImage = false;
 
 	TArray<FPlayerStats> LocalPlayerStats;
 
@@ -165,6 +169,12 @@ private:
 
 	float HUDShield;
 	float HUDMaxShield;
+
+	float WeaponAmmo;
+	float CarriedAmmo;
+	float InventoryAmmo;
+	EBWeaponType InventoryWeaponType;
+	EBFiringMode FiringMode;
 
 	int32 HUDLethalGrenades;
 	int32 HUDTacticalGrenades;

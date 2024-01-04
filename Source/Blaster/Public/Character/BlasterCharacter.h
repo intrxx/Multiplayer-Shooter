@@ -40,12 +40,14 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	virtual void OnRep_ReplicatedMovement() override;
+	virtual void Destroyed() override;
 
 	void SetOverlappingWeapon(ABWeapon* Weapon);
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
 	void PlayReloadMontage();
 	void PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory);
+	void EquipDefaultWeapon();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowScopeWidget(bool bShowScope);
@@ -90,11 +92,10 @@ public:
 	 */
 	bool IsWeaponEquipped();
 	bool IsAiming();
-
-	virtual void Destroyed() override;
-
+	
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
+	void UpdateHUDAmmo();
 
 public:
 	UPROPERTY(Replicated)
@@ -305,6 +306,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Combat")
 	TObjectPtr<UStaticMeshComponent> AttachedGrenade;
+	
+	/**
+	 * Default Weapon
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Defaults")
+	TSubclassOf<ABWeapon> DefaultWeaponClass;
 	
 private:
 	UFUNCTION()
