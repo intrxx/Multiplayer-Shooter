@@ -865,15 +865,16 @@ void ABlasterCharacter::UpdateHUDAmmo()
 
 void ABlasterCharacter::HandleDeath()
 {
-	if(CombatComp && CombatComp->EquippedWeapon)
+	// Drop or destroy all held weapons
+	if(CombatComp)
 	{
-		if(CombatComp->EquippedWeapon->bDestroyWeaponOnDeath)
+		if(CombatComp->EquippedWeapon)
 		{
-			CombatComp->EquippedWeapon->Destroy();
+			DropOrDestroyWeapon(CombatComp->EquippedWeapon);
 		}
-		else
+		if(CombatComp->SecondaryWeapon)
 		{
-			CombatComp->EquippedWeapon->Dropped();
+			DropOrDestroyWeapon(CombatComp->SecondaryWeapon);
 		}
 	}
 	MulticastHandleDeath();
@@ -934,6 +935,23 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	if(IsLocallyControlled() && CombatComp && CombatComp->bAiming && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Sniper)
 	{
 		ShowScopeWidget(false);
+	}
+}
+
+void ABlasterCharacter::DropOrDestroyWeapon(ABWeapon* Weapon)
+{
+	if(Weapon == nullptr)
+	{
+		return;
+	}
+	
+	if(Weapon->bDestroyWeaponOnDeath)
+	{
+		Weapon->Destroy();
+	}
+	else
+	{
+		Weapon->Dropped();
 	}
 }
 

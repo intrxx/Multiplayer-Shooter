@@ -136,6 +136,8 @@ protected:
 	void TacticalGrenadeButtonPressed();
 	void SwapToPrimaryButtonPressed();
 	void SwapToSecondaryButtonPressed();
+
+	void DropOrDestroyWeapon(ABWeapon* Weapon);
 	
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
