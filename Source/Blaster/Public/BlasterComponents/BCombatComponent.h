@@ -32,6 +32,8 @@ public:
 	void UpdateHUDGrenadeImage(const EBGrenadeCategory GrenadeCategory);
 	
 	void EquipWeapon(ABWeapon* WeaponToEquip);
+	void SwapWeapon();
+	
 	void Reload();
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void FinishReloading();

@@ -134,6 +134,8 @@ protected:
 	void ToggleInventory();
 	void LethalGrenadeButtonPressed();
 	void TacticalGrenadeButtonPressed();
+	void SwapToPrimaryButtonPressed();
+	void SwapToSecondaryButtonPressed();
 	
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();

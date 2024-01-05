@@ -136,79 +136,71 @@ void ABWeapon::SetWeaponState(EBWeaponState State)
 {
 	WeaponState = State;
 	
+	OnWeaponStateSet();
+}
+
+void ABWeapon::OnRep_WeaponState()
+{
+	OnWeaponStateSet();
+}
+
+void ABWeapon::OnWeaponStateSet()
+{
 	switch(WeaponState)
 	{
 	case EBWeaponState::EWS_Equipped:
-		ShowPickUpWidget(false);
-		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		WeaponMeshComp->SetSimulatePhysics(false);
-		WeaponMeshComp->SetEnableGravity(false);
-		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
-		if(WeaponType == EBWeaponType::EWT_SubMachineGun)
-		{
-			WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			WeaponMeshComp->SetEnableGravity(true);
-			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-		}
-
-		EnableCustomDepth(false);
+		HandleWeaponEquipped();
+		break;
+	case EBWeaponState::EWS_EquippedSecondary:
+		HandleSecondaryWeaponEquipped();
 		break;
 	case EBWeaponState::EWS_Dropped:
-		if(HasAuthority())
-		{
-			SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		}
-		WeaponMeshComp->SetSimulatePhysics(true);
-		WeaponMeshComp->SetEnableGravity(true);
-		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
-		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
-		WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
-		WeaponMeshComp->MarkRenderStateDirty();
-		EnableCustomDepth(true);
+		HandleWeaponDropped();
 		break;
 	default:
 		break;
 	}
 }
 
-void ABWeapon::OnRep_WeaponState()
+void ABWeapon::HandleWeaponEquipped()
 {
-	switch(WeaponState)
+	ShowPickUpWidget(false);
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMeshComp->SetSimulatePhysics(false);
+	WeaponMeshComp->SetEnableGravity(false);
+	WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+	if(WeaponType == EBWeaponType::EWT_SubMachineGun)
 	{
-	case EBWeaponState::EWS_Equipped:
-		ShowPickUpWidget(false);
-		WeaponMeshComp->SetSimulatePhysics(false);
-		WeaponMeshComp->SetEnableGravity(false);
-		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
-		if(WeaponType == EBWeaponType::EWT_SubMachineGun)
-		{
-			WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			WeaponMeshComp->SetEnableGravity(true);
-			WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-		}
-		
-		EnableCustomDepth(false);
-		break;
-	case EBWeaponState::EWS_Dropped:
-		WeaponMeshComp->SetSimulatePhysics(true);
-		WeaponMeshComp->SetEnableGravity(true);
 		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
-		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-		WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
-		WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
-		WeaponMeshComp->MarkRenderStateDirty();
-		EnableCustomDepth(true);
-		break;
-	default:
-		break;
+		WeaponMeshComp->SetEnableGravity(true);
+		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
+
+	EnableCustomDepth(false);
+}
+
+void ABWeapon::HandleWeaponDropped()
+{
+	if(HasAuthority())
+	{
+		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+	WeaponMeshComp->SetSimulatePhysics(true);
+	WeaponMeshComp->SetEnableGravity(true);
+	WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Block);
+	WeaponMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	WeaponMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
+	WeaponMeshComp->MarkRenderStateDirty();
+	EnableCustomDepth(true);
+}
+
+void ABWeapon::HandleSecondaryWeaponEquipped()
+{
+	HandleWeaponEquipped();
 }
 
 void ABWeapon::Fire(const FVector& HitTarget)

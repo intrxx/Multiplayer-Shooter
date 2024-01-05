@@ -343,6 +343,10 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::ReloadButtonPressed);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ToggleInventory, ETriggerEvent::Triggered, this,
 		&ThisClass::ToggleInventory);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_SwapToPrimaryWeapon, ETriggerEvent::Triggered, this,
+		&ThisClass::SwapToPrimaryButtonPressed);
+	//BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_SwapToSecondaryWeapon, ETriggerEvent::Triggered, this,
+		//&ThisClass::SwapToSecondaryButtonPressed);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -530,6 +534,22 @@ void ABlasterCharacter::TacticalGrenadeButtonPressed()
 	if(CombatComp)
 	{
 		CombatComp->ThrowGrenade(EBGrenadeCategory::EGC_Tactical);
+	}
+}
+
+void ABlasterCharacter::SwapToPrimaryButtonPressed()
+{
+	if(CombatComp)
+	{
+		CombatComp->SwapWeapon();
+	}
+}
+
+void ABlasterCharacter::SwapToSecondaryButtonPressed()
+{
+	if(CombatComp)
+	{
+		CombatComp->SwapWeapon();
 	}
 }
 

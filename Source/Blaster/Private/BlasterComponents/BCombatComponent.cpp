@@ -322,6 +322,29 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	BlasterCharacter->bUseControllerRotationYaw = true;
 }
 
+void UBCombatComponent::SwapWeapon()
+{
+	if(EquippedWeapon == nullptr)
+	{
+		return;
+	}
+	
+	ABWeapon* TempWeapon = EquippedWeapon;
+	EquippedWeapon = SecondaryWeapon;
+	SecondaryWeapon = TempWeapon;
+	
+	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+	AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+	EquippedWeapon->SetHUDAmmo();
+	EquippedWeapon->SetHUDAmmoImage();
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound(EquippedWeapon);
+	ReloadEmptyWeapon();
+
+	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
+	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
+}
+
 void UBCombatComponent::AttachPrimaryWeapon(ABWeapon* WeaponToEquip)
 {
 	if(WeaponToEquip == nullptr)
@@ -354,7 +377,7 @@ void UBCombatComponent::AttachSecondaryWeapon(ABWeapon* WeaponToEquip)
 	}
 	
 	SecondaryWeapon = WeaponToEquip;
-	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
 	
 	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
 
@@ -381,6 +404,9 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BlasterCharacter->bUseControllerRotationYaw = true;
+
+		EquippedWeapon->SetHUDAmmo();
+		EquippedWeapon->SetHUDAmmoImage();
 	}
 }
 
@@ -388,7 +414,7 @@ void UBCombatComponent::OnRep_SecondaryWeapon()
 {
 	if(SecondaryWeapon && BlasterCharacter)
 	{
-		SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+		SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
 
 		AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
 

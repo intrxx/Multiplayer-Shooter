@@ -22,6 +22,7 @@ enum class EBWeaponState : uint8
 {
 	EWS_Initial UMETA(DisplayName = "Initial State"),
 	EWS_Equipped UMETA(DisplayName = "Equpped"),
+	EWS_EquippedSecondary UMETA(DisplayName = "Equpped Secondary"),
 	EWS_Dropped UMETA(DisplayName = "Dropped"),
 
 	EWS_MAX UMETA(DisplayName = "Default MAX")
@@ -119,7 +120,11 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void OnWeaponStateSet();
+	virtual void HandleWeaponEquipped();
+	virtual void HandleWeaponDropped();
+	virtual void HandleSecondaryWeaponEquipped();
+	
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -127,6 +132,7 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 
 protected:
 	UPROPERTY()
