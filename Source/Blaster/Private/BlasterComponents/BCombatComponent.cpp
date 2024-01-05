@@ -25,6 +25,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UBCombatComponent, SecondaryWeapon);
 	DOREPLIFETIME(UBCombatComponent, EquippedLethalGrenade);
 	DOREPLIFETIME(UBCombatComponent, EquippedTacticalGrenade);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
@@ -265,11 +266,11 @@ void UBCombatComponent::UpdateCarriedAmmo()
 	}
 }
 
-void UBCombatComponent::PlayEquipWeaponSound()
+void UBCombatComponent::PlayEquipWeaponSound(ABWeapon* Weapon)
 {
-	if(EquippedWeapon && EquippedWeapon->EquipSound)
+	if(Weapon && Weapon->EquipSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EquipSound, BlasterCharacter->GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Weapon->EquipSound, BlasterCharacter->GetActorLocation());
 	}
 }
 
@@ -308,6 +309,26 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 		return;
 	}
 
+	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	{
+		AttachSecondaryWeapon(WeaponToEquip);
+	}
+	else
+	{
+		AttachPrimaryWeapon(WeaponToEquip);
+	}
+	
+	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+	BlasterCharacter->bUseControllerRotationYaw = true;
+}
+
+void UBCombatComponent::AttachPrimaryWeapon(ABWeapon* WeaponToEquip)
+{
+	if(WeaponToEquip == nullptr)
+	{
+		return;
+	}
+	
 	// If we hold a weapon we should drop it first
 	DropEquippedWeapon();
 	
@@ -321,11 +342,25 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	EquippedWeapon->SetHUDAmmoImage();
 
 	UpdateCarriedAmmo();
-	PlayEquipWeaponSound();
+	PlayEquipWeaponSound(EquippedWeapon);
 	ReloadEmptyWeapon();
+}
+
+void UBCombatComponent::AttachSecondaryWeapon(ABWeapon* WeaponToEquip)
+{
+	if(WeaponToEquip == nullptr)
+	{
+		return;
+	}
 	
-	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-	BlasterCharacter->bUseControllerRotationYaw = true;
+	SecondaryWeapon = WeaponToEquip;
+	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+	
+	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
+
+	SecondaryWeapon->SetOwner(BlasterCharacter);
+
+	PlayEquipWeaponSound(SecondaryWeapon);
 }
 
 void UBCombatComponent::OnRep_EquippedWeapon()
@@ -342,10 +377,22 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 			BlasterPC->SetHUDWeaponTypeText(EquippedWeapon->GetWeaponType());
 		}
 		
-		PlayEquipWeaponSound();
+		PlayEquipWeaponSound(EquippedWeapon);
 		
 		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BlasterCharacter->bUseControllerRotationYaw = true;
+	}
+}
+
+void UBCombatComponent::OnRep_SecondaryWeapon()
+{
+	if(SecondaryWeapon && BlasterCharacter)
+	{
+		SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+
+		AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
+
+		PlayEquipWeaponSound(SecondaryWeapon);
 	}
 }
 

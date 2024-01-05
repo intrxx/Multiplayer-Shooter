@@ -397,14 +397,7 @@ void ABlasterCharacter::EquipButtonPressed()
 {
 	if(CombatComp)
 	{
-		if(HasAuthority())
-		{
-			CombatComp->EquipWeapon(OverlappingWeapon);
-		}
-		else // We don't have authority so we call ServerRPC (A function that is called on client and executed on server)
-		{
-			ServerEquip();
-		}
+		ServerEquip();
 	}
 }
 

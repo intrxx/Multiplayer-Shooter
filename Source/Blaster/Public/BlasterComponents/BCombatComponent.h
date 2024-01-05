@@ -69,8 +69,14 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool bIsAiming);
 
+	void AttachPrimaryWeapon(ABWeapon* WeaponToEquip);
+	void AttachSecondaryWeapon(ABWeapon* WeaponToEquip);
+	
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
 
 	UFUNCTION()
 	void OnRep_EquippedLethalGrenade();
@@ -101,7 +107,7 @@ protected:
 
 	void AttachActorToHand(AActor* ActorToAttach, const FName SocketName);
 	void UpdateCarriedAmmo();
-	void PlayEquipWeaponSound();
+	void PlayEquipWeaponSound(ABWeapon* Weapon);
 	void ReloadEmptyWeapon();
 
 	UFUNCTION(Server, Reliable)
@@ -125,6 +131,9 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<ABWeapon> EquippedWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
+	TObjectPtr<ABWeapon> SecondaryWeapon;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedLethalGrenade)
 	TObjectPtr<ABGrenade> EquippedLethalGrenade;

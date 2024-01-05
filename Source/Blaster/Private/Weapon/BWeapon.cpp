@@ -85,10 +85,10 @@ void ABWeapon::OnRep_Owner()
 	else
 	{
 		// Temporary fix because idk why Owners doesn't get nulled after we set the owner to null in BWeapon::Dropped()
-		BlasterCharacterOwner = Cast<ABlasterCharacter>(GetOwner());
-		if(BlasterCharacterOwner)
+		BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterCharacterOwner;
+		if(BlasterCharacterOwner && BlasterCharacterOwner->GetEquippedWeapon() && BlasterCharacterOwner->GetEquippedWeapon() == this)
 		{
-			BlasterControllerOwner = Cast<ABPlayerController>(BlasterCharacterOwner->Controller);
+			BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
 			if(BlasterControllerOwner)
 			{
 				SetHUDAmmo();
