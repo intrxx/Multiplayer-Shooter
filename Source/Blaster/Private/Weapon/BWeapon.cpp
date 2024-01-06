@@ -46,14 +46,11 @@ void ABWeapon::BeginPlay()
 
 	SetReplicateMovement(true);
 	
-	if(HasAuthority())
-	{
-		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
-		SphereComp->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
-	}
-
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+	SphereComp->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
+	
 	if(PickUpWidgetComp)
 	{
 		PickUpWidgetComp->SetVisibility(false);
