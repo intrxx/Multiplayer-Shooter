@@ -233,7 +233,10 @@ void ABWeapon::Fire(const FVector& HitTarget)
 		}
 	}
 
-	SpendRound();
+	if(HasAuthority())
+	{
+		SpendRound();
+	}
 }
 
 void ABWeapon::SpendRound()

@@ -324,7 +324,9 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 
 void UBCombatComponent::SwapWeapon()
 {
-	if(EquippedWeapon == nullptr)
+	//TODO Not ideal as it is crucial to let the player swap weapon when one is empty
+	// Some swaping animation would be better 
+	if(CombatState != EBCombatState::ECS_Unoccupied)
 	{
 		return;
 	}
@@ -862,6 +864,7 @@ void UBCombatComponent::Fire()
 		
 		// Called on client to run on server
 		ServerFire(HitTarget);
+		LocalFire(HitTarget);
 		ShrinkCrosshairWhileShooting();
 		StartFireTimer();
 	}
@@ -972,6 +975,16 @@ void UBCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Tra
 
 void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled() && !BlasterCharacter->HasAuthority())
+	{
+		return;
+	}
+
+	LocalFire(TraceHitTarget);
+}
+
+void UBCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
+{
 	if(EquippedWeapon == nullptr)
 	{
 		return;
@@ -990,7 +1003,6 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire(TraceHitTarget);
 	}
-	
 }
 
 void UBCombatComponent::SetAiming(bool bIsAiming)
