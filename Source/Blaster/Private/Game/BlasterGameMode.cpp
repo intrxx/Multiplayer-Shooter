@@ -186,6 +186,7 @@ void ABlasterGameMode::UpdatePlayerList()
 			NewPlayerStats.Score = PS->GetScore();
 			NewPlayerStats.Deaths = PS->GetDeaths();
 			NewPlayerStats.Kills = PS->GetKills();
+			NewPlayerStats.Ping = FMath::FloorToInt(PS->GetPingInMilliseconds());
 			PlayerStats.Add(NewPlayerStats);
 		}
 	}

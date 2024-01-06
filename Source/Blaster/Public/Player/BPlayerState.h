@@ -22,6 +22,7 @@ public:
 	void AddToDeaths(int32 DeathToAdd);
 	void AddToKills(int32 KillsToAdd);
 	void AddToAssists(int32 AssistsToAdd);
+	void UpdatePingStat(float PingToUpdate);
 
 	int32 GetKills() const {return Kills;}
 	int32 GetDeaths() const {return Deaths;}

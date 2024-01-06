@@ -18,7 +18,7 @@ class BLASTER_API UBScoreboardPlayerEntry : public UUserWidget
 
 public:
 	void SetPlayerStats(FPlayerStats PlayerStats);
-	
+
 public:	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> PlayerName;

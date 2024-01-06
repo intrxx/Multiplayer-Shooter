@@ -22,3 +22,4 @@ void ABPlayerState::AddToAssists(int32 AssistsToAdd)
 {
 	Assists += AssistsToAdd;
 }
+

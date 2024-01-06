@@ -43,5 +43,11 @@ void UBScoreboardPlayerEntry::SetPlayerStats(FPlayerStats Stats)
 		FString Score = FString::Printf(TEXT("%d"), FMath::FloorToInt(PlayerStats.Score));
 		ScoreAmount->SetText(FText::FromString(Score));
 	}
-	
+
+	if(PingAmount)
+	{
+		FString PingText = FString::Printf(TEXT("%d"), FMath::FloorToInt(PlayerStats.Ping));
+		PingAmount->SetText(FText::FromString(PingText));
+	}
 }
+

@@ -39,6 +39,9 @@ public:
 	
 	UPROPERTY()
 	float Damage = 0.f;
+
+	UPROPERTY()            
+	float Ping = 0.f;    
 };
 
 /**
@@ -80,15 +83,6 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
-	
-protected:
-	/** Difference between client and server time */
-	float ClientServerDelta = 0.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Time")
-	float TimeSyncFrequency = 5.f;
-
-	float TimeSyncRunningTime = 0.f;
 
 protected:
 	virtual void BeginPlay() override;
@@ -97,6 +91,11 @@ protected:
 	void PollInit();
 	
 	void SetGameTime();
+
+	void CheckPing(float DeltaSeconds);
+	
+	void StartHighPingWarning();
+	void StopHighPingWarning();
 
 	/**
 	 *	Sync time between client and server
@@ -112,7 +111,7 @@ protected:
 
 	void CheckTimeSync(float DeltaTime);
 
-    /**
+	/**
 	 *	
 	 */
 
@@ -122,6 +121,15 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float Match, float LevelStartingTime, float Cooldown);
 	
+protected:
+	/** Difference between client and server time */
+	float ClientServerDelta = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Time")
+	float TimeSyncFrequency = 5.f;
+
+	float TimeSyncRunningTime = 0.f;
+
 private:
 	UFUNCTION()
 	void OnRep_MatchState();
@@ -149,6 +157,24 @@ private:
 	UBInventoryWidget* InventoryWidget;
 	UPROPERTY()
 	UBAnnouncement* Announcement;
+	
+	TArray<FPlayerStats> LocalPlayerStats;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ping")
+	float HighPingThreshold = 75.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ping")
+	float HighPingDuration = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Ping")
+	float CheckPingFrequency = 20.f;
+	
+	float HighPingRunningTime = 0.f;
+	float PingAnimationRunningTime = 0.f;
+	
+	/**
+	 * For Poll Init
+	*/
 
 	bool bInitHealth = false;
 	bool bInitShield = false;
@@ -158,12 +184,7 @@ private:
 	bool bInitWeaponAmmo = false;
 	bool bInitInventoryAmmo = false;
 	bool bInitWeaponImage = false;
-
-	TArray<FPlayerStats> LocalPlayerStats;
-
-	/**
-	 * For Poll Init
-	*/
+	
 	float HUDHealth;
 	float HUDMaxHealth;
 

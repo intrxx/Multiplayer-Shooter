@@ -11,6 +11,7 @@ class UProgressBar;
 class UTextBlock;
 class UOverlay;
 class UTexture2D;
+class UWidgetAnimation;
 
 /**
  * 
@@ -39,6 +40,12 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GameTimerText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> HighPingImage;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> HighPingAnimation;
 	
 	/**
 	 *  Death Overlay
