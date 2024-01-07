@@ -13,6 +13,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/BGrenade.h"
+#include "Weapon/Shotgun/BShotgun.h"
 #include "Weapon/Sniper/BSniperRifle.h"
 
 UBCombatComponent::UBCombatComponent()
@@ -897,8 +898,16 @@ void UBCombatComponent::Fire()
 
 void UBCombatComponent::FireProjectileWeapon()
 {
-	LocalFire(HitTarget);
-	ServerFire(HitTarget);
+	if(EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+
+		if(BlasterCharacter && !BlasterCharacter->HasAuthority())
+		{
+			LocalFire(HitTarget);
+		}
+		ServerFire(HitTarget);
+	}
 }
 
 void UBCombatComponent::FireHitScanWeapon()
@@ -906,13 +915,22 @@ void UBCombatComponent::FireHitScanWeapon()
 	if(EquippedWeapon)
 	{
 		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
-		LocalFire(HitTarget);
+
+		if(BlasterCharacter && !BlasterCharacter->HasAuthority())
+		{
+			LocalFire(HitTarget);
+		}
 		ServerFire(HitTarget);
 	}
 }
 
 void UBCombatComponent::FireShotgun()
 {
+	if(ABShotgun* Shotgun = Cast<ABShotgun>(EquippedWeapon))
+	{
+		TArray<FVector> HitTargets;
+		Shotgun->ShotgunScatter(HitTarget, HitTargets);
+	}
 }
 
 bool UBCombatComponent::CanFire()
@@ -921,10 +939,12 @@ bool UBCombatComponent::CanFire()
 	{
 		return false;
 	}
+	
 	if(!EquippedWeapon->IsMagEmpty() && bCanFire && CombatState == EBCombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Shotgun)
 	{
 		return true;
 	}
+	
 	return !EquippedWeapon->IsMagEmpty() && bCanFire && CombatState == EBCombatState::ECS_Unoccupied;
 }
 

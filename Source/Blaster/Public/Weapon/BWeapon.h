@@ -158,6 +158,20 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterControllerOwner;
 
+	/**
+	 * Trace End with Scatter
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	float DistanceToSphere = 800.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	float SphereRadius = 75.f;
+	
+	/**
+	 *
+	 */
+
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();
@@ -217,19 +231,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	int32 MagCapacity;
-
-	/**
-	 * Trace End with Scatter
-	 */
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
-	float DistanceToSphere = 800.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
-	float SphereRadius = 75.f;
 	
-	/**
-	 *
-	 */
 };
 
