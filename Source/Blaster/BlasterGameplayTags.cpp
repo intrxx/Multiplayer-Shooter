@@ -28,7 +28,6 @@ void FBlasterGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Input_ToggleScoreboard, "Input.ToggleScoreboard", "Tag used for toggling ScoreBoard input");
 	AddTag(Input_ToggleInventory, "Input.ToggleInventory", "Tag used for toggling inventory input");
 	AddTag(Input_SwapToPrimaryWeapon, "Input.SwapToPrimaryWeapon", "Tag used for swapping to primary weapon");
-	AddTag(Input_SwapToSecondaryWeapon, "Input.SwapToSecondaryWeapon", "Tag used for swapping to secondary weapon");
 }
 
 void FBlasterGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

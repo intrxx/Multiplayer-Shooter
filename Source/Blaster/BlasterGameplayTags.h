@@ -27,7 +27,6 @@ public:
 	FGameplayTag Input_ToggleScoreboard;
 	FGameplayTag Input_ToggleInventory;
 	FGameplayTag Input_SwapToPrimaryWeapon;
-	FGameplayTag Input_SwapToSecondaryWeapon;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);

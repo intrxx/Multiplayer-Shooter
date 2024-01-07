@@ -86,15 +86,27 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedTacticalGrenade();
+
+	// When called on server it will run on all clients and server
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
 	
 	// Server RPC, when called on client will execute on server
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
-
+	
+	UFUNCTION(Server, Reliable)
+	void ServerShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
+	
 	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
-
+	void LocalShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
+	
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
+	
 	void HandleReload();
 	int32 CalculateAmountToReload();
 
@@ -102,10 +114,6 @@ protected:
 	void ServerThrowGrenade(const EBGrenadeCategory GrenadeCategory);
 	void ThrowGrenade(const EBGrenadeCategory GrenadeCategory);
 	
-	// When called on server it will run on all clients and server
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
-
 	void TraceUnderCrosshair(FHitResult& OutHitResult, bool bUseDebug);
 	void SetHUDCrosshair(float DeltaTime);
 	void InterpFOV(float DeltaTime);

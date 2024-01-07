@@ -8,9 +8,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
 
-void ABShotgun::Fire(const FVector& HitTarget)
+void ABShotgun::FireShotgun(const TArray<FVector_NetQuantize>& HitTargets)
 {
-	ABWeapon::Fire(HitTarget);
+	ABWeapon::Fire(FVector());
 	
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if(OwnerPawn == nullptr)
@@ -19,40 +19,37 @@ void ABShotgun::Fire(const FVector& HitTarget)
 	}
 
 	AController* InstigatorController = OwnerPawn->GetController();
-	
+
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(TEXT("MuzzleFlash"));
 	if(MuzzleFlashSocket)
 	{
 		const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-		FVector Start = SocketTransform.GetLocation();
-		
+		const FVector Start = SocketTransform.GetLocation();
+
+		// Maps characters hit to number of times hit
 		TMap<ABlasterCharacter*, uint32> HitMap;
-		
-		for(uint32 i = 0; i < NumberOfPallets; i++)
+		for(FVector_NetQuantize HitTarget : HitTargets)
 		{
 			FHitResult FireHit;
 			HitScanTraceHit(Start, HitTarget, FireHit);
 			
 			if(ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(FireHit.GetActor()))
 			{
-				if(HasAuthority() && InstigatorController)
-				{	
-					if(HitMap.Contains(BlasterCharacter))
-					{
-						HitMap[BlasterCharacter]++;
-					}
-					else
-					{
-						HitMap.Emplace(BlasterCharacter, 1);
-					}
+				if(HitMap.Contains(BlasterCharacter))
+				{
+					HitMap[BlasterCharacter]++;
 				}
-				
+				else
+				{
+					HitMap.Emplace(BlasterCharacter, 1);
+				}
+
 				if(CharacterImpactParticles && CharacterHitSound)
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticles,
 						FireHit.ImpactPoint, FireHit.ImpactNormal.Rotation());
 					UGameplayStatics::PlaySoundAtLocation(GetWorld(), CharacterHitSound, FireHit.ImpactPoint,
-						0.5f, FMath::FRandRange(-0.5f, 0.5f));
+						0.5f, 0.9f);
 				}
 			}
 			else
@@ -62,22 +59,23 @@ void ABShotgun::Fire(const FVector& HitTarget)
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SurfaceImpactParticles,
 						FireHit.ImpactPoint, FireHit.ImpactNormal.Rotation());
 					UGameplayStatics::PlaySoundAtLocation(GetWorld(), SurfaceHitSound, FireHit.ImpactPoint,
-						0.5f, FMath::FRandRange(-0.5f, 0.5f));
+						0.5f, 0.9f);
 				}
 			}
 		}
+		
 		for(auto HitPair : HitMap)
 		{
 			if(HitPair.Key && HasAuthority() && InstigatorController)
 			{
-				UGameplayStatics::ApplyDamage(HitPair.Key, Damage * HitPair.Value,
+				UGameplayStatics::ApplyDamage(HitPair.Key, Damage * HitPair.Value, // Multiply damage by the times hit
 					InstigatorController, this, UDamageType::StaticClass());
 			}
 		}
 	}
 }
 
-void ABShotgun::ShotgunScatter(const FVector& HitTarget, TArray<FVector>& OutHitTargets)
+void ABShotgun::ShotgunScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& OutHitTargets)
 {
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(TEXT("MuzzleFlash"));
 	if(!MuzzleFlashSocket)

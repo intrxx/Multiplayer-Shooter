@@ -134,9 +134,10 @@ protected:
 	void ToggleInventory();
 	void LethalGrenadeButtonPressed();
 	void TacticalGrenadeButtonPressed();
-	void SwapToPrimaryButtonPressed();
-	void SwapToSecondaryButtonPressed();
 
+	UFUNCTION(Server, Reliable)
+	void ServerSwapButtonPressed();
+	
 	void DropOrDestroyWeapon(ABWeapon* Weapon);
 	
 	void AimOffset(float DeltaTime);

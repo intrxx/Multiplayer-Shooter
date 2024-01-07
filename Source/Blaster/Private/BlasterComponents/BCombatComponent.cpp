@@ -327,7 +327,7 @@ void UBCombatComponent::SwapWeapon()
 {
 	//TODO Not ideal as it is crucial to let the player swap weapon when one is empty
 	// Some swaping animation would be better 
-	if(CombatState != EBCombatState::ECS_Unoccupied)
+	if(CombatState != EBCombatState::ECS_Unoccupied || BlasterCharacter == nullptr || !BlasterCharacter->HasAuthority())
 	{
 		return;
 	}
@@ -382,10 +382,8 @@ void UBCombatComponent::AttachSecondaryWeapon(ABWeapon* WeaponToEquip)
 	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
 	
 	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
-
-	SecondaryWeapon->SetOwner(BlasterCharacter);
-
 	PlayEquipWeaponSound(SecondaryWeapon);
+	SecondaryWeapon->SetOwner(BlasterCharacter);
 }
 
 void UBCombatComponent::OnRep_EquippedWeapon()
@@ -928,8 +926,14 @@ void UBCombatComponent::FireShotgun()
 {
 	if(ABShotgun* Shotgun = Cast<ABShotgun>(EquippedWeapon))
 	{
-		TArray<FVector> HitTargets;
+		TArray<FVector_NetQuantize> HitTargets;
 		Shotgun->ShotgunScatter(HitTarget, HitTargets);
+		
+		if(BlasterCharacter && !BlasterCharacter->HasAuthority())
+		{
+			LocalShotgunFire(HitTargets);
+		}
+		ServerShotgunFire(HitTargets);
 	}
 }
 
@@ -1039,8 +1043,24 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 	{
 		return;
 	}
-
+	
 	LocalFire(TraceHitTarget);
+}
+
+void UBCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	
+	MulticastShotgunFire(TraceHitTargets);
+}
+
+void UBCombatComponent::MulticastShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled() && !BlasterCharacter->HasAuthority())
+	{
+		return;
+	}
+	
+	LocalShotgunFire(TraceHitTargets);
 }
 
 void UBCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
@@ -1050,18 +1070,26 @@ void UBCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 		return;
 	}
 	
-	if(BlasterCharacter && CombatState == EBCombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Shotgun)
-	{
-		BlasterCharacter->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(TraceHitTarget);
-		CombatState = EBCombatState::ECS_Unoccupied;
-		return;
-	}
-	
 	if(BlasterCharacter && CombatState == EBCombatState::ECS_Unoccupied)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire(TraceHitTarget);
+	}
+}
+
+void UBCombatComponent::LocalShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	ABShotgun* Shotgun = Cast<ABShotgun>(EquippedWeapon);
+	if(Shotgun == nullptr)
+	{
+		return;
+	}
+	
+	if(BlasterCharacter && CombatState == EBCombatState::ECS_Reloading || CombatState == EBCombatState::ECS_Unoccupied)
+	{
+		BlasterCharacter->PlayFireMontage(bAiming);
+		Shotgun->FireShotgun(TraceHitTargets);
+		CombatState = EBCombatState::ECS_Unoccupied;
 	}
 }
 

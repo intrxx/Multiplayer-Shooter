@@ -15,8 +15,8 @@ class BLASTER_API ABShotgun : public ABHitScanWeapon
 	GENERATED_BODY()
 
 public:
-	void Fire(const FVector& HitTarget) override;
-	virtual void ShotgunScatter(const FVector& HitTarget, /* OUT */ TArray<FVector>& OutHitTargets);
+	virtual void FireShotgun(const TArray<FVector_NetQuantize>& HitTargets);
+	virtual void ShotgunScatter(const FVector& HitTarget, /* OUT */ TArray<FVector_NetQuantize>& OutHitTargets);
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Shotgun")
 	uint32 NumberOfPallets = 10;
