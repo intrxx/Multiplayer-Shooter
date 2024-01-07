@@ -18,7 +18,6 @@ public:
 	virtual void Fire(const FVector& HitTarget) override;
 
 protected:
-	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
 	void HitScanTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit);
 
 protected:
@@ -47,20 +46,5 @@ protected:
 	TObjectPtr<USoundCue> FireSound;
 
 private:
-	/**
-	 * Trace End with Scatter
-	 */
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
-	float DistanceToSphere = 800.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
-	float SphereRadius = 75.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
-	bool bUseScatter = false;
-
-	/**
-	 *
-	 */
+	
 };

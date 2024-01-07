@@ -28,6 +28,16 @@ enum class EBWeaponState : uint8
 	EWS_MAX UMETA(DisplayName = "Default MAX")
 };
 
+UENUM(BlueprintType)
+enum class EBFireType : uint8
+{
+	EFT_HitScan UMETA(DisplayName = "Hit Scan Weapon"),
+	EFT_ProjectileWeapon UMETA(DisplayName = "Projectile Weapon"),
+	EFT_Shotgun UMETA(DisplayName = "Shotgun Weapon"),
+
+	EFT_MAX UMETA(DisplayName = "Default MAX")
+};
+
 UCLASS()
 class BLASTER_API ABWeapon : public AActor
 {
@@ -49,9 +59,7 @@ public:
 	virtual void ChangeFiringMode();
 	void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
-
-	bool bDestroyWeaponOnDeath = false;
-
+	
 	/**
 	 * Enable or disable custom depth to display the outline effect
 	 */
@@ -61,6 +69,8 @@ public:
 	/**
 	 * 
 	 */
+
+	FVector TraceEndWithScatter(const FVector& HitTarget);
 	
 	USphereComponent* GetWeaponSphereComp() const {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() const {return  WeaponMeshComp;}
@@ -76,6 +86,9 @@ public:
 	int32 GetMagCapacity() const {return MagCapacity;}
 	
 public:
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	EBFireType FireType;
+	
 	/**
 	 * Textures for the weapon crosshair
 	 */
@@ -118,6 +131,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USoundCue> EquipSound;
 
+	bool bDestroyWeaponOnDeath = false;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	bool bUseScatter = false;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
@@ -140,6 +158,14 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterControllerOwner;
 
+private:
+	UFUNCTION()
+	void OnRep_WeaponState();
+	
+	UFUNCTION()
+	void OnRep_Ammo();
+	void SpendRound();
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	EBWeaponType WeaponType;
@@ -192,12 +218,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	int32 MagCapacity;
 
-private:
-	UFUNCTION()
-	void OnRep_WeaponState();
+	/**
+	 * Trace End with Scatter
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	float DistanceToSphere = 800.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	float SphereRadius = 75.f;
 	
-	UFUNCTION()
-	void OnRep_Ammo();
-	void SpendRound();
+	/**
+	 *
+	 */
 };
 

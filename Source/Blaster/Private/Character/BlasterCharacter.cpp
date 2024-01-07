@@ -539,7 +539,7 @@ void ABlasterCharacter::TacticalGrenadeButtonPressed()
 
 void ABlasterCharacter::SwapToPrimaryButtonPressed()
 {
-	if(CombatComp)
+	if(CombatComp && CombatComp->ShouldSwapWeapons())
 	{
 		CombatComp->SwapWeapon();
 	}

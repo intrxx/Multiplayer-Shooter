@@ -59,7 +59,8 @@ public:
 	int32 GetTacticalGrenades() const {return CarriedTacticalGrenades;}
 	ABGrenade* GetEquippedLethalGrenade() const {return EquippedLethalGrenade;}
 	ABGrenade* GetEquippedTacticalGrenade() const {return EquippedTacticalGrenade;}
-
+	bool ShouldSwapWeapons();
+	
 	void SetBuffedSpeed(float BaseSpeed) {BaseWalkSpeed = BaseSpeed;}
 
 public:
@@ -262,6 +263,10 @@ private:
 	
 private:
 	void Fire();
+	void FireProjectileWeapon();
+	void FireHitScanWeapon();
+	void FireShotgun();
+	
 	void StartFireTimer();
 	void FireTimerFinished();
 	void ShrinkCrosshairWhileShooting();

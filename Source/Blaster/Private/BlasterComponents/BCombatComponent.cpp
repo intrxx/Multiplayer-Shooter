@@ -341,7 +341,6 @@ void UBCombatComponent::SwapWeapon()
 	EquippedWeapon->SetHUDAmmoImage();
 	UpdateCarriedAmmo();
 	PlayEquipWeaponSound(EquippedWeapon);
-	ReloadEmptyWeapon();
 
 	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
 	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
@@ -806,6 +805,11 @@ void UBCombatComponent::PickupAmmo(EBWeaponType WeaponType, int32 AmmoToAdd)
 	}
 }
 
+bool UBCombatComponent::ShouldSwapWeapons()
+{
+	return (EquippedWeapon != nullptr && SecondaryWeapon != nullptr);
+}
+
 void UBCombatComponent::ShowAttachedGrenade(bool bShow, UStaticMesh* GrenadeMesh)
 {
 	if(BlasterCharacter && BlasterCharacter->GetAttachedGrenade())
@@ -862,10 +866,26 @@ void UBCombatComponent::Fire()
 	{
 		bCanFire = false;
 		
-		// Called on client to run on server
-		ServerFire(HitTarget);
-		LocalFire(HitTarget);
-		ShrinkCrosshairWhileShooting();
+		if(EquippedWeapon)
+		{
+			ShrinkCrosshairWhileShooting();
+
+			switch (EquippedWeapon->FireType)
+			{
+			case EBFireType::EFT_ProjectileWeapon:
+				FireProjectileWeapon();
+				break;
+			case EBFireType::EFT_HitScan:
+				FireHitScanWeapon();
+				break;
+			case EBFireType::EFT_Shotgun:
+				FireShotgun();
+				break;
+			default:
+				break;
+			}
+		}
+		
 		StartFireTimer();
 	}
 	
@@ -873,6 +893,26 @@ void UBCombatComponent::Fire()
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquippedWeapon->EmptyMagSound, BlasterCharacter->GetActorLocation());
 	}
+}
+
+void UBCombatComponent::FireProjectileWeapon()
+{
+	LocalFire(HitTarget);
+	ServerFire(HitTarget);
+}
+
+void UBCombatComponent::FireHitScanWeapon()
+{
+	if(EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+		LocalFire(HitTarget);
+		ServerFire(HitTarget);
+	}
+}
+
+void UBCombatComponent::FireShotgun()
+{
 }
 
 bool UBCombatComponent::CanFire()
