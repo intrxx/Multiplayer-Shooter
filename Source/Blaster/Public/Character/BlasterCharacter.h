@@ -12,6 +12,8 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+class UBoxComponent;
+class UBLagCompensationComponent;
 class UBlasterBuffComponent;
 class ABPlayerState;
 class ABlasterHUD;
@@ -102,6 +104,68 @@ public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
 
+	/**
+	 * Hit Boxes used for server-side rewind
+	 */
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> HeadBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> NeckBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> HipsBox;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> SpineBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Spine1Box;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Spine2Box;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftArmBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftForeArmBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftHandBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightArmBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightForeArmBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightHandBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftUpLegBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftLegBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LeftFootBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightUpLegBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightLegBox;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> RightFootBox;
+	
+	/**
+	 * 
+	 */
+
 protected:
 	TArray<UInputMappingContext*> GameplayMappingContexts;
 	
@@ -184,11 +248,18 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<ABWeapon> OverlappingWeapon;
 
+	/**
+	 * Blaster Components
+	 */
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|Combat")
 	TObjectPtr<UBCombatComponent> CombatComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|Combat")
 	TObjectPtr<UBlasterBuffComponent> BuffComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Blaster|Combat")
+	TObjectPtr<UBLagCompensationComponent> LagCompensationComp;
 
 	/**
 	 * Anim Montages 
