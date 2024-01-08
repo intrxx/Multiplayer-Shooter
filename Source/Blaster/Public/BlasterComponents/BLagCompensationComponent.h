@@ -63,4 +63,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
+
+	TDoubleLinkedList<FBFramePackage> FrameHistory;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|ServerSideRewind")
+	float MaxRecordTime = 1.f;
 };
