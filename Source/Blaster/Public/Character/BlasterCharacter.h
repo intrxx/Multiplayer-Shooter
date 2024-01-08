@@ -71,6 +71,7 @@ public:
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
 	bool GetDisableGameplay() const {return bDisableGameplay;}
+	bool IsLocallyReloading();
 	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
 	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
 	

@@ -434,9 +434,12 @@ void UBCombatComponent::OnRep_EquippedTacticalGrenade()
 
 void UBCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState == EBCombatState::ECS_Unoccupied && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity())
+	if(CarriedAmmo > 0 && CombatState == EBCombatState::ECS_Unoccupied && EquippedWeapon && EquippedWeapon->GetAmmo() != EquippedWeapon->GetMagCapacity() && !bLocallyReloading)
 	{
 		ServerReload();
+		HandleReload();
+
+		bLocallyReloading = true;
 	}
 }
 
@@ -578,12 +581,19 @@ void UBCombatComponent::ServerReload_Implementation()
 	}
 	
 	CombatState = EBCombatState::ECS_Reloading;
-	HandleReload();
+	
+	if(!BlasterCharacter->IsLocallyControlled())
+	{
+		HandleReload();
+	}
 }
 
 void UBCombatComponent::HandleReload()
 {
-	BlasterCharacter->PlayReloadMontage();
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->PlayReloadMontage();
+	}
 }
 
 void UBCombatComponent::UpdateAmmoValues()
@@ -686,6 +696,7 @@ void UBCombatComponent::FinishReloading()
 		UpdateAmmoValues();
 	}
 
+	bLocallyReloading = false;
 	// This will be true only on the locally controlled character - we check if the fire button was pressed to continue
 	// firing when reload finishes
 	//f(bFireButtonPressed)
@@ -707,7 +718,10 @@ void UBCombatComponent::OnRep_CombatState()
 	switch (CombatState)
 	{
 	case EBCombatState::ECS_Reloading:
-		HandleReload();
+		if(BlasterCharacter && !BlasterCharacter->IsLocallyControlled())
+		{
+			HandleReload();
+		}
 		break;
 	case EBCombatState::ECS_Unoccupied:
 		if(bFireButtonPressed)
@@ -948,6 +962,11 @@ void UBCombatComponent::FireShotgun()
 bool UBCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr)
+	{
+		return false;
+	}
+
+	if(bLocallyReloading)
 	{
 		return false;
 	}

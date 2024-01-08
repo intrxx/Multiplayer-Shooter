@@ -64,6 +64,7 @@ public:
 	void SetBuffedSpeed(float BaseSpeed) {BaseWalkSpeed = BaseSpeed;}
 
 public:
+	bool bLocallyReloading = false;
 	
 protected:
 	virtual void BeginPlay() override;

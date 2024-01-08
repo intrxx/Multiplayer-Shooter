@@ -570,6 +570,16 @@ FVector ABlasterCharacter::GetHitTarget() const
 	return CombatComp->HitTarget;
 }
 
+bool ABlasterCharacter::IsLocallyReloading()
+{
+	if(CombatComp == nullptr)
+	{
+		return false;
+	}
+
+	return CombatComp->bLocallyReloading;
+}
+
 bool ABlasterCharacter::IsWeaponEquipped()
 {
 	return (CombatComp && CombatComp->EquippedWeapon);
