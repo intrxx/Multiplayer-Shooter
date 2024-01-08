@@ -743,6 +743,14 @@ void UBCombatComponent::OnRep_CombatState()
 	}
 }
 
+void UBCombatComponent::OnRep_Aiming()
+{
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
+	{
+		bAiming = bAimButtonPressed;
+	}
+}
+
 void UBCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
@@ -1116,6 +1124,11 @@ void UBCombatComponent::SetAiming(bool bIsAiming)
 		}
 
 		PlayScopeSounds(bIsAiming);
+	}
+
+	if(BlasterCharacter->IsLocallyControlled())
+	{
+		bAimButtonPressed = bIsAiming;
 	}
 }
 

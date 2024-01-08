@@ -160,8 +160,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Defaults")
 	TSubclassOf<ABGrenade> DefaultTacticalGrenade;
 
-	UPROPERTY(Replicated)
-	bool bAiming;
+	UPROPERTY(ReplicatedUsing = OnRep_Aiming)
+	bool bAiming = false;
+
+	bool bAimButtonPressed = false;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Movement")
 	float BaseWalkSpeed = 600.f;
@@ -294,6 +296,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_CombatState();
+	
+	UFUNCTION()
+	void OnRep_Aiming();
 
 	void UpdateAmmoValues();
 	void UpdateShotgunAmmoValues();
