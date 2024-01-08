@@ -151,7 +151,11 @@ protected:
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAmmo(int32 ServerAmmo);
 
+	UFUNCTION(Client, Reliable)
+	void ClientAddAmmo(int32 AmmoToAdd);
 protected:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacterOwner;
@@ -169,15 +173,17 @@ protected:
 	float SphereRadius = 75.f;
 	
 	/**
-	 *
+	 * Client side prediction
 	 */
+
+	// The number of unprocessed server request for Ammo.
+	// Incremented in SpendRound, decremented in UpdateAmmo
+	int32 AmmoSequence = 0;
 
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();
 	
-	UFUNCTION()
-	void OnRep_Ammo();
 	void SpendRound();
 	
 private:
@@ -226,7 +232,7 @@ private:
 	 * Ammo
 	 */
 
-	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo, Category = "Blaster|Weapon")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	int32 Ammo;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
