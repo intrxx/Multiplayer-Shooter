@@ -103,6 +103,24 @@ public:
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
+	
+	UPROPERTY()
+	TMap<FName, UBoxComponent*> HitCollisionBoxesMap;
+
+protected:
+	TArray<UInputMappingContext*> GameplayMappingContexts;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UBInputConfig> InputConfig;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> InventoryMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> CooldownStateMappingContext;
 
 	/**
 	 * Hit Boxes used for server-side rewind
@@ -161,25 +179,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> RightFootBox;
-	
+
 	/**
 	 * 
 	 */
-
-protected:
-	TArray<UInputMappingContext*> GameplayMappingContexts;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UBInputConfig> InputConfig;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UInputMappingContext> InventoryMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
-	TObjectPtr<UInputMappingContext> CooldownStateMappingContext;
 
 protected:
 	virtual void BeginPlay() override;

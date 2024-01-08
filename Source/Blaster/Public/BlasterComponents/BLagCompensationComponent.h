@@ -15,13 +15,13 @@ struct FBBoxInformation
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FVector Location;
+	FVector Location = FVector();
 
 	UPROPERTY()
-	FRotator Rotation;
+	FRotator Rotation = FRotator();
 
 	UPROPERTY()
-	FVector BoxExtent;
+	FVector BoxExtent = FVector();
 };
 
 USTRUCT(BlueprintType)
@@ -30,7 +30,7 @@ struct FBFramePackage
 	GENERATED_BODY()
 
 	UPROPERTY()
-	float Time;
+	float Time = 0;
 
 	UPROPERTY()
 	TMap<FName, FBBoxInformation> HitBoxInfoMap;
@@ -47,10 +47,15 @@ public:
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// Debug function to show the hit box package on a single frame
+	void ShowFramePackage(const FBFramePackage& FramePackage, const FColor& Color);
+
 public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	void SaveFramePackage(FBFramePackage& FramePackage);
 
 private:
 	UPROPERTY()
