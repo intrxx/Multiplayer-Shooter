@@ -15,13 +15,13 @@ struct FBBoxInformation
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FVector Location = FVector();
+	FVector Location = FVector::Zero();
 
 	UPROPERTY()
-	FRotator Rotation = FRotator();
+	FRotator Rotation = FRotator::ZeroRotator;
 
 	UPROPERTY()
-	FVector BoxExtent = FVector();
+	FVector BoxExtent = FVector::Zero();
 };
 
 USTRUCT(BlueprintType)
@@ -47,15 +47,16 @@ public:
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// Debug function to show the hit box package on a single frame
+	// Debug function to show the hit box package 
 	void ShowFramePackage(const FBFramePackage& FramePackage, const FColor& Color);
-
+	void ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime);
 public:
 	
 protected:
 	virtual void BeginPlay() override;
 
 	void SaveFramePackage(FBFramePackage& FramePackage);
+	FBFramePackage InterpBetweenFrames(const FBFramePackage& OlderFrame, const FBFramePackage& YoungerFrame, float HitTime);
 
 private:
 	UPROPERTY()

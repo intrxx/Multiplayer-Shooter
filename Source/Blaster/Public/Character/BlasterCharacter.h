@@ -68,6 +68,7 @@ public:
 	UCameraComponent* GetFollowCamera() const {return CameraComponent;}
 	UBCombatComponent* GetCombatComp() const {return CombatComp;}
 	UBlasterBuffComponent* GetBuffComp() const {return BuffComponent;}
+	UBLagCompensationComponent* GetLagCompensationComp() const {return LagCompensationComp;}
 	FVector GetHitTarget() const;
 	TArray<UInputMappingContext*> GetGameplayMappingContexts() const {return GameplayMappingContexts;};
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
