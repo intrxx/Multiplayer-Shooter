@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "BlasterTypes/BlasterBodyPart.h"
 #include "BLagCompensationComponent.generated.h"
 
 class ABPlayerController;
@@ -36,6 +37,18 @@ struct FBFramePackage
 	TMap<FName, FBBoxInformation> HitBoxInfoMap;
 };
 
+USTRUCT()
+struct FBServerSideRewindResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	bool bHitConfirmed;
+
+	UPROPERTY()
+	EBlasterBodyPart BodyPartHit = EBlasterBodyPart::BBP_None;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UBLagCompensationComponent : public UActorComponent
 {
@@ -49,7 +62,7 @@ public:
 
 	// Debug function to show the hit box package 
 	void ShowFramePackage(const FBFramePackage& FramePackage, const FColor& Color);
-	void ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime);
+	FBServerSideRewindResult ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime);
 public:
 	
 protected:
@@ -57,6 +70,13 @@ protected:
 
 	void SaveFramePackage(FBFramePackage& FramePackage);
 	FBFramePackage InterpBetweenFrames(const FBFramePackage& OlderFrame, const FBFramePackage& YoungerFrame, float HitTime);
+	FBServerSideRewindResult ConfirmHit(const FBFramePackage& PackageToCheck, ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation);
+	void CacheBoxPositions(ABlasterCharacter* HitCharacter, /* OUT */ FBFramePackage& OutFramePackage);
+	void MoveBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
+	void ResetHitBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
+
+	bool CheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool CheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
 
 private:
 	UPROPERTY()

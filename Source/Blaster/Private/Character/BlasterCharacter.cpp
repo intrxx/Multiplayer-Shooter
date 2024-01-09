@@ -259,6 +259,8 @@ void ABlasterCharacter::BeginPlay()
 	UpdateHUDAmmo();
 	UpdateHUDHealth();
 	UpdateHUDShield();
+	
+	
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -268,7 +270,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 	RotateInPlace(DeltaTime);
 	
 	HideCharacterIfCameraClose();
-	PollInit(); 
+	PollInit();
 }
 
 void ABlasterCharacter::RotateInPlace(float DeltaTime)

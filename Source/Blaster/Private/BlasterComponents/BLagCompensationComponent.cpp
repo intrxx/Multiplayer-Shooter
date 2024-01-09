@@ -101,8 +101,192 @@ FBFramePackage UBLagCompensationComponent::InterpBetweenFrames(const FBFramePack
 	return InterpFramePackage;
 }
 
-void UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter,
-	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
+FBServerSideRewindResult UBLagCompensationComponent::ConfirmHit(const FBFramePackage& PackageToCheck,
+	ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation)
+{
+	if(HitCharacter == nullptr)
+	{
+		return FBServerSideRewindResult();
+	}
+
+	FBFramePackage CurrentFrame;
+	CacheBoxPositions(HitCharacter, CurrentFrame);
+	
+	MoveBoxes(HitCharacter, PackageToCheck);
+
+	FHitResult ConfirmHitResult;
+	const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.15f;
+	
+	if(CheckHeadShotForHit(HitCharacter, TraceStart, TraceEnd))
+	{
+		ResetHitBoxes(HitCharacter, CurrentFrame);
+		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Head};
+	}
+	
+	if(CheckLegsForHit(HitCharacter, TraceStart, TraceEnd))
+	{
+		ResetHitBoxes(HitCharacter, CurrentFrame);
+		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Legs};
+	}
+
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxesMap)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			HitBoxPair.Value->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		}
+	}
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+
+		if(ConfirmHitResult.bBlockingHit)
+		{
+			ResetHitBoxes(HitCharacter, CurrentFrame);
+			return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Body};
+		}
+	}
+
+	ResetHitBoxes(HitCharacter, CurrentFrame);
+	return FBServerSideRewindResult{false, EBlasterBodyPart::BBP_None};
+}
+
+bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	const FVector& TraceEnd)
+{
+	if(HitCharacter == nullptr)
+	{
+		return false;
+	}
+
+	UBoxComponent* HeadBox = HitCharacter->HitCollisionBoxesMap[FName("Head")];
+	if(HeadBox)
+	{
+		HeadBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		HeadBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		
+		FHitResult ConfirmHitResult;
+
+		UWorld* World = GetWorld();
+		if(World)
+		{
+			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+
+			return ConfirmHitResult.bBlockingHit;
+		}
+		return false;
+	}
+	return false;
+}
+
+bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	const FVector& TraceEnd)
+{
+	if(HitCharacter == nullptr)
+	{
+		return false;
+	}
+
+	UBoxComponent* LeftUpLegBox = HitCharacter->HitCollisionBoxesMap[FName("LeftUpLeg")];
+	UBoxComponent* LeftLegBox = HitCharacter->HitCollisionBoxesMap[FName("LeftLeg")];
+	UBoxComponent* LeftFootBox = HitCharacter->HitCollisionBoxesMap[FName("LeftFoot")];
+	
+	UBoxComponent* RightUpLegBox = HitCharacter->HitCollisionBoxesMap[FName("RightUpLeg")];
+	UBoxComponent* RightLegBox = HitCharacter->HitCollisionBoxesMap[FName("RightLeg")];
+	UBoxComponent* RightFootBox = HitCharacter->HitCollisionBoxesMap[FName("RightFoot")];
+	if(LeftUpLegBox && LeftLegBox && LeftFootBox && RightUpLegBox && RightLegBox && RightFootBox)
+	{
+		LeftUpLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		LeftUpLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		LeftLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		LeftLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		LeftFootBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		LeftFootBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+		RightUpLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		RightUpLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		RightLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		RightLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		RightFootBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		RightFootBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		
+		FHitResult ConfirmHitResult;
+
+		UWorld* World = GetWorld();
+		if(World)
+		{
+			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+
+			return ConfirmHitResult.bBlockingHit;
+		}
+		return false;
+	}
+	return false;
+}
+
+void UBLagCompensationComponent::CacheBoxPositions(ABlasterCharacter* HitCharacter, /* OUT */ FBFramePackage& OutFramePackage)
+{
+	if(HitCharacter == nullptr)
+	{
+		return;
+	}
+
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxesMap)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			FBBoxInformation BoxInfo;
+			BoxInfo.Location = HitBoxPair.Value->GetComponentLocation();
+			BoxInfo.Rotation = HitBoxPair.Value->GetComponentRotation();
+			BoxInfo.BoxExtent = HitBoxPair.Value->GetScaledBoxExtent();
+
+			OutFramePackage.HitBoxInfoMap.Add(HitBoxPair.Key, BoxInfo);
+		}
+	}
+}
+
+void UBLagCompensationComponent::MoveBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage)
+{
+	if(HitCharacter == nullptr)
+	{
+		return;
+	}
+
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxesMap)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			HitBoxPair.Value->SetWorldLocation(FramePackage.HitBoxInfoMap[HitBoxPair.Key].Location);
+			HitBoxPair.Value->SetWorldRotation(FramePackage.HitBoxInfoMap[HitBoxPair.Key].Rotation);
+			HitBoxPair.Value->SetBoxExtent(FramePackage.HitBoxInfoMap[HitBoxPair.Key].BoxExtent);
+		}
+	}
+}
+
+void UBLagCompensationComponent::ResetHitBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage)
+{
+	if(HitCharacter == nullptr)
+	{
+		return;
+	}
+
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxesMap)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			HitBoxPair.Value->SetWorldLocation(FramePackage.HitBoxInfoMap[HitBoxPair.Key].Location);
+			HitBoxPair.Value->SetWorldRotation(FramePackage.HitBoxInfoMap[HitBoxPair.Key].Rotation);
+			HitBoxPair.Value->SetBoxExtent(FramePackage.HitBoxInfoMap[HitBoxPair.Key].BoxExtent);
+			HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+}
+
+FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter,
+                                                  const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
 {
 	bool bReturn = HitCharacter == nullptr ||
 		HitCharacter->GetLagCompensationComp() == nullptr ||
@@ -111,7 +295,7 @@ void UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacte
 	
 	if(bReturn)
 	{
-		return;
+		return FBServerSideRewindResult();
 	}
 
 	// Frame package that we check to verify the hit
@@ -127,7 +311,7 @@ void UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacte
 	
 	if(OldestHistoryTime > HitTime) // Too far back, too laggy to do SSR
 	{
-		return;
+		return FBServerSideRewindResult();
 	}
 
 	if(OldestHistoryTime == HitTime)
@@ -171,5 +355,7 @@ void UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacte
 		// Interpolate between Younger and Older because the HitTime is inbetween them
 		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
 	}
+
+	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 }
 
