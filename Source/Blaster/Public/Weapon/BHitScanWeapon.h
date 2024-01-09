@@ -22,9 +22,6 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
-	float Damage = 20.f;
-	
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	TObjectPtr<UParticleSystem> SurfaceImpactParticles;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")

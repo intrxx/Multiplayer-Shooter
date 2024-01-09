@@ -84,6 +84,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
 
+public:
+	float SingleTripTime = 0.f;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;

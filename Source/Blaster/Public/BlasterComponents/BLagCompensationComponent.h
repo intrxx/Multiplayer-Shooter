@@ -9,6 +9,7 @@
 
 class ABPlayerController;
 class ABlasterCharacter;
+class ABWeapon;
 
 USTRUCT(BlueprintType)
 struct FBBoxInformation
@@ -63,11 +64,15 @@ public:
 	// Debug function to show the hit box package 
 	void ShowFramePackage(const FBFramePackage& FramePackage, const FColor& Color);
 	FBServerSideRewindResult ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime);
+
+	UFUNCTION(Server, Reliable)
+	void ServerScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser);
 public:
 	
 protected:
 	virtual void BeginPlay() override;
 
+	void SavePackage();
 	void SaveFramePackage(FBFramePackage& FramePackage);
 	FBFramePackage InterpBetweenFrames(const FBFramePackage& OlderFrame, const FBFramePackage& YoungerFrame, float HitTime);
 	FBServerSideRewindResult ConfirmHit(const FBFramePackage& PackageToCheck, ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation);
@@ -88,5 +93,5 @@ private:
 	TDoubleLinkedList<FBFramePackage> FrameHistory;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|ServerSideRewind")
-	float MaxRecordTime = 1.f;
+	float MaxRecordTime = 4.f;
 };

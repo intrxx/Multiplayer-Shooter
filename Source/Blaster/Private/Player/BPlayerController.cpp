@@ -194,7 +194,8 @@ void ABPlayerController::ClientReportServerTime_Implementation(float TimeOfClien
 {
 	// Time from sending the request to server and receiving the answer from server
 	float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
-	float CurrentServerTime = TimerServerReceivedClientRequest + (0.5f * RoundTripTime);
+	SingleTripTime = 0.5f * RoundTripTime;
+	float CurrentServerTime = TimerServerReceivedClientRequest + SingleTripTime;
 
 	ClientServerDelta = CurrentServerTime - GetWorld()->GetTimeSeconds();
 }

@@ -84,6 +84,7 @@ public:
 	bool IsMagFull() const;
 	int32 GetAmmo() const {return Ammo;}
 	int32 GetMagCapacity() const {return MagCapacity;}
+	float GetDamage() const {return Damage;}
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
@@ -133,7 +134,7 @@ public:
 
 	bool bDestroyWeaponOnDeath = false;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Scatter")
 	bool bUseScatter = false;
 
 protected:
@@ -156,6 +157,7 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientAddAmmo(int32 AmmoToAdd);
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacterOwner;
@@ -166,10 +168,10 @@ protected:
 	 * Trace End with Scatter
 	 */
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Scatter")
 	float DistanceToSphere = 800.f;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan|Scatter")
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Scatter")
 	float SphereRadius = 75.f;
 	
 	/**
@@ -179,6 +181,12 @@ protected:
 	// The number of unprocessed server request for Ammo.
 	// Incremented in SpendRound, decremented in UpdateAmmo
 	int32 AmmoSequence = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	bool bUseServerSideRewind = false;
 
 private:
 	UFUNCTION()

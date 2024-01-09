@@ -4,6 +4,8 @@
 
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Weapon/BWeapon.h"
 
 UBLagCompensationComponent::UBLagCompensationComponent()
 {
@@ -21,6 +23,16 @@ void UBLagCompensationComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	SavePackage();
+}
+
+void UBLagCompensationComponent::SavePackage()
+{
+	if(BlasterCharacter == nullptr || !BlasterCharacter->HasAuthority())
+	{
+		return;
+	}
+	
 	if(FrameHistory.Num() <= 1)
 	{
 		FBFramePackage ThisFrame;
@@ -41,7 +53,7 @@ void UBLagCompensationComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		SaveFramePackage(ThisFrame);
 		FrameHistory.AddHead(ThisFrame);
 
-		ShowFramePackage(ThisFrame, FColor::Emerald);
+		//ShowFramePackage(ThisFrame, FColor::Emerald);
 	}
 }
 
@@ -357,5 +369,17 @@ FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCh
 	}
 
 	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
+}
+
+void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter,
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
+{
+	FBServerSideRewindResult ConfirmHit = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
+
+	if(BlasterCharacter && HitCharacter && DamageCauser && ConfirmHit.bHitConfirmed)
+	{
+		UGameplayStatics::ApplyDamage(HitCharacter, DamageCauser->GetDamage(),
+			BlasterCharacter->Controller, DamageCauser, UDamageType::StaticClass());
+	}
 }
 
