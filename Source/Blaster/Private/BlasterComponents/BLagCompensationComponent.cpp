@@ -63,6 +63,7 @@ void UBLagCompensationComponent::SaveFramePackage(FBFramePackage& FramePackage)
 	if(BlasterCharacter)
 	{
 		FramePackage.Time = GetWorld()->GetTimeSeconds();
+		FramePackage.Character = BlasterCharacter;
 		
 		for(auto& BoxPair : BlasterCharacter->HitCollisionBoxesMap)
 		{
@@ -125,8 +126,7 @@ FBServerSideRewindResult UBLagCompensationComponent::ConfirmHit(const FBFramePac
 	CacheBoxPositions(HitCharacter, CurrentFrame);
 	
 	MoveBoxes(HitCharacter, PackageToCheck);
-
-	FHitResult ConfirmHitResult;
+	
 	const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.15f;
 	
 	if(CheckHeadShotForHit(HitCharacter, TraceStart, TraceEnd))
@@ -141,29 +141,109 @@ FBServerSideRewindResult UBLagCompensationComponent::ConfirmHit(const FBFramePac
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Legs};
 	}
 
-	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxesMap)
+	if(CheckBodyForHit(HitCharacter, TraceStart, TraceEnd))
 	{
-		if(HitBoxPair.Value != nullptr)
-		{
-			HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			HitBoxPair.Value->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		}
+		ResetHitBoxes(HitCharacter, CurrentFrame);
+		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Body};
 	}
-
-	UWorld* World = GetWorld();
-	if(World)
-	{
-		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
-
-		if(ConfirmHitResult.bBlockingHit)
-		{
-			ResetHitBoxes(HitCharacter, CurrentFrame);
-			return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Body};
-		}
-	}
-
+	
 	ResetHitBoxes(HitCharacter, CurrentFrame);
 	return FBServerSideRewindResult{false, EBlasterBodyPart::BBP_None};
+}
+
+FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArray<FBFramePackage>& FramePackages,
+	 const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations)
+{
+	for(auto& Package : FramePackages)
+	{
+		if(Package.Character == nullptr)
+		{
+			return FBShotgunSSRewindResult();
+		}
+	}
+
+	FBShotgunSSRewindResult ShotgunSSRHitResult;
+
+	TArray<FBFramePackage> CurrentFrames;
+	for(auto& Package : FramePackages)
+	{
+		FBFramePackage CurrentFrame;
+		CurrentFrame.Character = Package.Character;
+		CacheBoxPositions(Package.Character, CurrentFrame);
+		MoveBoxes(Package.Character, CurrentFrame);
+		CurrentFrames.Add(CurrentFrame);
+	}
+
+	TArray<FVector> EndLocations;
+	for(auto& HitLocation : HitLocations)
+	{
+		FVector EndLocation = TraceStart + (HitLocation - TraceStart) * 1.15f;
+		EndLocations.Add(EndLocation);
+	}
+	
+	// Adding to headshot count for every character hit
+	for(auto& Package : FramePackages)
+	{
+		for(auto& EndLocation : EndLocations)
+		{
+			if(CheckHeadShotForHit(Package.Character, TraceStart, EndLocation))
+			{
+				if(ShotgunSSRHitResult.HeadShots.Contains(BlasterCharacter))
+				{
+					ShotgunSSRHitResult.HeadShots[BlasterCharacter]++;
+				}
+				else
+				{
+					ShotgunSSRHitResult.HeadShots.Emplace(BlasterCharacter, 1);
+				}
+			}
+		}
+	}
+
+	// Adding to legshot count for every character hit
+	for(auto& Package : FramePackages)
+	{
+		for(auto& EndLocation : EndLocations)
+		{
+			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
+			{
+				if(ShotgunSSRHitResult.LegShots.Contains(BlasterCharacter))
+				{
+					ShotgunSSRHitResult.LegShots[BlasterCharacter]++;
+				}
+				else
+				{
+					ShotgunSSRHitResult.LegShots.Emplace(BlasterCharacter, 1);
+				}
+			}
+		}
+	}
+
+	// Adding to bodyshot count for every character hit
+	for(auto& Package : FramePackages)
+	{
+		for(auto& EndLocation : EndLocations)
+		{
+			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
+			{
+				if(ShotgunSSRHitResult.BodyShots.Contains(BlasterCharacter))
+				{
+					ShotgunSSRHitResult.BodyShots[BlasterCharacter]++;
+				}
+				else
+				{
+					ShotgunSSRHitResult.BodyShots.Emplace(BlasterCharacter, 1);
+				}
+			}
+		}
+	}
+
+	for(auto& Frame : CurrentFrames)
+	{
+		ResetHitBoxes(Frame.Character, Frame);
+	}
+	
+	return ShotgunSSRHitResult;
 }
 
 bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
@@ -187,10 +267,19 @@ bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitChara
 		{
 			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
 
-			return ConfirmHitResult.bBlockingHit;
+			ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+			if(BlasterCharacter)
+			{
+				HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				return true;
+			}
+			HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			return false;
 		}
+		HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		return false;
 	}
+	HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	return false;
 }
 
@@ -202,41 +291,107 @@ bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter
 		return false;
 	}
 
-	UBoxComponent* LeftUpLegBox = HitCharacter->HitCollisionBoxesMap[FName("LeftUpLeg")];
-	UBoxComponent* LeftLegBox = HitCharacter->HitCollisionBoxesMap[FName("LeftLeg")];
-	UBoxComponent* LeftFootBox = HitCharacter->HitCollisionBoxesMap[FName("LeftFoot")];
+	TArray<UBoxComponent*> LegHitBoxes;
 	
-	UBoxComponent* RightUpLegBox = HitCharacter->HitCollisionBoxesMap[FName("RightUpLeg")];
-	UBoxComponent* RightLegBox = HitCharacter->HitCollisionBoxesMap[FName("RightLeg")];
-	UBoxComponent* RightFootBox = HitCharacter->HitCollisionBoxesMap[FName("RightFoot")];
-	if(LeftUpLegBox && LeftLegBox && LeftFootBox && RightUpLegBox && RightLegBox && RightFootBox)
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftUpLeg")]);
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftLeg")]);
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftFoot")]);
+
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightUpLeg")]);
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightLeg")]);
+	LegHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightFoot")]);
+
+	for(auto& HitBox : LegHitBoxes)
 	{
-		LeftUpLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		LeftUpLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		LeftLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		LeftLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		LeftFootBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		LeftFootBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-
-		RightUpLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		RightUpLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		RightLegBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		RightLegBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		RightFootBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		RightFootBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-		
-		FHitResult ConfirmHitResult;
-
-		UWorld* World = GetWorld();
-		if(World)
+		if(HitBox)
 		{
-			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
-
-			return ConfirmHitResult.bBlockingHit;
+			HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			HitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 		}
+	}
+	
+	FHitResult ConfirmHitResult;
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+
+		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(BlasterCharacter)
+		{
+			EnableBoxCollision(LegHitBoxes, ECollisionEnabled::NoCollision);
+			return true;
+		}
+		EnableBoxCollision(LegHitBoxes, ECollisionEnabled::NoCollision);
 		return false;
 	}
+	EnableBoxCollision(LegHitBoxes, ECollisionEnabled::NoCollision);
 	return false;
+}
+
+bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	const FVector& TraceEnd)
+{
+	if(HitCharacter == nullptr)
+	{
+		return false;
+	}
+
+	TArray<UBoxComponent*> BodyHitBoxes;
+	
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("Neck")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("Hips")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("Spine")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("Spine1")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("Spine2")]);
+	
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftArm")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftForeArm")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("LeftHand")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightArm")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightForeArm")]);
+	BodyHitBoxes.Add(HitCharacter->HitCollisionBoxesMap[FName("RightHand")]);
+
+	for(auto& HitBox : BodyHitBoxes)
+	{
+		if(HitBox)
+		{
+			HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			HitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		}
+	}
+	
+	FHitResult ConfirmHitResult;
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+
+		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(BlasterCharacter)
+		{
+			EnableBoxCollision(BodyHitBoxes, ECollisionEnabled::NoCollision);
+			return true;
+		}
+		EnableBoxCollision(BodyHitBoxes, ECollisionEnabled::NoCollision);
+		return false;
+	}
+	EnableBoxCollision(BodyHitBoxes, ECollisionEnabled::NoCollision);
+	return false;
+}
+
+void UBLagCompensationComponent::EnableBoxCollision(const TArray<UBoxComponent*>& CollisionBoxes,
+	ECollisionEnabled::Type CollisionEnabled)
+{
+	for(auto& HitBox : CollisionBoxes)
+	{
+		if(HitBox)
+		{
+			HitBox->SetCollisionEnabled(CollisionEnabled);
+		}
+	}
 }
 
 void UBLagCompensationComponent::CacheBoxPositions(ABlasterCharacter* HitCharacter, /* OUT */ FBFramePackage& OutFramePackage)
@@ -300,6 +455,24 @@ void UBLagCompensationComponent::ResetHitBoxes(ABlasterCharacter* HitCharacter, 
 FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter,
                                                   const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
 {
+	return ConfirmHit(GetFrameToCheck(HitCharacter, HitTime), HitCharacter, TraceStart, HitLocation);
+}
+
+FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunServerSideRewind(
+	const TArray<ABlasterCharacter*>& HitCharacters, const FVector_NetQuantize& TraceStart,
+	const TArray<FVector_NetQuantize>& HitLocations, float HitTime)
+{
+	TArray<FBFramePackage> FramesToCheck;
+	for(ABlasterCharacter* HitCharacter : HitCharacters)
+	{
+		FramesToCheck.Add(GetFrameToCheck(HitCharacter, HitTime));
+	}
+
+	return ShotgunConfirmHit(FramesToCheck, TraceStart, HitLocations);
+}
+
+FBFramePackage UBLagCompensationComponent::GetFrameToCheck(ABlasterCharacter* HitCharacter, float HitTime)
+{
 	bool bReturn = HitCharacter == nullptr ||
 		HitCharacter->GetLagCompensationComp() == nullptr ||
 		HitCharacter->GetLagCompensationComp()->FrameHistory.GetHead() == nullptr ||
@@ -307,12 +480,11 @@ FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCh
 	
 	if(bReturn)
 	{
-		return FBServerSideRewindResult();
+		return FBFramePackage();
 	}
 
 	// Frame package that we check to verify the hit
 	FBFramePackage FrameToCheck;
-
 	bool bShouldInterpolate = true;
 	
 	// Frame history of the hit character
@@ -323,7 +495,7 @@ FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCh
 	
 	if(OldestHistoryTime > HitTime) // Too far back, too laggy to do SSR
 	{
-		return FBServerSideRewindResult();
+		return FBFramePackage();
 	}
 
 	if(OldestHistoryTime == HitTime)
@@ -368,11 +540,11 @@ FBServerSideRewindResult UBLagCompensationComponent::ServerSideRewind(ABlasterCh
 		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
 	}
 
-	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
+	return FrameToCheck;
 }
 
 void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter,
-	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
+                                                                   const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
 {
 	FBServerSideRewindResult ConfirmHit = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
 
