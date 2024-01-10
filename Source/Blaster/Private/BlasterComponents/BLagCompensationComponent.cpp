@@ -132,21 +132,25 @@ FBServerSideRewindResult UBLagCompensationComponent::ConfirmHit(const FBFramePac
 	if(CheckHeadShotForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		UE_LOG(LogTemp, Warning, TEXT("Got a hitscan headshot!"));
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Head};
 	}
 	
 	if(CheckLegsForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		UE_LOG(LogTemp, Warning, TEXT("Got a hitscan legshot!"));
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Legs};
 	}
 
 	if(CheckBodyForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		UE_LOG(LogTemp, Warning, TEXT("Got a hitscan bodyshot!"));
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Body};
 	}
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("Hitscan miss!"));
 	ResetHitBoxes(HitCharacter, CurrentFrame);
 	return FBServerSideRewindResult{false, EBlasterBodyPart::BBP_None};
 }
@@ -161,6 +165,8 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 			return FBShotgunSSRewindResult();
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Confirming Hit"));
 
 	FBShotgunSSRewindResult ShotgunSSRHitResult;
 
@@ -188,14 +194,17 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		{
 			if(CheckHeadShotForHit(Package.Character, TraceStart, EndLocation))
 			{
-				if(ShotgunSSRHitResult.HeadShots.Contains(BlasterCharacter))
+				if(ShotgunSSRHitResult.HeadShots.Contains(Package.Character))
 				{
-					ShotgunSSRHitResult.HeadShots[BlasterCharacter]++;
+					ShotgunSSRHitResult.HeadShots[Package.Character]++;
+					UE_LOG(LogTemp, Error, TEXT("increasing!"));
 				}
 				else
 				{
-					ShotgunSSRHitResult.HeadShots.Emplace(BlasterCharacter, 1);
+					ShotgunSSRHitResult.HeadShots.Emplace(Package.Character, 1);
+					UE_LOG(LogTemp, Error, TEXT("adding!"));
 				}
+				UE_LOG(LogTemp, Error, TEXT("Got a headshot!"));
 			}
 		}
 	}
@@ -207,14 +216,16 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		{
 			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
 			{
-				if(ShotgunSSRHitResult.LegShots.Contains(BlasterCharacter))
+				if(ShotgunSSRHitResult.LegShots.Contains(Package.Character))
 				{
-					ShotgunSSRHitResult.LegShots[BlasterCharacter]++;
+					ShotgunSSRHitResult.LegShots[Package.Character]++;
 				}
 				else
 				{
-					ShotgunSSRHitResult.LegShots.Emplace(BlasterCharacter, 1);
+					ShotgunSSRHitResult.LegShots.Emplace(Package.Character, 1);
 				}
+
+				UE_LOG(LogTemp, Error, TEXT("Got a legshot!"));
 			}
 		}
 	}
@@ -226,14 +237,15 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		{
 			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
 			{
-				if(ShotgunSSRHitResult.BodyShots.Contains(BlasterCharacter))
+				if(ShotgunSSRHitResult.BodyShots.Contains(Package.Character))
 				{
-					ShotgunSSRHitResult.BodyShots[BlasterCharacter]++;
+					ShotgunSSRHitResult.BodyShots[Package.Character]++;
 				}
 				else
 				{
-					ShotgunSSRHitResult.BodyShots.Emplace(BlasterCharacter, 1);
+					ShotgunSSRHitResult.BodyShots.Emplace(Package.Character, 1);
 				}
+				UE_LOG(LogTemp, Error, TEXT("Got a bodyshot!"));
 			}
 		}
 	}
@@ -540,6 +552,8 @@ FBFramePackage UBLagCompensationComponent::GetFrameToCheck(ABlasterCharacter* Hi
 		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
 	}
 
+	FrameToCheck.Character = HitCharacter;
+	
 	return FrameToCheck;
 }
 
@@ -558,15 +572,21 @@ void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterChara
 void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const TArray<ABlasterCharacter*>& HitCharacters,
 	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations, float HitTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("HeyFromServerShotgunScoreRequest"));
 	FBShotgunSSRewindResult Confirm = ShotgunServerSideRewind(HitCharacters, TraceStart, HitLocations, HitTime);
 
+	if(HitCharacters.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit Characters Empty"));
+	}
+	
 	for(auto& HitCharacter : HitCharacters)
 	{
 		if(BlasterCharacter == nullptr || HitCharacter == nullptr || BlasterCharacter->GetEquippedWeapon() == nullptr)
 		{
 			continue;
 		}
-
+		
 		float TotalDamage = 0.f;
 		
 		if(Confirm.HeadShots.Contains(HitCharacter))
@@ -587,6 +607,8 @@ void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const
 			TotalDamage += LegShotDamage;
 		}
 
+		UE_LOG(LogTemp, Error, TEXT("Damage: %f"), TotalDamage);
+		
 		UGameplayStatics::ApplyDamage(HitCharacter, TotalDamage,BlasterCharacter->Controller,
 			BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}

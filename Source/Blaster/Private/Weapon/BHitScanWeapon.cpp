@@ -49,7 +49,7 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 					BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(OwnerPawn) : BlasterCharacterOwner;
 					BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(OwnerPawn->Controller) : BlasterControllerOwner;
 
-					if(BlasterCharacterOwner && BlasterControllerOwner && BlasterCharacterOwner->GetLagCompensationComp())
+					if(BlasterCharacterOwner && BlasterControllerOwner && BlasterCharacterOwner->GetLagCompensationComp() && BlasterCharacterOwner->IsLocallyControlled())
 					{
 						BlasterCharacterOwner->GetLagCompensationComp()->ServerScoreRequest(
 							BlasterCharacter,
