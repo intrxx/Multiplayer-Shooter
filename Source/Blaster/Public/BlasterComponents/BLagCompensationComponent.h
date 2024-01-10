@@ -39,7 +39,7 @@ struct FBFramePackage
 	TMap<FName, FBBoxInformation> HitBoxInfoMap;
 
 	UPROPERTY()
-	ABlasterCharacter* Character;
+	ABlasterCharacter* Character = nullptr;
 };
 
 USTRUCT()
@@ -48,7 +48,7 @@ struct FBServerSideRewindResult
 	GENERATED_BODY()
 
 	UPROPERTY()
-	bool bHitConfirmed;
+	bool bHitConfirmed = false;
 
 	UPROPERTY()
 	EBlasterBodyPart BodyPartHit = EBlasterBodyPart::BBP_None;
@@ -86,6 +86,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser);
+
+	UFUNCTION(Server, Reliable)
+	void ServerShotgunScoreRequest(const TArray<ABlasterCharacter*>& HitCharacters, const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations, float HitTime);
 public:
 	
 protected:

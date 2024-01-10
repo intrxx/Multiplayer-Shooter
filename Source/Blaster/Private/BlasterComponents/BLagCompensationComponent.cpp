@@ -267,8 +267,8 @@ bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitChara
 		{
 			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
 
-			ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
-			if(BlasterCharacter)
+			ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+			if(Character)
 			{
 				HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				return true;
@@ -317,8 +317,8 @@ bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter
 	{
 		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
 
-		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
-		if(BlasterCharacter)
+		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(Character)
 		{
 			EnableBoxCollision(LegHitBoxes, ECollisionEnabled::NoCollision);
 			return true;
@@ -369,8 +369,8 @@ bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter
 	{
 		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
 
-		ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
-		if(BlasterCharacter)
+		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(Character)
 		{
 			EnableBoxCollision(BodyHitBoxes, ECollisionEnabled::NoCollision);
 			return true;
@@ -543,8 +543,8 @@ FBFramePackage UBLagCompensationComponent::GetFrameToCheck(ABlasterCharacter* Hi
 	return FrameToCheck;
 }
 
-void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter,
-                                                                   const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
+void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
 {
 	FBServerSideRewindResult ConfirmHit = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
 
@@ -552,6 +552,43 @@ void UBLagCompensationComponent::ServerScoreRequest_Implementation(ABlasterChara
 	{
 		UGameplayStatics::ApplyDamage(HitCharacter, DamageCauser->GetDamage(),
 			BlasterCharacter->Controller, DamageCauser, UDamageType::StaticClass());
+	}
+}
+
+void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const TArray<ABlasterCharacter*>& HitCharacters,
+	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations, float HitTime)
+{
+	FBShotgunSSRewindResult Confirm = ShotgunServerSideRewind(HitCharacters, TraceStart, HitLocations, HitTime);
+
+	for(auto& HitCharacter : HitCharacters)
+	{
+		if(BlasterCharacter == nullptr || HitCharacter == nullptr || BlasterCharacter->GetEquippedWeapon() == nullptr)
+		{
+			continue;
+		}
+
+		float TotalDamage = 0.f;
+		
+		if(Confirm.HeadShots.Contains(HitCharacter))
+		{
+			float HeadShotDamage = Confirm.HeadShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			TotalDamage += HeadShotDamage;
+		}
+
+		if(Confirm.HeadShots.Contains(HitCharacter))
+		{
+			float BodyShotDamage = Confirm.BodyShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			TotalDamage += BodyShotDamage;
+		}
+
+		if(Confirm.HeadShots.Contains(HitCharacter))
+		{
+			float LegShotDamage = Confirm.LegShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			TotalDamage += LegShotDamage;
+		}
+
+		UGameplayStatics::ApplyDamage(HitCharacter, TotalDamage,BlasterCharacter->Controller,
+			BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}
 }
 
