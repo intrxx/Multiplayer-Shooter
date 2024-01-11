@@ -11,8 +11,8 @@ ABProjectileBullet::ABProjectileBullet()
 	BProjectileMoveComp = CreateDefaultSubobject<UBProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
 	BProjectileMoveComp->SetIsReplicated(true);
 	BProjectileMoveComp->bRotationFollowsVelocity = true;
-	BProjectileMoveComp->InitialSpeed = InitialBulletSpeed;
-	BProjectileMoveComp->MaxSpeed = InitialBulletSpeed;
+	BProjectileMoveComp->InitialSpeed = InitialProjectileSpeed;
+	BProjectileMoveComp->MaxSpeed = MaxProjectileSpeed;
 }
 
 void ABProjectileBullet::BeginPlay()
@@ -25,7 +25,7 @@ void ABProjectileBullet::BeginPlay()
 	ProjPathParams.bTraceWithCollision = true;
 	ProjPathParams.DrawDebugTime = 5.f;
 	ProjPathParams.DrawDebugType = EDrawDebugTrace::ForDuration;
-	ProjPathParams.LaunchVelocity = GetActorForwardVector() * InitialBulletSpeed;
+	ProjPathParams.LaunchVelocity = GetActorForwardVector() * InitialProjectileSpeed;
 	ProjPathParams.MaxSimTime = 4.f;
 	ProjPathParams.ProjectileRadius = 5.f;
 	ProjPathParams.SimFrequency = 30.f;
@@ -35,6 +35,31 @@ void ABProjectileBullet::BeginPlay()
 	
 	UGameplayStatics::PredictProjectilePath(this, ProjPathParams, ProjPathResult);
 }
+
+#if WITH_EDITOR
+void ABProjectileBullet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = PropertyChangedEvent.Property != nullptr ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	
+	if(PropertyName == GET_MEMBER_NAME_CHECKED(ThisClass, InitialProjectileSpeed))
+	{
+		if(BProjectileMoveComp)
+		{
+			BProjectileMoveComp->InitialSpeed = InitialProjectileSpeed;
+		}
+	}
+
+	if(PropertyName == GET_MEMBER_NAME_CHECKED(ThisClass, MaxProjectileSpeed))
+	{
+		if(BProjectileMoveComp)
+		{
+			BProjectileMoveComp->MaxSpeed = MaxProjectileSpeed;
+		}
+	}
+}
+#endif
 
 void ABProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                FVector NormalImpulse, const FHitResult& Hit)
@@ -52,3 +77,4 @@ void ABProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	
 	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 }
+

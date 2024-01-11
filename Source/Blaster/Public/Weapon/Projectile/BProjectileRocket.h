@@ -23,7 +23,7 @@ class BLASTER_API ABProjectileRocket : public ABProjectile
 public:
 	ABProjectileRocket();
 	virtual void Destroyed() override;
-	
+
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
@@ -32,6 +32,10 @@ protected:
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void BeginPlay() override;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|RocketJump")

@@ -78,7 +78,10 @@ protected:
 	FTimerHandle DestroyTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float InitialBulletSpeed = 14000.f;
+	float InitialProjectileSpeed = 14000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float MaxProjectileSpeed = 14000.f;
 
 	/**
 	 * Used for server side rewind

@@ -21,8 +21,8 @@ ABProjectileRocket::ABProjectileRocket()
 	RocketProjectileMoveComp = CreateDefaultSubobject<UBRocketProjectileMovementComp>(TEXT("RocketMoveComp"));
 	RocketProjectileMoveComp->SetIsReplicated(true);
 	RocketProjectileMoveComp->bRotationFollowsVelocity = true;
-	RocketProjectileMoveComp->InitialSpeed = 7000.f;
-	RocketProjectileMoveComp->MaxSpeed = 7000.f;
+	RocketProjectileMoveComp->InitialSpeed = InitialProjectileSpeed;
+	RocketProjectileMoveComp->MaxSpeed = MaxProjectileSpeed;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("RocketJumpSphereComp"));
 	SphereComp->SetupAttachment(RootComponent);
@@ -58,6 +58,31 @@ void ABProjectileRocket::BeginPlay()
 			false);
 	}
 }
+
+#if WITH_EDITOR
+void ABProjectileRocket::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = PropertyChangedEvent.Property != nullptr ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	
+	if(PropertyName == GET_MEMBER_NAME_CHECKED(ThisClass, InitialProjectileSpeed))
+	{
+		if(RocketProjectileMoveComp)
+		{
+			RocketProjectileMoveComp->InitialSpeed = InitialProjectileSpeed;
+		}
+	}
+
+	if(PropertyName == GET_MEMBER_NAME_CHECKED(ThisClass, MaxProjectileSpeed))
+	{
+		if(RocketProjectileMoveComp)
+		{
+			RocketProjectileMoveComp->MaxSpeed = MaxProjectileSpeed;
+		}
+	}
+}
+#endif
 
 void ABProjectileRocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                FVector NormalImpulse, const FHitResult& Hit)
