@@ -77,6 +77,19 @@ protected:
 
 	FTimerHandle DestroyTimerHandle;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float InitialBulletSpeed = 14000.f;
+
+	/**
+	 * Used for server side rewind
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|SSR")
+	bool bUseServerSideRewind = false;
+	
+	FVector_NetQuantize TraceStart;
+	FVector_NetQuantize100 InitialVelocity;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComp;
