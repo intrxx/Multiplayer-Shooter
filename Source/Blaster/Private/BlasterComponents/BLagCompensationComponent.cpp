@@ -5,6 +5,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Physics/BlasterCollisionChannels.h"
 #include "Weapon/BWeapon.h"
 
 UBLagCompensationComponent::UBLagCompensationComponent()
@@ -124,30 +125,35 @@ FBServerSideRewindResult UBLagCompensationComponent::ConfirmHit(const FBFramePac
 
 	FBFramePackage CurrentFrame;
 	CacheBoxPositions(HitCharacter, CurrentFrame);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::NoCollision);
 	
 	MoveBoxes(HitCharacter, PackageToCheck);
 	
 	const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.15f;
 	
-	if(CheckHeadShotForHit(HitCharacter, TraceStart, TraceEnd))
+	if(SingleShotCheckHeadShotForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Head};
 	}
 	
-	if(CheckLegsForHit(HitCharacter, TraceStart, TraceEnd))
+	if(SingleShotCheckLegsForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Legs};
 	}
 
-	if(CheckBodyForHit(HitCharacter, TraceStart, TraceEnd))
+	if(SingleShotCheckBodyForHit(HitCharacter, TraceStart, TraceEnd))
 	{
 		ResetHitBoxes(HitCharacter, CurrentFrame);
+		EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
 		return FBServerSideRewindResult{true, EBlasterBodyPart::BBP_Body};
 	}
 	
 	ResetHitBoxes(HitCharacter, CurrentFrame);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
 	return FBServerSideRewindResult{false, EBlasterBodyPart::BBP_None};
 }
 
@@ -161,8 +167,15 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 			return FBShotgunSSRewindResult();
 		}
 	}
+
+	UWorld* World = GetWorld();
+	if(World == nullptr)
+	{
+		return FBShotgunSSRewindResult();
+	}
 	
 	FBShotgunSSRewindResult ShotgunSSRHitResult;
+	FHitResult ConfirmHitResult;
 
 	TArray<FBFramePackage> CurrentFrames;
 	for(auto& Package : FramePackages)
@@ -171,82 +184,126 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		CurrentFrame.Character = Package.Character;
 		CacheBoxPositions(Package.Character, CurrentFrame);
 		MoveBoxes(Package.Character, CurrentFrame);
+		EnableCharacterMeshCollision(Package.Character, ECollisionEnabled::NoCollision);
 		CurrentFrames.Add(CurrentFrame);
 	}
-
+	
 	TArray<FVector> EndLocations;
 	for(auto& HitLocation : HitLocations)
 	{
-		FVector EndLocation = TraceStart + (HitLocation - TraceStart) * 1.15f;
+		const FVector EndLocation = TraceStart + (HitLocation - TraceStart) * 1.25f;
 		EndLocations.Add(EndLocation);
 	}
 	
-	// Adding to headshot count for every character hit
-	for(auto& Package : FramePackages)
+	EnableHeadShotBoxCollisions(FramePackages, ECollisionEnabled::QueryOnly, ECR_Block);
+
+	// Adding to headshot count
+	for(auto& EndLocation : EndLocations)
 	{
-		for(auto& EndLocation : EndLocations)
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, EndLocation, ECC_ObjectChannel_HitBox);
+
+		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(Character)
 		{
-			if(CheckHeadShotForHit(Package.Character, TraceStart, EndLocation))
+			if(ConfirmHitResult.Component.IsValid())
 			{
-				if(ShotgunSSRHitResult.HeadShots.Contains(Package.Character))
+				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+				if(Box)
 				{
-					ShotgunSSRHitResult.HeadShots[Package.Character]++;
+					DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+						FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
 				}
-				else
-				{
-					ShotgunSSRHitResult.HeadShots.Emplace(Package.Character, 1);
-				}
+			}
+			
+			if(ShotgunSSRHitResult.HeadShots.Contains(Character))
+			{
+				ShotgunSSRHitResult.HeadShots[Character]++;
+			}
+			else
+			{
+				ShotgunSSRHitResult.HeadShots.Emplace(Character, 1);
 			}
 		}
 	}
 
-	// Adding to legshot count for every character hit
-	for(auto& Package : FramePackages)
+	EnableHeadShotBoxCollisions(FramePackages, ECollisionEnabled::NoCollision, ECR_Ignore);
+
+	EnableBodyShotBoxCollisions(FramePackages, ECollisionEnabled::QueryOnly, ECR_Block);
+
+	//  Adding to bodyshots count
+	for(auto& EndLocation : EndLocations)
 	{
-		for(auto& EndLocation : EndLocations)
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, EndLocation, ECC_ObjectChannel_HitBox);
+
+		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(Character)
 		{
-			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
+			if(ConfirmHitResult.Component.IsValid())
 			{
-				if(ShotgunSSRHitResult.LegShots.Contains(Package.Character))
+				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+				if(Box)
 				{
-					ShotgunSSRHitResult.LegShots[Package.Character]++;
+					DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+						FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
 				}
-				else
-				{
-					ShotgunSSRHitResult.LegShots.Emplace(Package.Character, 1);
-				}
+			}
+			
+			if(ShotgunSSRHitResult.BodyShots.Contains(Character))
+			{
+				ShotgunSSRHitResult.BodyShots[Character]++;
+			}
+			else
+			{
+				ShotgunSSRHitResult.BodyShots.Emplace(Character, 1);
 			}
 		}
 	}
+
+	EnableBodyShotBoxCollisions(FramePackages, ECollisionEnabled::NoCollision, ECR_Ignore);
+
+	EnableLegShotBoxCollisions(FramePackages, ECollisionEnabled::QueryOnly, ECR_Block);
 
 	// Adding to bodyshot count for every character hit
-	for(auto& Package : FramePackages)
+	for(auto& EndLocation : EndLocations)
 	{
-		for(auto& EndLocation : EndLocations)
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, EndLocation, ECC_ObjectChannel_HitBox);
+
+		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
+		if(Character)
 		{
-			if(CheckLegsForHit(Package.Character, TraceStart, EndLocation))
+			if(ConfirmHitResult.Component.IsValid())
 			{
-				if(ShotgunSSRHitResult.BodyShots.Contains(Package.Character))
+				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+				if(Box)
 				{
-					ShotgunSSRHitResult.BodyShots[Package.Character]++;
+					DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+						FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
 				}
-				else
-				{
-					ShotgunSSRHitResult.BodyShots.Emplace(Package.Character, 1);
-				}
+			}
+			
+			if(ShotgunSSRHitResult.LegShots.Contains(Character))
+			{
+				ShotgunSSRHitResult.LegShots[Character]++;
+			}
+			else
+			{
+				ShotgunSSRHitResult.LegShots.Emplace(Character, 1);
 			}
 		}
 	}
+
+	EnableLegShotBoxCollisions(FramePackages, ECollisionEnabled::NoCollision, ECR_Ignore);
 
 	for(auto& Frame : CurrentFrames)
 	{
 		ResetHitBoxes(Frame.Character, Frame);
+		EnableCharacterMeshCollision(Frame.Character, ECollisionEnabled::QueryAndPhysics);
 	}
 	
 	return ShotgunSSRHitResult;
 }
 
-bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+bool UBLagCompensationComponent::SingleShotCheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 	const FVector& TraceEnd)
 {
 	if(HitCharacter == nullptr)
@@ -258,14 +315,24 @@ bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitChara
 	if(HeadBox)
 	{
 		HeadBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		HeadBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		HeadBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, ECR_Block);
 		
 		FHitResult ConfirmHitResult;
 
 		UWorld* World = GetWorld();
 		if(World)
 		{
-			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
+
+			if(ConfirmHitResult.Component.IsValid())
+			{
+				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+				if(Box)
+				{
+					DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+						FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
+				}
+			}
 
 			ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 			if(Character)
@@ -283,7 +350,7 @@ bool UBLagCompensationComponent::CheckHeadShotForHit(ABlasterCharacter* HitChara
 	return false;
 }
 
-bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+bool UBLagCompensationComponent::SingleShotCheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 	const FVector& TraceEnd)
 {
 	if(HitCharacter == nullptr)
@@ -306,7 +373,7 @@ bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter
 		if(HitBox)
 		{
 			HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			HitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+			HitBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, ECR_Block);
 		}
 	}
 	
@@ -315,7 +382,17 @@ bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter
 	UWorld* World = GetWorld();
 	if(World)
 	{
-		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
+		
+		if(ConfirmHitResult.Component.IsValid())
+		{
+			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+			if(Box)
+			{
+				DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+					FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
+			}
+		}
 
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
@@ -330,7 +407,7 @@ bool UBLagCompensationComponent::CheckLegsForHit(ABlasterCharacter* HitCharacter
 	return false;
 }
 
-bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+bool UBLagCompensationComponent::SingleShotCheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 	const FVector& TraceEnd)
 {
 	if(HitCharacter == nullptr)
@@ -358,7 +435,7 @@ bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter
 		if(HitBox)
 		{
 			HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			HitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+			HitBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, ECR_Block);
 		}
 	}
 	
@@ -367,7 +444,17 @@ bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter
 	UWorld* World = GetWorld();
 	if(World)
 	{
-		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_Visibility);
+		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
+
+		if(ConfirmHitResult.Component.IsValid())
+		{
+			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+			if(Box)
+			{
+				DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
+					FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
+			}
+		}
 
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
@@ -382,8 +469,104 @@ bool UBLagCompensationComponent::CheckBodyForHit(ABlasterCharacter* HitCharacter
 	return false;
 }
 
-void UBLagCompensationComponent::EnableBoxCollision(const TArray<UBoxComponent*>& CollisionBoxes,
-	ECollisionEnabled::Type CollisionEnabled)
+void UBLagCompensationComponent::EnableHeadShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled,
+	ECollisionResponse CollisionResponse)
+{
+	for(auto& Package : FramePackages)
+	{
+		if(Package.Character)
+		{
+			UBoxComponent* HeadBox = Package.Character->HitCollisionBoxesMap[FName("Head")];
+			if(HeadBox)
+			{
+				HeadBox->SetCollisionEnabled(CollisionEnabled);
+				HeadBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, CollisionResponse);
+			}
+		}
+	}
+}
+
+void UBLagCompensationComponent::EnableBodyShotBoxCollisions(const TArray<FBFramePackage>& FramePackages,
+	ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse)
+{
+	for(auto& Package : FramePackages)
+	{
+		if(Package.Character)
+		{
+			if(Package.Character == nullptr)
+			{
+				continue;
+			}
+			
+			TArray<UBoxComponent*> BodyHitBoxes;
+	
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("Neck")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("Hips")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("Spine")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("Spine1")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("Spine2")]);
+	
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftArm")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftForeArm")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftHand")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightArm")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightForeArm")]);
+			BodyHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightHand")]);
+			
+			if(!BodyHitBoxes.IsEmpty())
+			{
+				for(auto& HitBox : BodyHitBoxes)
+				{
+					if(HitBox)
+					{
+						HitBox->SetCollisionEnabled(CollisionEnabled);
+						HitBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, CollisionResponse);
+					}
+				}
+			}
+		}
+	}
+}
+
+void UBLagCompensationComponent::EnableLegShotBoxCollisions(const TArray<FBFramePackage>& FramePackages,
+	ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse)
+{
+	for(auto& Package : FramePackages)
+	{
+		if(Package.Character)
+		{
+			if(Package.Character == nullptr)
+			{
+				continue;
+			}
+			
+			TArray<UBoxComponent*> LegHitBoxes;
+	
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftUpLeg")]);
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftLeg")]);
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("LeftFoot")]);
+
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightUpLeg")]);
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightLeg")]);
+			LegHitBoxes.Add(Package.Character->HitCollisionBoxesMap[FName("RightFoot")]);
+			
+			if(!LegHitBoxes.IsEmpty())
+			{
+				for(auto& HitBox : LegHitBoxes)
+				{
+					if(HitBox)
+					{
+						HitBox->SetCollisionEnabled(CollisionEnabled);
+						HitBox->SetCollisionResponseToChannel(ECC_ObjectChannel_HitBox, CollisionResponse);
+					}
+				}
+			}
+		}
+	}
+}
+
+void UBLagCompensationComponent::EnableBoxCollision(TArray<UBoxComponent*>& CollisionBoxes,
+                                                    ECollisionEnabled::Type CollisionEnabled)
 {
 	for(auto& HitBox : CollisionBoxes)
 	{
@@ -391,6 +574,15 @@ void UBLagCompensationComponent::EnableBoxCollision(const TArray<UBoxComponent*>
 		{
 			HitBox->SetCollisionEnabled(CollisionEnabled);
 		}
+	}
+}
+
+void UBLagCompensationComponent::EnableCharacterMeshCollision(ABlasterCharacter* HitCharacter,
+	ECollisionEnabled::Type CollisionEnabled)
+{
+	if (HitCharacter && HitCharacter->GetMesh())
+	{
+		HitCharacter->GetMesh()->SetCollisionEnabled(CollisionEnabled);
 	}
 }
 
@@ -564,7 +756,7 @@ void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const
 	
 	for(auto& HitCharacter : HitCharacters)
 	{
-		if(BlasterCharacter == nullptr || HitCharacter == nullptr || BlasterCharacter->GetEquippedWeapon() == nullptr)
+		if(HitCharacter == nullptr || HitCharacter->GetEquippedWeapon() == nullptr || BlasterCharacter == nullptr)
 		{
 			continue;
 		}
@@ -573,24 +765,24 @@ void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const
 		
 		if(Confirm.HeadShots.Contains(HitCharacter))
 		{
-			float HeadShotDamage = Confirm.HeadShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			float HeadShotDamage = Confirm.HeadShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
 			TotalDamage += HeadShotDamage;
 		}
 
-		if(Confirm.HeadShots.Contains(HitCharacter))
+		if(Confirm.BodyShots.Contains(HitCharacter))
 		{
-			float BodyShotDamage = Confirm.BodyShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			float BodyShotDamage = Confirm.BodyShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
 			TotalDamage += BodyShotDamage;
 		}
 
-		if(Confirm.HeadShots.Contains(HitCharacter))
+		if(Confirm.LegShots.Contains(HitCharacter))
 		{
-			float LegShotDamage = Confirm.LegShots[HitCharacter] * BlasterCharacter->GetEquippedWeapon()->GetDamage();
+			float LegShotDamage = Confirm.LegShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
 			TotalDamage += LegShotDamage;
 		}
 		
 		UGameplayStatics::ApplyDamage(HitCharacter, TotalDamage,BlasterCharacter->Controller,
-			BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
+			HitCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}
 }
 

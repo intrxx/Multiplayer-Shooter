@@ -25,6 +25,25 @@ public:
 	// We can put the Hit logic here like playing sound and spawning particles, because we call Destroy() from OnHit
 	virtual void Destroyed() override;
 
+public:
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|SSR")
+	bool bUseServerSideRewind = false;
+
+	/**
+	 * Used for server side rewind
+	 */
+	
+	FVector_NetQuantize TraceStart;
+	FVector_NetQuantize100 InitialVelocity;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float InitialProjectileSpeed = 14000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float MaxProjectileSpeed = 14000.f;
+	
+	float Damage = 20.f;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -62,9 +81,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Projectile|Impact")
 	TObjectPtr<USoundCue> SurfaceImpactSound;
 	
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Damage")
-	float Damage = 20.f;
-
 	// Minimal damage applied to actors that are in the outer ring of radial damage
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|Explode")
 	float MinimalDamage = 10.f;
@@ -76,22 +92,6 @@ protected:
 	float DamageOuterRadius = 400.f;
 
 	FTimerHandle DestroyTimerHandle;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float InitialProjectileSpeed = 14000.f;
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
-	float MaxProjectileSpeed = 14000.f;
-
-	/**
-	 * Used for server side rewind
-	 */
-
-	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|SSR")
-	bool bUseServerSideRewind = false;
-	
-	FVector_NetQuantize TraceStart;
-	FVector_NetQuantize100 InitialVelocity;
 
 private:
 	UPROPERTY()

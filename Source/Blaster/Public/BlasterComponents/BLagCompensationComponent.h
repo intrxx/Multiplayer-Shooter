@@ -108,11 +108,16 @@ protected:
 	void MoveBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
 	void ResetHitBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
 
-	bool CheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
-	bool CheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
-	bool CheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool SingleShotCheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool SingleShotCheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool SingleShotCheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
 
-	void EnableBoxCollision(const TArray<UBoxComponent*>& CollisionBoxes, ECollisionEnabled::Type CollisionEnabled);
+	void EnableHeadShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	void EnableBodyShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	void EnableLegShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	void EnableBoxCollision(TArray<UBoxComponent*>& CollisionBoxes, ECollisionEnabled::Type CollisionEnabled);
+	void EnableCharacterMeshCollision(ABlasterCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
+	
 
 	FBFramePackage GetFrameToCheck(ABlasterCharacter* HitCharacter, float HitTime);
 

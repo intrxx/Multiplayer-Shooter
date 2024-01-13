@@ -20,4 +20,7 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	TSubclassOf<ABProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	TSubclassOf<ABProjectile> ServerSideRewindProjectileClass;
 };

@@ -12,6 +12,8 @@
 ABProjectile::ABProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// This needs to be disabled in the Server Side Rewind Projectiles BPs
 	bReplicates = true;
 	
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
