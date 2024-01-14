@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BlasterTypes/BlasterBodyPart.h"
+#include "Kismet/GameplayStaticsTypes.h"
 #include "BLagCompensationComponent.generated.h"
 
 class ABPlayerController;
@@ -84,43 +85,44 @@ public:
 	void ShowFramePackage(const FBFramePackage& FramePackage, const FColor& Color);
 	
 	UFUNCTION(Server, Reliable)
-	void ServerScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	void ServerHitScanScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser);
 
 	UFUNCTION(Server, Reliable)
 	void ServerShotgunScoreRequest(const TArray<ABlasterCharacter*>& HitCharacters, const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations, float HitTime);
-public:
 	
 protected:
 	virtual void BeginPlay() override;
-
-	FBServerSideRewindResult ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
-		const FVector_NetQuantize& HitLocation, float HitTime);
 	
 	void SavePackage();
 	void SaveFramePackage(FBFramePackage& FramePackage);
 	FBFramePackage InterpBetweenFrames(const FBFramePackage& OlderFrame, const FBFramePackage& YoungerFrame, float HitTime);
-	FBServerSideRewindResult ConfirmHit(const FBFramePackage& PackageToCheck, ABlasterCharacter* HitCharacter,
-		const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation);
+	
 	
 	void CacheBoxPositions(ABlasterCharacter* HitCharacter, /* OUT */ FBFramePackage& OutFramePackage);
 	void MoveBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
 	void ResetHitBoxes(ABlasterCharacter* HitCharacter, const FBFramePackage& FramePackage);
-
-	bool SingleShotCheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
-	bool SingleShotCheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
-	bool SingleShotCheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
-
-	void EnableHeadShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
-	void EnableBodyShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
-	void EnableLegShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	
 	void EnableBoxCollision(TArray<UBoxComponent*>& CollisionBoxes, ECollisionEnabled::Type CollisionEnabled);
 	void EnableCharacterMeshCollision(ABlasterCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
 	
 
 	FBFramePackage GetFrameToCheck(ABlasterCharacter* HitCharacter, float HitTime);
 
+	/**
+	 *  HitScan
+	 */
+	FBServerSideRewindResult HitScanServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+	                                          const FVector_NetQuantize& HitLocation, float HitTime);
+	
+	FBServerSideRewindResult HitScanConfirmHit(const FBFramePackage& PackageToCheck, ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation);
+
+	bool SingleShotCheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool SingleShotCheckLegsForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	bool SingleShotCheckBodyForHit(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector& TraceEnd);
+	
 	/**
 	 * Shotgun
 	 */
@@ -129,6 +131,25 @@ protected:
 	
 	FBShotgunSSRewindResult ShotgunConfirmHit(const TArray<FBFramePackage>& FramePackages, const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations);
+
+	void EnableHeadShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	void EnableBodyShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+	void EnableLegShotBoxCollisions(const TArray<FBFramePackage>& FramePackages, ECollisionEnabled::Type CollisionEnabled, ECollisionResponse CollisionResponse);
+
+	/**
+	 * Projectile
+	 */
+	FBServerSideRewindResult ProjectileServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity, float HitTime);
+
+	FBServerSideRewindResult ProjectileConfirmHit(const FBFramePackage& PackageToCheck, ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime);
+
+	bool ProjectileCheckHeadShotForHit(ABlasterCharacter* HitCharacter, const FPredictProjectilePathParams& PathParams);
+	bool ProjectileCheckBodyShotForHit(ABlasterCharacter* HitCharacter, const FPredictProjectilePathParams& PathParams);
+	bool ProjectileCheckLegShotForHit(ABlasterCharacter* HitCharacter, const FPredictProjectilePathParams& PathParams);
+
+	
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
@@ -140,4 +161,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|ServerSideRewind")
 	float MaxRecordTime = 4.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|ServerSideRewind")
+	float ProjectilePathPredictSimFrequency = 15.f;
 };

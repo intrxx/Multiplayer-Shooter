@@ -18,7 +18,10 @@ ABProjectileBullet::ABProjectileBullet()
 void ABProjectileBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	/*
+	 * Example of well configured PredictProjectilePath, this is very important as Params have to be filled correctly 
+	 *
 	FPredictProjectilePathResult ProjPathResult;
 	FPredictProjectilePathParams ProjPathParams;
 	ProjPathParams.bTraceWithChannel = true;
@@ -34,6 +37,7 @@ void ABProjectileBullet::BeginPlay()
 	ProjPathParams.ActorsToIgnore.Add(this);
 	
 	UGameplayStatics::PredictProjectilePath(this, ProjPathParams, ProjPathResult);
+	*/
 }
 
 #if WITH_EDITOR

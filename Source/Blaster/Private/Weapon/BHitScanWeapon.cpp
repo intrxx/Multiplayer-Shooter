@@ -51,7 +51,7 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 
 					if(BlasterCharacterOwner && BlasterControllerOwner && BlasterCharacterOwner->GetLagCompensationComp() && BlasterCharacterOwner->IsLocallyControlled())
 					{
-						BlasterCharacterOwner->GetLagCompensationComp()->ServerScoreRequest(
+						BlasterCharacterOwner->GetLagCompensationComp()->ServerHitScanScoreRequest(
 							BlasterCharacter,
 							Start,
 							FireHit.ImpactPoint,
