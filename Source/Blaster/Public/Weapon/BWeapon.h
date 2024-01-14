@@ -143,6 +143,9 @@ protected:
 	virtual void HandleWeaponEquipped();
 	virtual void HandleWeaponDropped();
 	virtual void HandleSecondaryWeaponEquipped();
+
+	UFUNCTION()
+	void OnPingTooHigh(bool bPingTooHigh);
 	
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -185,7 +188,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	float Damage = 20.f;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	UPROPERTY(EditAnywhere, Replicated, Category = "Blaster|Weapon")
 	bool bUseServerSideRewind = false;
 
 private:

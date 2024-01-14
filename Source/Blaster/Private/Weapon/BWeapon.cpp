@@ -68,6 +68,7 @@ void ABWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABWeapon, WeaponState);
+	DOREPLIFETIME_CONDITION(ABWeapon, bUseServerSideRewind, COND_OwnerOnly);
 }
 
 void ABWeapon::OnRep_Owner()
@@ -175,6 +176,16 @@ void ABWeapon::HandleWeaponEquipped()
 	}
 
 	EnableCustomDepth(false);
+
+	BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterCharacterOwner;
+	if(BlasterCharacterOwner && bUseServerSideRewind && HasAuthority())
+	{
+		BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
+		if(BlasterControllerOwner && !BlasterControllerOwner->OnHighPingDelegate.IsBound())
+		{
+			BlasterControllerOwner->OnHighPingDelegate.AddDynamic(this, &ThisClass::OnPingTooHigh);
+		}
+	}
 }
 
 void ABWeapon::HandleWeaponDropped()
@@ -193,11 +204,49 @@ void ABWeapon::HandleWeaponDropped()
 	WeaponMeshComp->SetCustomDepthStencilValue(BlasterStencil::Purple);
 	WeaponMeshComp->MarkRenderStateDirty();
 	EnableCustomDepth(true);
+
+	BlasterCharacterOwner = BlasterCharacterOwner == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterCharacterOwner;
+	
+	if(BlasterCharacterOwner && HasAuthority())
+	{
+		BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
+		if(BlasterControllerOwner && BlasterControllerOwner->OnHighPingDelegate.IsBound())
+		{
+			BlasterControllerOwner->OnHighPingDelegate.RemoveDynamic(this, &ThisClass::OnPingTooHigh);
+		}
+	}
 }
 
 void ABWeapon::HandleSecondaryWeaponEquipped()
 {
-	HandleWeaponEquipped();
+	ShowPickUpWidget(false);
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMeshComp->SetSimulatePhysics(false);
+	WeaponMeshComp->SetEnableGravity(false);
+	WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+	if(WeaponType == EBWeaponType::EWT_SubMachineGun)
+	{
+		WeaponMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMeshComp->SetEnableGravity(true);
+		WeaponMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
+	EnableCustomDepth(false);
+
+	if(BlasterCharacterOwner && HasAuthority())
+	{
+		BlasterControllerOwner = BlasterControllerOwner == nullptr ? Cast<ABPlayerController>(BlasterCharacterOwner->Controller) : BlasterControllerOwner;
+		if(BlasterControllerOwner && BlasterControllerOwner->OnHighPingDelegate.IsBound())
+		{
+			BlasterControllerOwner->OnHighPingDelegate.RemoveDynamic(this, &ThisClass::OnPingTooHigh);
+		}
+	}
+}
+
+void ABWeapon::OnPingTooHigh(bool bPingTooHigh)
+{
+	bUseServerSideRewind = !bPingTooHigh;
 }
 
 void ABWeapon::Fire(const FVector& HitTarget)

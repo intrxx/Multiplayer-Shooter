@@ -48,11 +48,17 @@ void ABPlayerController::CheckPing(float DeltaSeconds)
 		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
 		if(PlayerState)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Ping %f"), PlayerState->GetPingInMilliseconds());
 			if(PlayerState->GetPingInMilliseconds() > HighPingThreshold) 
 			{
+				ServerReportPingStatus(true);
 				StartHighPingWarning();
 				
 				PingAnimationRunningTime = 0.f;
+			}
+			else
+			{
+				ServerReportPingStatus(false);
 			}
 		}
 
@@ -67,6 +73,11 @@ void ABPlayerController::CheckPing(float DeltaSeconds)
 			StopHighPingWarning();
 		}
 	}
+}
+
+void ABPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
+{
+	OnHighPingDelegate.Broadcast(bHighPing);
 }
 
 void ABPlayerController::ReceivedPlayer()

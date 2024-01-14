@@ -44,6 +44,8 @@ public:
 	float Ping = 0.f;    
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHighPingDelegate, bool, bPingTooHigh);
+
 /**
  * 
  */
@@ -86,6 +88,8 @@ public:
 
 public:
 	float SingleTripTime = 0.f;
+
+	FOnHighPingDelegate OnHighPingDelegate;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -96,6 +100,9 @@ protected:
 	void SetGameTime();
 
 	void CheckPing(float DeltaSeconds);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReportPingStatus(bool bHighPing);
 	
 	void StartHighPingWarning();
 	void StopHighPingWarning();
