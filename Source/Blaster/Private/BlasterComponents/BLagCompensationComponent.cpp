@@ -363,7 +363,7 @@ bool UBLagCompensationComponent::ProjectileCheckBodyShotForHit(ABlasterCharacter
 		if(Box)
 		{
 			DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
-			FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
+			FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
 		}
 	}
 
@@ -414,7 +414,7 @@ bool UBLagCompensationComponent::ProjectileCheckLegShotForHit(ABlasterCharacter*
 		if(Box)
 		{
 			DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(),
-			FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
+			FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
 		}
 	}
 
@@ -992,4 +992,18 @@ void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const
 			HitCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}
 }
+
+void UBLagCompensationComponent::ServerProjectileScoreRequest_Implementation(ABlasterCharacter* HitCharacter,
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime)
+{
+	FBServerSideRewindResult ConfirmHit = ProjectileServerSideRewind(HitCharacter, TraceStart, InitialVelocity, HitTime);
+
+	if(BlasterCharacter && HitCharacter && ConfirmHit.bHitConfirmed)
+	{
+		UGameplayStatics::ApplyDamage(HitCharacter, BlasterCharacter->GetEquippedWeapon()->GetDamage(),
+			BlasterCharacter->Controller, BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
+	}
+}
+
+
 

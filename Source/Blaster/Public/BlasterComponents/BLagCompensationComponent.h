@@ -91,6 +91,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerShotgunScoreRequest(const TArray<ABlasterCharacter*>& HitCharacters, const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations, float HitTime);
+
+	UFUNCTION(Server, Reliable)
+	void ServerProjectileScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity, float HitTime);
 	
 protected:
 	virtual void BeginPlay() override;

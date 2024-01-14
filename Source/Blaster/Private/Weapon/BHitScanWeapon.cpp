@@ -38,7 +38,7 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 		{
 			if(InstigatorController)
 			{
-				if(HasAuthority() && !bUseServerSideRewind)
+				if(HasAuthority() && (!bUseServerSideRewind || OwnerPawn->IsLocallyControlled()))
 				{
 					UGameplayStatics::ApplyDamage(BlasterCharacter, Damage, InstigatorController,
 				this, UDamageType::StaticClass());
