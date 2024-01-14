@@ -325,26 +325,14 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 
 void UBCombatComponent::SwapWeapon()
 {
-	//TODO Not ideal as it is crucial to let the player swap weapon when one is empty
-	// Some swaping animation would be better 
-	if(CombatState != EBCombatState::ECS_Unoccupied || BlasterCharacter == nullptr || !BlasterCharacter->HasAuthority())
+	if(CombatState == EBCombatState::ECS_SwappingWeapon || CombatState == EBCombatState::ECS_ThrowingGrenade || BlasterCharacter == nullptr || !BlasterCharacter->HasAuthority())
 	{
 		return;
 	}
-	
-	ABWeapon* TempWeapon = EquippedWeapon;
-	EquippedWeapon = SecondaryWeapon;
-	SecondaryWeapon = TempWeapon;
-	
-	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
-	AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
-	EquippedWeapon->SetHUDAmmo();
-	EquippedWeapon->SetHUDAmmoImage();
-	UpdateCarriedAmmo();
-	PlayEquipWeaponSound(EquippedWeapon);
 
-	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
-	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
+	BlasterCharacter->PlaySwapMontage();
+	BlasterCharacter->bFinishedSwapping = false;
+	CombatState = EBCombatState::ECS_SwappingWeapon;
 }
 
 void UBCombatComponent::AttachPrimaryWeapon(ABWeapon* WeaponToEquip)
@@ -705,6 +693,38 @@ void UBCombatComponent::FinishReloading()
 	//}
 }
 
+void UBCombatComponent::FinishSwapChangeState()
+{
+	if(BlasterCharacter == nullptr)
+	{
+		return;
+	}
+	
+	if(BlasterCharacter->HasAuthority())
+	{
+		CombatState = EBCombatState::ECS_Unoccupied;
+	}
+	
+	BlasterCharacter->bFinishedSwapping = true;
+}
+
+void UBCombatComponent::FinishSwapAttachWeapons()
+{
+	ABWeapon* TempWeapon = EquippedWeapon;
+	EquippedWeapon = SecondaryWeapon;
+	SecondaryWeapon = TempWeapon;
+	
+	EquippedWeapon->SetWeaponState(EBWeaponState::EWS_Equipped);
+	AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+	EquippedWeapon->SetHUDAmmo();
+	EquippedWeapon->SetHUDAmmoImage();
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound(EquippedWeapon);
+
+	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
+	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
+}
+
 void UBCombatComponent::ShotgunShellReload()
 {
 	if(BlasterCharacter && BlasterCharacter->HasAuthority())
@@ -750,6 +770,12 @@ void UBCombatComponent::OnRep_CombatState()
 			default:
 				break;
 			}
+		}
+		break;
+	case EBCombatState::ECS_SwappingWeapon:
+		if(BlasterCharacter && !BlasterCharacter->IsLocallyControlled())
+		{
+			BlasterCharacter->PlaySwapMontage();
 		}
 		break;
 	default:
@@ -965,15 +991,15 @@ bool UBCombatComponent::CanFire()
 	{
 		return false;
 	}
-
-	if(bLocallyReloading)
-	{
-		return false;
-	}
 	
 	if(!EquippedWeapon->IsMagEmpty() && bCanFire && CombatState == EBCombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EBWeaponType::EWT_Shotgun)
 	{
 		return true;
+	}
+	
+	if(bLocallyReloading)
+	{
+		return false;
 	}
 	
 	return !EquippedWeapon->IsMagEmpty() && bCanFire && CombatState == EBCombatState::ECS_Unoccupied;

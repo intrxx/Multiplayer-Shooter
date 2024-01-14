@@ -48,6 +48,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayDeathMontage(bool bAiming);
 	void PlayReloadMontage();
+	void PlaySwapMontage();
 	void PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory);
 	void EquipDefaultWeapon();
 
@@ -107,6 +108,8 @@ public:
 	
 	UPROPERTY()
 	TMap<FName, UBoxComponent*> HitCollisionBoxesMap;
+
+	bool bFinishedSwapping = false;
 
 protected:
 	TArray<UInputMappingContext*> GameplayMappingContexts;
@@ -203,9 +206,7 @@ protected:
 	void ToggleInventory();
 	void LethalGrenadeButtonPressed();
 	void TacticalGrenadeButtonPressed();
-
-	UFUNCTION(Server, Reliable)
-	void ServerSwapButtonPressed();
+	void SwapButtonPressed();
 	
 	void DropOrDestroyWeapon(ABWeapon* Weapon);
 	
@@ -284,7 +285,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TObjectPtr<UAnimMontage> RareDeathMontage;
 
-	// Rare Death Montage Chance - [0,1]
+	// Rare Death Montage Chance - [0,100]
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	int32 RareDeathChance = 20.f;
 	
@@ -293,6 +294,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Death")
 	TArray<TObjectPtr<UAnimMontage>> RegularDeathMontages_Aim;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Combat")
+	TObjectPtr<UAnimMontage> SwapWeaponMontage;
 	
 	/**
 	 * 
@@ -406,6 +410,9 @@ private:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerEquip();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSwapButtonPressed();
 	
 	void HideCharacterIfCameraClose();
 	void RespawnTimerFinished();

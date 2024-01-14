@@ -37,6 +37,12 @@ public:
 	void Reload();
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void FinishReloading();
+
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
+	void FinishSwapChangeState();
+
+	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
+	void FinishSwapAttachWeapons();
 	
 	UFUNCTION(BlueprintCallable, Category = "Blaster|Combat")
 	void ShotgunShellReload();

@@ -449,7 +449,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_ToggleInventory, ETriggerEvent::Triggered, this,
 		&ThisClass::ToggleInventory);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_SwapToPrimaryWeapon, ETriggerEvent::Triggered, this,
-		&ThisClass::ServerSwapButtonPressed);
+		&ThisClass::SwapButtonPressed);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -640,6 +640,27 @@ void ABlasterCharacter::TacticalGrenadeButtonPressed()
 	}
 }
 
+inline void ABlasterCharacter::SwapButtonPressed()
+{
+	if(CombatComp)
+	{
+		if(CombatComp->CombatState != EBCombatState::ECS_SwappingWeapon && CombatComp->CombatState != EBCombatState::ECS_ThrowingGrenade)
+		{
+			ServerSwapButtonPressed();
+		}
+		
+		if(CombatComp->ShouldSwapWeapons() && !HasAuthority())
+		{
+			if(GetMesh() && GetMesh()->GetAnimInstance() && !GetMesh()->GetAnimInstance()->Montage_IsPlaying(SwapWeaponMontage))
+			{
+				PlaySwapMontage();
+				CombatComp->CombatState = EBCombatState::ECS_SwappingWeapon;
+				bFinishedSwapping = false;
+			}
+		}
+	}
+}
+
 void ABlasterCharacter::ServerSwapButtonPressed_Implementation()
 {
 	if(CombatComp && CombatComp->ShouldSwapWeapons())
@@ -811,6 +832,15 @@ void ABlasterCharacter::PlayReloadMontage()
 			break;
 		}
 		
+	}
+}
+
+void ABlasterCharacter::PlaySwapMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && SwapWeaponMontage)
+	{
+		AnimInstance->Montage_Play(SwapWeaponMontage);
 	}
 }
 
