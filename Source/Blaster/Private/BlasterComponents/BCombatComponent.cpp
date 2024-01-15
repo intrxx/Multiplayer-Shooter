@@ -952,7 +952,7 @@ void UBCombatComponent::FireProjectileWeapon()
 		{
 			LocalFire(HitTarget);
 		}
-		ServerFire(HitTarget);
+		ServerFire(HitTarget, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -966,7 +966,7 @@ void UBCombatComponent::FireHitScanWeapon()
 		{
 			LocalFire(HitTarget);
 		}
-		ServerFire(HitTarget);
+		ServerFire(HitTarget, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -981,7 +981,7 @@ void UBCombatComponent::FireShotgun()
 		{
 			LocalShotgunFire(HitTargets);
 		}
-		ServerShotgunFire(HitTargets);
+		ServerShotgunFire(HitTargets, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -1084,10 +1084,19 @@ void UBCombatComponent::ShrinkCrosshairWhileShooting()
 		3.f);
 }
 
-void UBCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UBCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
 {
 	// Called on server
 	MulticastFire(TraceHitTarget);
+}
+
+bool UBCombatComponent::ServerFire_Validate(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
+{
+	if(EquippedWeapon)
+	{
+		return FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+	}
+	return true;
 }
 
 void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -1100,7 +1109,16 @@ void UBCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& 
 	LocalFire(TraceHitTarget);
 }
 
-void UBCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+bool UBCombatComponent::ServerShotgunFire_Validate(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
+{
+	if(EquippedWeapon)
+	{
+		return FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+	}
+	return true;
+}
+
+void UBCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
 {
 	
 	MulticastShotgunFire(TraceHitTargets);
