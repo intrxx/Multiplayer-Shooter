@@ -7,6 +7,7 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "GameFramework/GameModeBase.h"
 #include "Player/BPlayerController.h"
+#include "Character/BlasterCharacter.h"
 
 void UBInGameMenu::InGameMenuSetup()
 {
@@ -136,17 +137,37 @@ void UBInGameMenu::ReturnButtonClicked()
 void UBInGameMenu::MenuButtonClicked()
 {
 	ReturnButton->SetIsEnabled(false);
-	
-	if(MultiplayerSessionsSubsystem)
+
+	UWorld* World = GetWorld();
+	if(World)
 	{
-		MultiplayerSessionsSubsystem->DestroySession();
-	}
-	else
-	{
-		ReturnButton->SetIsEnabled(true);
+		PC = PC == nullptr ? World->GetFirstPlayerController() : PC;
+		if(PC)
+		{
+			ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(PC->GetPawn());
+			if(BlasterCharacter)
+			{
+				BlasterCharacter->ServerLeaveGame();
+				BlasterCharacter->OnLeftGameDelegate.AddUObject(this, &ThisClass::OnPlayerLeftGame);
+			}
+			else
+			{
+				ReturnButton->SetIsEnabled(true);
+			}
+		}
 	}
 }
 
 void UBInGameMenu::OptionsButtonClicked()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
+		FString::Printf(TEXT("TODO Implement Options")));
+}
+
+void UBInGameMenu::OnPlayerLeftGame()
+{
+	if(MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->DestroySession();
+	}
 }

@@ -29,6 +29,8 @@ class UInputMappingContext;
 class UAnimMontage;
 class AController;
 
+DECLARE_MULTICAST_DELEGATE(FOnLeftGame);
+
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IBCrosshairInteractionInterface
 {
@@ -56,10 +58,10 @@ public:
 	void ShowScopeWidget(bool bShowScope);
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastHandleDeath();
+	void MulticastHandleDeath(bool bPlayerLeftGame);
 
 	// For just server functionality
-	void HandleDeath();
+	void HandleDeath(bool bPlayerLeftGame);
 	
 	float GetAO_Yaw() const {return AO_Yaw;}
 	float GetAO_Pitch() const {return AO_Pitch;}
@@ -102,6 +104,13 @@ public:
 	void UpdateHUDShield();
 	void UpdateHUDAmmo();
 
+	/**
+	 * Leaving the game
+	 */
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
+
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -110,6 +119,8 @@ public:
 	TMap<FName, UBoxComponent*> HitCollisionBoxesMap;
 
 	bool bFinishedSwapping = false;
+	
+	FOnLeftGame OnLeftGameDelegate;
 
 protected:
 	TArray<UInputMappingContext*> GameplayMappingContexts;
@@ -230,6 +241,7 @@ protected:
 	// Poll for any relevant classes and initialize HUD
 	void PollInit();
 
+
 private:
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
@@ -332,7 +344,7 @@ private:
 	float Shield = 50.f;
 	
 	bool bDead = false;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Death")
 	float RespawnDelay = 3.f;
 	FTimerHandle RespawnTimerHandle;
@@ -398,7 +410,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Defaults")
 	TSubclassOf<ABWeapon> DefaultWeaponClass;
-	
+
+	/**
+	 * Leaving the game
+	 */
+
+	bool bLeftGame = false;
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);

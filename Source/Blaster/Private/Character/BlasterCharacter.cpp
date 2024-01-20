@@ -998,7 +998,7 @@ void ABlasterCharacter::UpdateHUDAmmo()
 	}
 }
 
-void ABlasterCharacter::HandleDeath()
+void ABlasterCharacter::HandleDeath(bool bPlayerLeftGame)
 {
 	// Drop or destroy all held weapons
 	if(CombatComp)
@@ -1012,13 +1012,12 @@ void ABlasterCharacter::HandleDeath()
 			DropOrDestroyWeapon(CombatComp->SecondaryWeapon);
 		}
 	}
-	MulticastHandleDeath();
-
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::RespawnTimerFinished, RespawnDelay);
+	MulticastHandleDeath(bPlayerLeftGame);
 }
 
-void ABlasterCharacter::MulticastHandleDeath_Implementation()
+void ABlasterCharacter::MulticastHandleDeath_Implementation(bool bPlayerLeftGame)
 {
+	bLeftGame = bPlayerLeftGame;
 	if(BlasterPC)
 	{
 		BlasterPC->SetHUDWeaponAmmo(0);
@@ -1071,6 +1070,9 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation()
 	{
 		ShowScopeWidget(false);
 	}
+	
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::RespawnTimerFinished,
+		RespawnDelay);
 }
 
 void ABlasterCharacter::DropOrDestroyWeapon(ABWeapon* Weapon)
@@ -1115,9 +1117,14 @@ void ABlasterCharacter::CreateDeathDynamicMaterialInstances()
 void ABlasterCharacter::RespawnTimerFinished()
 {
 	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
-	if(BlasterGameMode)
+	if(BlasterGameMode && !bLeftGame)
 	{
 		BlasterGameMode->RequestRespawn(this, Controller);
+	}
+
+	if(bLeftGame && IsLocallyControlled())
+	{
+		OnLeftGameDelegate.Broadcast();
 	}
 }
 
@@ -1185,6 +1192,16 @@ void ABlasterCharacter::ServerEquip_Implementation()
 	if(CombatComp)
 	{
 		CombatComp->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void ABlasterCharacter::ServerLeaveGame_Implementation()
+{
+	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	ABPlayerState* BPS = GetPlayerState<ABPlayerState>();
+	if(BlasterGameMode && BPS)
+	{
+		BlasterGameMode->PlayerLeftGame(BPS);
 	}
 }
 

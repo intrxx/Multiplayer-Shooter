@@ -102,7 +102,7 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 			FString KillerName = TargetPS->GetPlayerName();
 			TargetController->ClientSetHUDDeathScreen(KillerName);
 		}
-		ElimmedCharacter->HandleDeath();
+		ElimmedCharacter->HandleDeath(false);
 	}
 }
 
@@ -170,6 +170,26 @@ void ABlasterGameMode::Logout(AController* Exiting)
 
 	LoginPlayerControllers.Remove(Exiting);
 	UpdatePlayerList();
+}
+
+void ABlasterGameMode::PlayerLeftGame(ABPlayerState* LeavingPlayer)
+{
+	if(LeavingPlayer == nullptr)
+	{
+		return;
+	}
+	
+	ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
+	if(BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(LeavingPlayer))
+	{
+		BlasterGameState->TopScoringPlayers.Remove(LeavingPlayer);
+	}
+
+	ABlasterCharacter* BlasterPlayerLeaving = Cast<ABlasterCharacter>(LeavingPlayer->GetPawn());
+	if(BlasterPlayerLeaving)
+	{
+		BlasterPlayerLeaving->HandleDeath(true);
+	}
 }
 
 void ABlasterGameMode::UpdatePlayerList()

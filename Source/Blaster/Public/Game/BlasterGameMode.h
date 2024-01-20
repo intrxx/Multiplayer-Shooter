@@ -8,6 +8,7 @@
 
 class ABlasterGameState;
 class ABlasterCharacter;
+class ABPlayerState;
 class ABPlayerController;
 struct FPlayerStats;
 
@@ -29,6 +30,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
+	void PlayerLeftGame(ABPlayerState* LeavingPlayer);
 	
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC, ABPlayerController* AttackerBPC);
 	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC);

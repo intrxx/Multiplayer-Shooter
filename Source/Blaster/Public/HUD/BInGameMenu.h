@@ -28,6 +28,8 @@ protected:
 	UFUNCTION()
 	void OnDestroySession(bool bWasSuccessful);
 
+	void OnPlayerLeftGame();
+
 private:
 	UFUNCTION()
 	void ReturnButtonClicked();
