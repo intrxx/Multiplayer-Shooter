@@ -15,7 +15,10 @@ public class Blaster : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"EnhancedInput",
-			"Niagara"
+			"Niagara",
+			"MultiplayerSessions",
+			"OnlineSubsystem",
+			"OnlineSubsystemSteam"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

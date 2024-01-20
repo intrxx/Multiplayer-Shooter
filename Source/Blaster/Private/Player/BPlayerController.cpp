@@ -10,6 +10,7 @@
 #include "Components/Image.h"
 #include "HUD/BScoreBoard.h"
 #include "EnhancedInputSubsystems.h"
+#include "Blaster/BlasterGameplayTags.h"
 #include "Components/Overlay.h"
 #include "HUD/BInventoryWidget.h"
 #include "Net/UnrealNetwork.h"
@@ -18,6 +19,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BCombatComponent.h"
 #include "Game/BlasterGameState.h"
+#include "HUD/BInGameMenu.h"
+#include "Input/BlasterEnhancedInputComponent.h"
 #include "Player/BPlayerState.h"
 #include "Weapon/BGrenade.h"
 
@@ -38,6 +41,19 @@ void ABPlayerController::Tick(float DeltaSeconds)
 	PollInit();
 
 	CheckPing(DeltaSeconds);
+}
+
+void ABPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	
+	UBlasterEnhancedInputComponent* BlasterInputComponent = Cast<UBlasterEnhancedInputComponent>(InputComponent);
+	check(BlasterInputComponent)
+
+	const FBlasterGameplayTags& GameplayTags = FBlasterGameplayTags::Get();
+
+	BlasterInputComponent->BindNativeAction(ControllerInputConfig, GameplayTags.Input_ToggleInGameMenu, ETriggerEvent::Triggered,
+		this, &ThisClass::ShowInGameMenu);
 }
 
 void ABPlayerController::CheckPing(float DeltaSeconds)
@@ -663,6 +679,32 @@ void ABPlayerController::StopHighPingWarning()
 	}
 }
 
+void ABPlayerController::ShowInGameMenu()
+{
+	if(InGameMenuWidgetClass == nullptr)
+	{
+		return;
+	}
+
+	if(InGameMenu == nullptr)
+	{
+		InGameMenu = CreateWidget<UBInGameMenu>(this, InGameMenuWidgetClass);
+	}
+
+	if(InGameMenu)
+	{
+		bInGameMenuOpen = !bInGameMenuOpen;
+		if(bInGameMenuOpen)
+		{
+			InGameMenu->InGameMenuSetup();
+		}
+		else
+		{
+			InGameMenu->InGameMenuTearDown();
+		}
+	}
+}
+
 void ABPlayerController::CheckTimeSync(float DeltaTime)
 {
 	TimeSyncRunningTime += DeltaTime;
@@ -834,6 +876,11 @@ void ABPlayerController::HandleCooldown()
 			}
 		}
 	}
+}
+
+void ABPlayerController::ReturnFromInGameMenu()
+{
+	ShowInGameMenu();
 }
 
 void ABPlayerController::OnRep_MatchState()

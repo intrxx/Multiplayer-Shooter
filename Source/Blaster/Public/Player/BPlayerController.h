@@ -8,6 +8,8 @@
 #include "BPlayerController.generated.h"
 
 
+class UBInputConfig;
+class UBInGameMenu;
 class UBAnnouncement;
 class ABlasterGameMode;
 class UBInventoryWidget;
@@ -86,6 +88,8 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
 
+	void ReturnFromInGameMenu();
+
 public:
 	float SingleTripTime = 0.f;
 
@@ -94,19 +98,22 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void SetupInputComponent() override;
 
 	void PollInit();
 	
 	void SetGameTime();
 
 	void CheckPing(float DeltaSeconds);
+	
+	void ShowInGameMenu();
 
 	UFUNCTION(Server, Reliable)
 	void ServerReportPingStatus(bool bHighPing);
 	
 	void StartHighPingWarning();
 	void StopHighPingWarning();
-
+	
 	/**
 	 *	Sync time between client and server
 	 */
@@ -150,6 +157,25 @@ private:
 	UPROPERTY()
 	TObjectPtr<ABlasterGameMode> BlasterGameMode;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Input")
+	TObjectPtr<UBInputConfig> ControllerInputConfig;
+
+	/**
+	 * InGameMenu
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
+	TSubclassOf<UUserWidget> InGameMenuWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UBInGameMenu> InGameMenu;
+
+	bool bInGameMenuOpen = false;
+	
+	/**
+	 * 
+	 */
+	
 	float LevelStartedTime = 0.f;
 	float MatchTime = 0.f;
 	float WarmupTime = 0.f;
