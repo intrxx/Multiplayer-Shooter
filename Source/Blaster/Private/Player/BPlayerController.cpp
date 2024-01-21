@@ -778,6 +778,45 @@ void ABPlayerController::CheckTimeSync(float DeltaTime)
 	}
 }
 
+void ABPlayerController::BroadcastElimination(ABPlayerState* Attacker, ABPlayerState* Victim)
+{
+	ClientKillFeedEntry(Attacker, Victim);
+}
+
+void ABPlayerController::ClientKillFeedEntry_Implementation(ABPlayerState* Attacker, ABPlayerState* Victim)
+{
+	if(Attacker == nullptr || Victim == nullptr)
+	{
+		return;
+	}
+	
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	
+	const FString KillerName = Attacker->GetPlayerName();
+	const FString KilledName = Victim->GetPlayerName();
+	
+	ABlasterCharacter* AttackerCharacter = Cast<ABlasterCharacter>(Attacker->GetPawn());
+	if(AttackerCharacter)
+	{
+		ABWeapon* EquippedWeapon = AttackerCharacter->GetEquippedWeapon();
+		if(EquippedWeapon)
+		{
+			UTexture2D* GunImage = AttackerCharacter->GetEquippedWeapon()->KillFeedGunImage;
+			
+			if(BlasterHUD)
+			{
+				BlasterHUD->AddKillFeed(KillerName, KilledName, GunImage);
+				return;
+			}
+		}
+	}
+
+	if(BlasterHUD)
+	{
+		BlasterHUD->AddKillFeed(KillerName, KilledName, nullptr);
+	}
+}
+
 void ABPlayerController::ServerCheckMatchState_Implementation()
 {
 	BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;

@@ -8,6 +8,7 @@
 #include "BPlayerController.generated.h"
 
 
+class ABPlayerState;
 class UBInputConfig;
 class UBInGameMenu;
 class UBAnnouncement;
@@ -96,6 +97,8 @@ public:
 	
 	void ReturnFromInGameMenu();
 
+	void BroadcastElimination(ABPlayerState* Attacker, ABPlayerState* Victim);
+
 public:
 	float SingleTripTime = 0.f;
 
@@ -143,6 +146,9 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float Match, float LevelStartingTime, float Cooldown);
+
+	UFUNCTION(Client, Reliable)
+	void ClientKillFeedEntry(ABPlayerState* Attacker, ABPlayerState* Victim);
 	
 protected:
 	/** Difference between client and server time */

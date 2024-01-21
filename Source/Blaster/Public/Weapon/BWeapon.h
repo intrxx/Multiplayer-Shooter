@@ -137,6 +137,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Scatter")
 	bool bUseScatter = false;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon|Image")
+	TObjectPtr<UTexture2D> KillFeedGunImage;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();

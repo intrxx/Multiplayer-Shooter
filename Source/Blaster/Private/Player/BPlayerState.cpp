@@ -2,6 +2,8 @@
 
 
 #include "Player/BPlayerState.h"
+#include "Character/BlasterCharacter.h"
+#include "Weapon/BWeapon.h"
 
 void ABPlayerState::AddToScore(float ScoreToAdd)
 {
@@ -22,4 +24,5 @@ void ABPlayerState::AddToAssists(int32 AssistsToAdd)
 {
 	Assists += AssistsToAdd;
 }
+
 

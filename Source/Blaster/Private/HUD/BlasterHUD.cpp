@@ -8,11 +8,11 @@
 #include "HUD/BScoreBoard.h"
 #include "HUD/BInventoryWidget.h"
 #include "HUD/BAnnouncement.h"
+#include "HUD/BKillFeed.h"
 
 void ABlasterHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ABlasterHUD::AddCharacterOverlay()
@@ -56,6 +56,22 @@ void ABlasterHUD::AddAnnouncement()
 		Announcement->AddToViewport();
 	}
 }
+
+void ABlasterHUD::AddKillFeed(const FString& KillerName, const FString& KilledName, UTexture2D* GunImage)
+{
+	OwningPlayer = OwningPlayer == nullptr ? GetOwningPlayerController() : OwningPlayer;
+	if(OwningPlayer && KillFeedClass)
+	{
+		KillFeed = CreateWidget<UBKillFeed>(OwningPlayer, KillFeedClass);
+		
+		if(KillFeed)
+		{
+			KillFeed->SetKillFeedText(KillerName, KilledName , GunImage);
+			KillFeed->AddToViewport();
+		}
+	}
+}
+
 
 void ABlasterHUD::ToggleScoreboard(bool bIsVisible)
 {

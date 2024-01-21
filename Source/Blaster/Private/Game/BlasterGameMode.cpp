@@ -92,6 +92,8 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 		AttackerPS->AddToKills(1);
 		UpdatePlayerList();
 		BlasterGameState->UpdateTopScore(AttackerPS);
+
+		//TODO Can refactor this to be called in EliminationBroadcast to avoid iterating and casting all the controllers
 		UpdateLeadingPlayer();
 
 		if(BlasterGameState->TopScoringPlayers.Contains(AttackerPS))
@@ -130,6 +132,18 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 			TargetController->ClientSetHUDDeathScreen(KillerName);
 		}
 		ElimmedCharacter->HandleDeath(false);
+	}
+
+	if(AttackerPS && TargetPS)
+	{
+		for(FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			ABPlayerController* BPC = Cast<ABPlayerController>(*It);
+			if(BPC)
+			{
+				BPC->BroadcastElimination(AttackerPS, TargetPS);
+			}
+		}
 	}
 }
 

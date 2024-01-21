@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BlasterHUD.generated.h"
 
+class UBKillFeed;
 class UBAnnouncement;
 class UBInventoryWidget;
 class UBScoreBoard;
@@ -69,6 +70,7 @@ public:
 	void AddHUD();
 	void RemoveHUD(bool bRemoveOverlay, bool bRemoveScoreboard, bool bRemoveInventory);
 	void AddAnnouncement();
+	void AddKillFeed(const FString& KillerName, const FString& KilledName, UTexture2D* GunImage);
 	
 	bool IsScoreboardVisible();
 	bool IsInventoryVisible();
@@ -86,6 +88,8 @@ public:
 	TObjectPtr<UBInventoryWidget> Inventory;
 	UPROPERTY()
 	TObjectPtr<UBAnnouncement> Announcement;
+	UPROPERTY()
+	TObjectPtr<UBKillFeed> KillFeed;
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
@@ -98,6 +102,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> AnnouncementClass;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
+	TSubclassOf<UUserWidget> KillFeedClass;
 
 	bool bHUDAdded = false;
 
@@ -112,6 +119,9 @@ private:
 	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
 	
 private:
+	UPROPERTY()
+	TObjectPtr<APlayerController> OwningPlayer;
+	
 	FCrosshairInfo CrosshairInfo;
 	
 	UPROPERTY(EditAnywhere)
