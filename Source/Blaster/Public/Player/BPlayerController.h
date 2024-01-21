@@ -76,6 +76,9 @@ public:
 	void SetDeathScreenVisibility(bool bSetVisibility);
 	void SetHUDGrenadesNumber(int32 Grenades, const EBGrenadeCategory GrenadeCategory);
 	void SetHUDGrenadesImage(UTexture2D* GrenadeImage, const EBGrenadeCategory GrenadeCategory);
+	void SetLeadingPlayerBoxVisible(bool bIsVisible);
+	void SetLeadingPlayerName(const FString& PlayerName);
+	void SetLeadingPlayerKills(int32 Kills);
 	
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
@@ -87,7 +90,10 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientSetHUDPlayerStats(const TArray<FPlayerStats>& PlayerStats);
-
+	
+	UFUNCTION(Client, Reliable)
+	void ClientSetHUDLeadingPlayer(const FString& PlayerName, int32 PlayerKills);
+	
 	void ReturnFromInGameMenu();
 
 public:
@@ -171,6 +177,7 @@ private:
 	TObjectPtr<UBInGameMenu> InGameMenu;
 
 	bool bInGameMenuOpen = false;
+	bool bLeadingPlayerBoxVisible = false;
 	
 	/**
 	 * 

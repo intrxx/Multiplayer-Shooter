@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BCharacterOverlay.generated.h"
 
+class USizeBox;
 class UImage;
 class UProgressBar;
 class UTextBlock;
@@ -103,5 +104,18 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TacticalGrenadesNumber;
+
+	/**
+	 * Leading player
+	 */
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> LeadingPlayerName;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> LeadingPlayerKillsText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<USizeBox> LeadingPlayerBox;
 	
 };

@@ -15,6 +15,7 @@ class USoundAttenuation;
 /**
  * 
  */
+
 UCLASS()
 class BLASTER_API ABProjectileRocket : public ABProjectile
 {

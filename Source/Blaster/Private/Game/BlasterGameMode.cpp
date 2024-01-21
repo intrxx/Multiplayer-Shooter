@@ -82,11 +82,38 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 
 	if(AttackerPS && AttackerPS != TargetPS && BlasterGameState)
 	{
+		TArray<ABPlayerState*> PlayersInTheLead;
+		for(auto& LeadPlayer : BlasterGameState->TopScoringPlayers)
+		{
+			PlayersInTheLead.Add(LeadPlayer);
+		}
+		
 		AttackerPS->AddToScore(KillScoreAward);
 		AttackerPS->AddToKills(1);
 		UpdatePlayerList();
-
 		BlasterGameState->UpdateTopScore(AttackerPS);
+		UpdateLeadingPlayer();
+
+		if(BlasterGameState->TopScoringPlayers.Contains(AttackerPS))
+		{
+			ABlasterCharacter* GainLeadCharacter = Cast<ABlasterCharacter>(AttackerPS->GetPawn());
+			if(GainLeadCharacter)
+			{
+				GainLeadCharacter->MulticastGainedTheLead();
+			}
+		}
+
+		for(int32 i = 0; i < PlayersInTheLead.Num(); i++)
+		{
+			if(!BlasterGameState->TopScoringPlayers.Contains(PlayersInTheLead[i]))
+			{
+				ABlasterCharacter* LostLeadCharacter = Cast<ABlasterCharacter>(PlayersInTheLead[i]->GetPawn());
+				if(LostLeadCharacter)
+				{
+					LostLeadCharacter->MulticastLostTheLead();
+				}
+			}
+		}
 	}
 	
 	if(TargetPS)
@@ -214,10 +241,32 @@ void ABlasterGameMode::UpdatePlayerList()
 	for(AController* C  : LoginPlayerControllers)
 	{
 		ABPlayerController* PC = Cast<ABPlayerController>(C);
+		if (PC)
 		{
+			PC->ClientSetHUDPlayerStats(PlayerStats);
+		}
+	}
+}
+
+void ABlasterGameMode::UpdateLeadingPlayer()
+{
+	ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
+	if(BlasterGameState == nullptr)
+	{
+		return;
+	}
+
+	if(!BlasterGameState->TopScoringPlayers.IsEmpty())
+	{
+		const FString LeaderName = BlasterGameState->TopScoringPlayers.Top()->GetPlayerName();
+		const int32 LeaderKills = BlasterGameState->TopScoringPlayers.Top()->GetKills();
+
+		for(AController* C  : LoginPlayerControllers)
+		{
+			ABPlayerController* PC = Cast<ABPlayerController>(C);
 			if (PC)
 			{
-				PC->ClientSetHUDPlayerStats(PlayerStats);
+				PC->ClientSetHUDLeadingPlayer(LeaderName, LeaderKills);
 			}
 		}
 	}

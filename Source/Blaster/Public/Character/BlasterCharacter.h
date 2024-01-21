@@ -12,6 +12,8 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+class UNiagaraComponent;
+class UNiagaraSystem;
 class UBoxComponent;
 class UBLagCompensationComponent;
 class UBlasterBuffComponent;
@@ -110,6 +112,16 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerLeaveGame();
+
+	/**
+	 * Leading the scoreboard
+	 */
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastGainedTheLead();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLostTheLead();
 
 public:
 	UPROPERTY(Replicated)
@@ -416,6 +428,17 @@ private:
 	 */
 
 	bool bLeftGame = false;
+
+	/**
+	 * Leaving the game
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|LeadingPlayer")
+	TObjectPtr<UNiagaraSystem> CrownSystem;
+
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> CrownComponent;
+	
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);

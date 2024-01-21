@@ -28,6 +28,9 @@
 #include "Player/BPlayerState.h"
 #include "BlasterTypes/BWeaponTypes.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Game/BlasterGameState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -252,8 +255,6 @@ void ABlasterCharacter::BeginPlay()
 	UpdateHUDAmmo();
 	UpdateHUDHealth();
 	UpdateHUDShield();
-	
-	
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -298,6 +299,12 @@ void ABlasterCharacter::PollInit()
 		if(BlasterPS)
 		{
 			BlasterPS->AddToScore(0.f);
+			
+			ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(GetWorld()));
+			if(BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(BlasterPS))
+			{
+				MulticastGainedTheLead();
+			}
 		}
 	}
 }
@@ -1070,6 +1077,11 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation(bool bPlayerLeftGame
 	{
 		ShowScopeWidget(false);
 	}
+
+	if(CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
+	}
 	
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::RespawnTimerFinished,
 		RespawnDelay);
@@ -1202,6 +1214,35 @@ void ABlasterCharacter::ServerLeaveGame_Implementation()
 	if(BlasterGameMode && BPS)
 	{
 		BlasterGameMode->PlayerLeftGame(BPS);
+	}
+}
+
+void ABlasterCharacter::MulticastGainedTheLead_Implementation()
+{
+	if(CrownSystem == nullptr)
+	{
+		return;
+	}
+	
+	if(CrownComponent == nullptr)
+	{
+		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(CrownSystem, GetCapsuleComponent(), FName(),
+			GetActorLocation() + FVector(0.f, 0.f, 90.f), GetActorRotation(),
+			EAttachLocation::KeepWorldPosition, false);
+		CrownComponent->SetNiagaraVariableLinearColor(FString("Color01"), FLinearColor::Red);
+	}
+	
+	if(CrownComponent)
+	{
+		CrownComponent->Activate();	
+	}
+}
+
+void ABlasterCharacter::MulticastLostTheLead_Implementation()
+{
+	if(CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
 	}
 }
 

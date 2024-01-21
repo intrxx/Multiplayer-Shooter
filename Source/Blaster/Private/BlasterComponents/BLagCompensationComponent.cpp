@@ -53,8 +53,6 @@ void UBLagCompensationComponent::SavePackage()
 		FBFramePackage ThisFrame;
 		SaveFramePackage(ThisFrame);
 		FrameHistory.AddHead(ThisFrame);
-
-		//ShowFramePackage(ThisFrame, FColor::Emerald);
 	}
 }
 
@@ -135,7 +133,8 @@ bool UBLagCompensationComponent::SingleShotCheckHeadShotForHit(ABlasterCharacter
 		if(World)
 		{
 			World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
-
+			
+#if ENABLE_DRAW_DEBUG
 			if(ConfirmHitResult.Component.IsValid())
 			{
 				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -145,7 +144,8 @@ bool UBLagCompensationComponent::SingleShotCheckHeadShotForHit(ABlasterCharacter
 						FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
 				}
 			}
-
+#endif
+			
 			ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 			if(Character)
 			{
@@ -196,6 +196,7 @@ bool UBLagCompensationComponent::SingleShotCheckLegsForHit(ABlasterCharacter* Hi
 	{
 		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
 		
+#if ENABLE_DRAW_DEBUG	
 		if(ConfirmHitResult.Component.IsValid())
 		{
 			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -205,7 +206,8 @@ bool UBLagCompensationComponent::SingleShotCheckLegsForHit(ABlasterCharacter* Hi
 					FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
 			}
 		}
-
+#endif
+		
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
 		{
@@ -257,7 +259,8 @@ bool UBLagCompensationComponent::SingleShotCheckBodyForHit(ABlasterCharacter* Hi
 	if(World)
 	{
 		World->LineTraceSingleByChannel(ConfirmHitResult, TraceStart, TraceEnd, ECC_ObjectChannel_HitBox);
-
+		
+#if ENABLE_DRAW_DEBUG
 		if(ConfirmHitResult.Component.IsValid())
 		{
 			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -267,6 +270,7 @@ bool UBLagCompensationComponent::SingleShotCheckBodyForHit(ABlasterCharacter* Hi
 					FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
 			}
 		}
+#endif
 
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
@@ -299,6 +303,7 @@ bool UBLagCompensationComponent::ProjectileCheckHeadShotForHit(ABlasterCharacter
 
 		UGameplayStatics::PredictProjectilePath(this, PathParams, PathResult);
 		
+#if ENABLE_DRAW_DEBUG
 		if(PathResult.HitResult.Component.IsValid())
 		{
 			UBoxComponent* Box = Cast<UBoxComponent>(PathResult.HitResult.Component);
@@ -308,6 +313,7 @@ bool UBLagCompensationComponent::ProjectileCheckHeadShotForHit(ABlasterCharacter
 					FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
 			}
 		}
+#endif
 
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(PathResult.HitResult.GetActor());
 		if(Character)
@@ -356,7 +362,8 @@ bool UBLagCompensationComponent::ProjectileCheckBodyShotForHit(ABlasterCharacter
 	FPredictProjectilePathResult PathResult;
 
 	UGameplayStatics::PredictProjectilePath(this, PathParams, PathResult);
-		
+	
+#if ENABLE_DRAW_DEBUG		
 	if(PathResult.HitResult.Component.IsValid())
 	{
 		UBoxComponent* Box = Cast<UBoxComponent>(PathResult.HitResult.Component);
@@ -366,7 +373,8 @@ bool UBLagCompensationComponent::ProjectileCheckBodyShotForHit(ABlasterCharacter
 			FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
 		}
 	}
-
+#endif
+	
 	ABlasterCharacter* Character = Cast<ABlasterCharacter>(PathResult.HitResult.GetActor());
 	if(Character)
 	{
@@ -407,7 +415,8 @@ bool UBLagCompensationComponent::ProjectileCheckLegShotForHit(ABlasterCharacter*
 	FPredictProjectilePathResult PathResult;
 
 	UGameplayStatics::PredictProjectilePath(this, PathParams, PathResult);
-		
+
+#if ENABLE_DRAW_DEBUG
 	if(PathResult.HitResult.Component.IsValid())
 	{
 		UBoxComponent* Box = Cast<UBoxComponent>(PathResult.HitResult.Component);
@@ -417,7 +426,8 @@ bool UBLagCompensationComponent::ProjectileCheckLegShotForHit(ABlasterCharacter*
 			FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
 		}
 	}
-
+#endif
+	
 	ABlasterCharacter* Character = Cast<ABlasterCharacter>(PathResult.HitResult.GetActor());
 	if(Character)
 	{
@@ -693,6 +703,8 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
 		{
+			
+#if ENABLE_DRAW_DEBUG
 			if(ConfirmHitResult.Component.IsValid())
 			{
 				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -702,6 +714,7 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 						FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
 				}
 			}
+#endif
 			
 			if(ShotgunSSRHitResult.HeadShots.Contains(Character))
 			{
@@ -726,6 +739,8 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
 		{
+
+#if ENABLE_DRAW_DEBUG
 			if(ConfirmHitResult.Component.IsValid())
 			{
 				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -735,6 +750,7 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 						FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
 				}
 			}
+#endif
 			
 			if(ShotgunSSRHitResult.BodyShots.Contains(Character))
 			{
@@ -759,6 +775,8 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 		ABlasterCharacter* Character = Cast<ABlasterCharacter>(ConfirmHitResult.GetActor());
 		if(Character)
 		{
+
+#if ENABLE_DRAW_DEBUG
 			if(ConfirmHitResult.Component.IsValid())
 			{
 				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
@@ -768,6 +786,7 @@ FBShotgunSSRewindResult UBLagCompensationComponent::ShotgunConfirmHit(const TArr
 						FQuat(Box->GetComponentRotation()), FColor::Green, false, 8.f);
 				}
 			}
+#endif
 			
 			if(ShotgunSSRHitResult.LegShots.Contains(Character))
 			{

@@ -18,6 +18,7 @@
 #include "HUD/BAnnouncement.h"
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BCombatComponent.h"
+#include "Components/SizeBox.h"
 #include "Game/BlasterGameState.h"
 #include "HUD/BInGameMenu.h"
 #include "Input/BlasterEnhancedInputComponent.h"
@@ -64,7 +65,6 @@ void ABPlayerController::CheckPing(float DeltaSeconds)
 		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
 		if(PlayerState)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Ping %f"), PlayerState->GetPingInMilliseconds());
 			if(PlayerState->GetPingInMilliseconds() > HighPingThreshold) 
 			{
 				ServerReportPingStatus(true);
@@ -583,6 +583,69 @@ void ABPlayerController::SetHUDGrenadesImage(UTexture2D* GrenadeImage, const EBG
 			break;
 		}
 	}
+}
+
+void ABPlayerController::SetLeadingPlayerBoxVisible(bool bIsVisible)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->LeadingPlayerBox;
+
+	if(bHUDValid)
+	{
+		if(bIsVisible)
+		{
+			BlasterHUD->CharacterOverlay->LeadingPlayerBox->SetVisibility(ESlateVisibility::Visible);
+			bLeadingPlayerBoxVisible = true;
+		}
+		else
+		{
+			BlasterHUD->CharacterOverlay->LeadingPlayerBox->SetVisibility(ESlateVisibility::Hidden);
+			bLeadingPlayerBoxVisible = false;
+		}
+	}
+}
+
+void ABPlayerController::SetLeadingPlayerName(const FString& PlayerName)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->LeadingPlayerName &&
+		BlasterHUD->CharacterOverlay->LeadingPlayerBox;
+
+	if(bHUDValid)
+	{
+		BlasterHUD->CharacterOverlay->LeadingPlayerName->SetText(FText::FromString(PlayerName));
+	}
+}
+
+void ABPlayerController::SetLeadingPlayerKills(int32 Kills)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->LeadingPlayerKillsText;
+
+	if(bHUDValid)
+	{
+		const FText KillsText = FText::FromString(FString::Printf(TEXT("%d"), Kills));
+		BlasterHUD->CharacterOverlay->LeadingPlayerKillsText->SetText(KillsText);
+	}
+}
+
+void ABPlayerController::ClientSetHUDLeadingPlayer_Implementation(const FString& PlayerName, int32 PlayerKills)
+{
+	if(!bLeadingPlayerBoxVisible)
+	{
+		SetLeadingPlayerBoxVisible(true);
+	}
+	SetLeadingPlayerName(PlayerName);
+	SetLeadingPlayerKills(PlayerKills);
 }
 
 /*

@@ -38,6 +38,7 @@ public:
 	float GetCountdownTime() const {return CountdownTime;}
 	
 	void UpdatePlayerList();
+	void UpdateLeadingPlayer();
 
 public:
 	UPROPERTY()
