@@ -9,6 +9,9 @@
 #include "HUD/BInventoryWidget.h"
 #include "HUD/BAnnouncement.h"
 #include "HUD/BKillFeed.h"
+#include "Components/HorizontalBox.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
 
 void ABlasterHUD::BeginPlay()
 {
@@ -68,10 +71,44 @@ void ABlasterHUD::AddKillFeed(const FString& KillerName, const FString& KilledNa
 		{
 			KillFeed->SetKillFeedText(KillerName, KilledName , GunImage);
 			KillFeed->AddToViewport();
+
+			for(UBKillFeed* Entry : KillFeedEntries)
+			{
+				if(Entry && Entry->KillFeedBox)
+				{
+					UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Entry->KillFeedBox);
+					if(CanvasSlot)
+					{
+						FVector2D Position  = CanvasSlot->GetPosition();
+						FVector2D NewPosition(CanvasSlot->GetPosition().X,
+							CanvasSlot->GetPosition().Y + CanvasSlot->GetSize().Y);
+
+						CanvasSlot->SetPosition(NewPosition);
+					}
+				}
+			}
+			
+			KillFeedEntries.Add(KillFeed);
+
+			FTimerHandle KillFeedEntryTimer;
+			FTimerDelegate KillFeedEntryDelegate;
+
+			KillFeedEntryDelegate.BindUFunction(this, FName("KillFeedEntryTimerFinished"), KillFeed);
+
+			GetWorldTimerManager().SetTimer(KillFeedEntryTimer, KillFeedEntryDelegate, KillFeedEntryTime,
+				false);
 		}
 	}
 }
 
+void ABlasterHUD::KillFeedEntryTimerFinished(UBKillFeed* KillFeedToRemove)
+{
+	if(KillFeedToRemove)
+	{
+		KillFeedToRemove->RemoveFromParent();
+		KillFeedEntries.Remove(KillFeedToRemove);
+	}
+}
 
 void ABlasterHUD::ToggleScoreboard(bool bIsVisible)
 {

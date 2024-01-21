@@ -115,8 +115,15 @@ protected:
 	void AddScoreBoard();
 	void AddInventoryWidget();
 
+protected:
+	UPROPERTY()
+	TArray<UBKillFeed*> KillFeedEntries;
+
 private:
 	void DrawCrosshairElement(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor);
+
+	UFUNCTION()
+	void KillFeedEntryTimerFinished(UBKillFeed* KillFeedToRemove);
 	
 private:
 	UPROPERTY()
@@ -124,7 +131,11 @@ private:
 	
 	FCrosshairInfo CrosshairInfo;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Blaster|HUD|Crosshair")
 	float CrosshairSpreadMax = 16.f;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|HUD|KillFeed")
+	float KillFeedEntryTime = 3.5f;
+	
 };
 

@@ -6,8 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "BKillFeed.generated.h"
 
+class UHorizontalBox;
 class UImage;
-class UVerticalBox;
 class UTextBlock;
 
 /**
@@ -23,7 +23,7 @@ public:
 	void SetKillFeedText(const FString& KillerName, const FString& KilledName, UTexture2D* GunTextureImage);
 	
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVerticalBox> KillFeedBox;
+	TObjectPtr<UHorizontalBox> KillFeedBox;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> KillerPlayerName;
