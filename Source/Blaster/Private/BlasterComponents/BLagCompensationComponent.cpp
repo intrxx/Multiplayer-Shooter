@@ -964,14 +964,25 @@ FBFramePackage UBLagCompensationComponent::GetFrameToCheck(ABlasterCharacter* Hi
 }
 
 void UBLagCompensationComponent::ServerHitScanScoreRequest_Implementation(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
-	const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser)
+	const FVector_NetQuantize& HitLocation, float HitTime)
 {
 	FBServerSideRewindResult ConfirmHit = HitScanServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
 
-	if(BlasterCharacter && HitCharacter && DamageCauser && ConfirmHit.bHitConfirmed)
+	if(BlasterCharacter && HitCharacter && ConfirmHit.bHitConfirmed && BlasterCharacter->GetEquippedWeapon())
 	{
-		UGameplayStatics::ApplyDamage(HitCharacter, DamageCauser->GetDamage(),
-			BlasterCharacter->Controller, DamageCauser, UDamageType::StaticClass());
+		float DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetDamage();
+		
+		if(ConfirmHit.BodyPartHit == EBlasterBodyPart::BBP_Head)
+		{
+			DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetHeadShotDamage();
+		}
+		else if(ConfirmHit.BodyPartHit == EBlasterBodyPart::BBP_Legs)
+		{
+			DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetLegsShotDamage();
+		}
+		
+		UGameplayStatics::ApplyDamage(HitCharacter, DamageToCause, BlasterCharacter->Controller,
+			BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}
 }
 
@@ -991,19 +1002,19 @@ void UBLagCompensationComponent::ServerShotgunScoreRequest_Implementation( const
 		
 		if(Confirm.HeadShots.Contains(HitCharacter))
 		{
-			float HeadShotDamage = Confirm.HeadShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
+			const float HeadShotDamage = Confirm.HeadShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetHeadShotDamage();
 			TotalDamage += HeadShotDamage;
 		}
 
 		if(Confirm.BodyShots.Contains(HitCharacter))
 		{
-			float BodyShotDamage = Confirm.BodyShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
+			const float BodyShotDamage = Confirm.BodyShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
 			TotalDamage += BodyShotDamage;
 		}
 
 		if(Confirm.LegShots.Contains(HitCharacter))
 		{
-			float LegShotDamage = Confirm.LegShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetDamage();
+			const float LegShotDamage = Confirm.LegShots[HitCharacter] * HitCharacter->GetEquippedWeapon()->GetLegsShotDamage();
 			TotalDamage += LegShotDamage;
 		}
 		
@@ -1017,10 +1028,21 @@ void UBLagCompensationComponent::ServerProjectileScoreRequest_Implementation(ABl
 {
 	FBServerSideRewindResult ConfirmHit = ProjectileServerSideRewind(HitCharacter, TraceStart, InitialVelocity, HitTime);
 
-	if(BlasterCharacter && HitCharacter && ConfirmHit.bHitConfirmed)
+	if(BlasterCharacter && HitCharacter && ConfirmHit.bHitConfirmed && BlasterCharacter->GetEquippedWeapon())
 	{
-		UGameplayStatics::ApplyDamage(HitCharacter, BlasterCharacter->GetEquippedWeapon()->GetDamage(),
-			BlasterCharacter->Controller, BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
+		float DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetDamage();
+		
+		if(ConfirmHit.BodyPartHit == EBlasterBodyPart::BBP_Head)
+		{
+			DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetHeadShotDamage();
+		}
+		else if(ConfirmHit.BodyPartHit == EBlasterBodyPart::BBP_Legs)
+		{
+			DamageToCause = BlasterCharacter->GetEquippedWeapon()->GetLegsShotDamage();
+		}
+		
+		UGameplayStatics::ApplyDamage(HitCharacter, DamageToCause, BlasterCharacter->Controller,
+			BlasterCharacter->GetEquippedWeapon(), UDamageType::StaticClass());
 	}
 }
 

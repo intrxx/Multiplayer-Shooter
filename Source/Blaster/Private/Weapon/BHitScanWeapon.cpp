@@ -65,8 +65,7 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 							BlasterCharacter,
 							Start,
 							FireHit.ImpactPoint,
-							BlasterControllerOwner->GetServerTimeSeconds() - BlasterControllerOwner->SingleTripTime,
-							this);
+							BlasterControllerOwner->GetServerTimeSeconds() - BlasterControllerOwner->SingleTripTime);
 					}
 				}
 			}

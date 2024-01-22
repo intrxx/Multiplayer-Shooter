@@ -86,7 +86,7 @@ public:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerHitScanScoreRequest(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
-		const FVector_NetQuantize& HitLocation, float HitTime, ABWeapon* DamageCauser);
+		const FVector_NetQuantize& HitLocation, float HitTime);
 
 	UFUNCTION(Server, Reliable)
 	void ServerShotgunScoreRequest(const TArray<ABlasterCharacter*>& HitCharacters, const FVector_NetQuantize& TraceStart,

@@ -1164,6 +1164,7 @@ void UBCombatComponent::LocalShotgunFire(const TArray<FVector_NetQuantize>& Trac
 	
 	if(BlasterCharacter && CombatState == EBCombatState::ECS_Reloading || CombatState == EBCombatState::ECS_Unoccupied)
 	{
+		bLocallyReloading = false;
 		BlasterCharacter->PlayFireMontage(bAiming);
 		Shotgun->FireShotgun(TraceHitTargets);
 		CombatState = EBCombatState::ECS_Unoccupied;
