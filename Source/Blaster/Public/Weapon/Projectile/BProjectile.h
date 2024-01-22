@@ -25,6 +25,8 @@ public:
 	// We can put the Hit logic here like playing sound and spawning particles, because we call Destroy() from OnHit
 	virtual void Destroyed() override;
 
+	bool ProjectileCheckLegsForHit(const FHitResult& HitResult, const TArray<FString>& BoneNames);
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile|SSR")
 	bool bUseServerSideRewind = false;
@@ -41,8 +43,18 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
 	float MaxProjectileSpeed = 14000.f;
-	
+
+	// Only set this for Grenades and Rocket
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
 	float Damage = 20.f;
+
+	// Grenades and Rockets doesn't use it
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float HeadShotDamage = 40.f;
+
+	// Grenades and Rockets doesn't use it
+	UPROPERTY(EditAnywhere, Category = "Blaster|Projectile")
+	float LegShotDamage = 15.f;
 
 protected:
 	virtual void BeginPlay() override;

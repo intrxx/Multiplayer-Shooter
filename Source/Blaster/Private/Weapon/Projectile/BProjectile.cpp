@@ -88,6 +88,20 @@ void ABProjectile::Destroyed()
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 }
 
+bool ABProjectile::ProjectileCheckLegsForHit(const FHitResult& HitResult, const TArray<FString>& BoneNames)
+{
+	const FString BoneHit = HitResult.BoneName.ToString();
+	
+	for(auto& Name : BoneNames)
+	{
+		if(Name == BoneHit)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void ABProjectile::MulticastPlayHitParticleAndSound_Implementation(bool bCharacterHit)
 {
 	HitParticles = bCharacterHit ? CharacterImpactParticle : SurfaceImpactParticle;

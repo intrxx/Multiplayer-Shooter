@@ -7,7 +7,6 @@
 #include "BlasterComponents/BLagCompensationComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BProjectileMovementComponent.h"
-#include "Chaos/GeometryParticlesfwd.h"
 
 ABProjectileBullet::ABProjectileBullet()
 {
@@ -77,16 +76,29 @@ void ABProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 		ABPlayerController* OwnerController = Cast<ABPlayerController>(OwnerCharacter->Controller);
 		if(OwnerController)
 		{
+			ABlasterCharacter* HitCharacter = Cast<ABlasterCharacter>(OtherActor);
+			
+			float DamageToCause = Damage;
+			
+			if(Hit.BoneName.ToString() == FString("Head"))
+			{
+				DamageToCause = HeadShotDamage;
+			}
+			
+			if(HitCharacter && ProjectileCheckLegsForHit(Hit, HitCharacter->LegBoneNames))
+			{
+				DamageToCause = LegShotDamage;
+			}
+			
 			if(OwnerCharacter->HasAuthority() && (!bUseServerSideRewind || OwnerCharacter->IsLocallyControlled()))
 			{
-				UGameplayStatics::ApplyDamage(OtherActor, Damage, OwnerController, this,
+				UGameplayStatics::ApplyDamage(OtherActor, DamageToCause, OwnerController, this,
 					UDamageType::StaticClass());
 				
 				Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 				return;
 			}
-
-			ABlasterCharacter* HitCharacter = Cast<ABlasterCharacter>(OtherActor);
+			
 			if(bUseServerSideRewind && OwnerCharacter->GetLagCompensationComp() && OwnerCharacter->IsLocallyControlled() && HitCharacter)
 			{
 				OwnerCharacter->GetLagCompensationComp()->ServerProjectileScoreRequest(HitCharacter, TraceStart, InitialVelocity,
