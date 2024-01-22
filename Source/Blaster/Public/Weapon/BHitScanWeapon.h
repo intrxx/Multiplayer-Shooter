@@ -19,7 +19,7 @@ public:
 
 protected:
 	void HitScanTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit);
-
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blaster|HitScan")
 	TObjectPtr<UParticleSystem> SurfaceImpactParticles;

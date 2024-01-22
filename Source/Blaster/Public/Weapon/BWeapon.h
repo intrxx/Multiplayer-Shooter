@@ -59,6 +59,8 @@ public:
 	virtual void ChangeFiringMode();
 	void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
+
+	bool CheckLegsForHit(const FHitResult& HitResult, const TArray<FString>& BoneNames);
 	
 	/**
 	 * Enable or disable custom depth to display the outline effect
@@ -85,6 +87,8 @@ public:
 	int32 GetAmmo() const {return Ammo;}
 	int32 GetMagCapacity() const {return MagCapacity;}
 	float GetDamage() const {return Damage;}
+	float GetHeadShotDamage() const {return HeadShotDamage;}
+	float GetLegsShotDamage() const {return LegsShotDamage;}
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
@@ -189,8 +193,14 @@ protected:
 	int32 AmmoSequence = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	float LegsShotDamage = 15.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	float Damage = 20.f;
 
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	float HeadShotDamage = 40.f;
+	
 	UPROPERTY(EditAnywhere, Replicated, Category = "Blaster|Weapon")
 	bool bUseServerSideRewind = false;
 

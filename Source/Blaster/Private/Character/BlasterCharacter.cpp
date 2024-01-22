@@ -166,8 +166,17 @@ ABlasterCharacter::ABlasterCharacter()
 	}
 	
 	/**
-	 * 
+	 * Leg bone names 
 	 */
+
+	LegBoneNames.Add("LeftUpLeg");
+	LegBoneNames.Add("LeftLeg");
+	LegBoneNames.Add("LeftFoot");
+	LegBoneNames.Add("LeftToeBase");
+	LegBoneNames.Add("RightUpLeg");
+	LegBoneNames.Add("RightLeg");
+	LegBoneNames.Add("RightFoot");
+	LegBoneNames.Add("RightToeBase");
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

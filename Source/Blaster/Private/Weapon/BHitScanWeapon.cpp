@@ -2,13 +2,10 @@
 
 
 #include "Weapon/BHitScanWeapon.h"
-
 #include "BlasterComponents/BLagCompensationComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "BlasterTypes/BWeaponTypes.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/BPlayerController.h"
 #include "Sound/SoundCue.h"
@@ -40,7 +37,20 @@ void ABHitScanWeapon::Fire(const FVector& HitTarget)
 			{
 				if(HasAuthority() && (!bUseServerSideRewind || OwnerPawn->IsLocallyControlled()))
 				{
-					UGameplayStatics::ApplyDamage(BlasterCharacter, Damage, InstigatorController,
+					float CausedDamage = Damage;
+
+					if(FireHit.BoneName.ToString() == FString("Head"))
+					{
+						CausedDamage = HeadShotDamage;
+					}
+					
+					if(CheckLegsForHit(FireHit, BlasterCharacter->LegBoneNames))
+					{
+						CausedDamage = LegsShotDamage;
+						//TODO Cause slow
+					}
+					
+					UGameplayStatics::ApplyDamage(BlasterCharacter, CausedDamage, InstigatorController,
 				this, UDamageType::StaticClass());
 				}
 				
@@ -102,6 +112,10 @@ void ABHitScanWeapon::HitScanTraceHit(const FVector& TraceStart, const FVector& 
 		{
 			BeamEnd = OutHit.ImpactPoint;
 		}
+		else
+		{
+			OutHit.ImpactPoint = End;
+		}
 		
 		if(BeamParticles)
 		{
@@ -114,4 +128,6 @@ void ABHitScanWeapon::HitScanTraceHit(const FVector& TraceStart, const FVector& 
 		}
 	}
 }
+
+
 

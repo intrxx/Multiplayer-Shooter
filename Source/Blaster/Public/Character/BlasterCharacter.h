@@ -134,6 +134,9 @@ public:
 	
 	FOnLeftGame OnLeftGameDelegate;
 
+	UPROPERTY()
+	TArray<FString> LegBoneNames;
+
 protected:
 	TArray<UInputMappingContext*> GameplayMappingContexts;
 	

@@ -61,6 +61,8 @@ void ABWeapon::BeginPlay()
 	{
 		FiringMode = FiringModes[0];
 	}
+
+	
 }
 
 void ABWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -445,6 +447,20 @@ FVector ABWeapon::TraceEndWithScatter(const FVector& HitTarget)
 	*/
 	
 	return FVector(TraceStart + ToEndLocation * Combat::TraceLength / ToEndLocation.Size());
+}
+
+bool ABWeapon::CheckLegsForHit(const FHitResult& HitResult, const TArray<FString>& BoneNames)
+{
+	const FString BoneHit = HitResult.BoneName.ToString();
+	
+	for(auto& Name : BoneNames)
+	{
+		if(Name == BoneHit)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
