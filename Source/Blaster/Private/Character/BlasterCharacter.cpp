@@ -656,10 +656,15 @@ void ABlasterCharacter::TacticalGrenadeButtonPressed()
 	}
 }
 
-inline void ABlasterCharacter::SwapButtonPressed()
+void ABlasterCharacter::SwapButtonPressed()
 {
 	if(CombatComp)
 	{
+		if(CombatComp->bLocallyReloading)
+		{
+			CombatComp->bLocallyReloading = false;
+		}
+		
 		if(CombatComp->CombatState != EBCombatState::ECS_SwappingWeapon && CombatComp->CombatState != EBCombatState::ECS_ThrowingGrenade)
 		{
 			ServerSwapButtonPressed();

@@ -331,8 +331,8 @@ void UBCombatComponent::SwapWeapon()
 	}
 
 	BlasterCharacter->PlaySwapMontage();
-	BlasterCharacter->bFinishedSwapping = false;
 	CombatState = EBCombatState::ECS_SwappingWeapon;
+	BlasterCharacter->bFinishedSwapping = false;
 }
 
 void UBCombatComponent::AttachPrimaryWeapon(ABWeapon* WeaponToEquip)
@@ -710,6 +710,13 @@ void UBCombatComponent::FinishSwapChangeState()
 
 void UBCombatComponent::FinishSwapAttachWeapons()
 {
+	PlayEquipWeaponSound(SecondaryWeapon);
+	
+	if(BlasterCharacter == nullptr || !BlasterCharacter->HasAuthority())
+	{
+		return;
+	}
+	
 	ABWeapon* TempWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;
 	SecondaryWeapon = TempWeapon;
@@ -719,7 +726,6 @@ void UBCombatComponent::FinishSwapAttachWeapons()
 	EquippedWeapon->SetHUDAmmo();
 	EquippedWeapon->SetHUDAmmoImage();
 	UpdateCarriedAmmo();
-	PlayEquipWeaponSound(EquippedWeapon);
 
 	SecondaryWeapon->SetWeaponState(EBWeaponState::EWS_EquippedSecondary);
 	AttachActorToHand(SecondaryWeapon, FName("SecondaryWeaponSocket"));
