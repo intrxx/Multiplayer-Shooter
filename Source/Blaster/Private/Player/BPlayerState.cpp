@@ -2,9 +2,15 @@
 
 
 #include "Player/BPlayerState.h"
-#include "Character/BlasterCharacter.h"
-#include "Weapon/BWeapon.h"
+#include "Net/UnrealNetwork.h"
 
+
+void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABPlayerState, Team);
+}
 void ABPlayerState::AddToScore(float ScoreToAdd)
 {
 	SetScore(GetScore() + ScoreToAdd);
@@ -24,5 +30,7 @@ void ABPlayerState::AddToAssists(int32 AssistsToAdd)
 {
 	Assists += AssistsToAdd;
 }
+
+
 
 

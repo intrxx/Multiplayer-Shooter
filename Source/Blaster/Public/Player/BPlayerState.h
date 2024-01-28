@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "BlasterTypes/BTeams.h"
 #include "BPlayerState.generated.h"
 
 class ABPlayerController;
@@ -23,8 +24,13 @@ public:
 	void AddToKills(int32 KillsToAdd);
 	void AddToAssists(int32 AssistsToAdd);
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	int32 GetKills() const {return Kills;}
 	int32 GetDeaths() const {return Deaths;}
+	EBTeam GetTeam() const {return Team;}
+
+	void SetTeam(EBTeam TeamToSet) {Team = TeamToSet;}
 	
 private:
 	UPROPERTY()
@@ -33,6 +39,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
 
+	UPROPERTY(Replicated)
+	EBTeam Team = EBTeam::EBT_NoTeam;
+	
 	int32 Deaths;
 	int32 Kills;
 	int32 Assists;
