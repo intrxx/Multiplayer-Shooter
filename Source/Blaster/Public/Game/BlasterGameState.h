@@ -29,7 +29,7 @@ public:
 
 	UPROPERTY()
 	TArray<TObjectPtr<ABPlayerState>> RedTeam;
-
+	
 	UPROPERTY()
 	TArray<TObjectPtr<ABPlayerState>> BlueTeam;
 
@@ -48,3 +48,4 @@ private:
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
 };
+

@@ -167,7 +167,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> SpineBox;
-
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> Spine1Box;
 
@@ -176,7 +176,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> LeftArmBox;
-
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> LeftForeArmBox;
 
