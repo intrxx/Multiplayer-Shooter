@@ -68,20 +68,28 @@ void UBTeamSelect::TeamSelectTearDown()
 void UBTeamSelect::OnRedSelectClicked()
 {
 	ABPlayerState* BPS = Cast<ABPlayerState>(GetOwningPlayerState());
-	if(BPS)
+	if(BPS == nullptr)
+	{
+		return;
+	}
+	
+	if(BPS->GetTeam() != EBTeam::EBT_RedTeam)
 	{
 		BPS->ServerSetTeam(EBTeam::EBT_RedTeam);
 	}
-	TeamSelectTearDown();
 }
 
 void UBTeamSelect::OnBlueSelectClicked()
 {
 	ABPlayerState* BPS = Cast<ABPlayerState>(GetOwningPlayerState());
-	if(BPS)
+	if(BPS == nullptr)
+	{
+		return;
+	}
+	
+	if(BPS->GetTeam() != EBTeam::EBT_BlueTeam)
 	{
 		BPS->ServerSetTeam(EBTeam::EBT_BlueTeam);
 	}
-	TeamSelectTearDown();
 }
 

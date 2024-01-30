@@ -104,7 +104,7 @@ public:
 	void ClientCreateTeamSelectWidget();
 	
 	UFUNCTION(Client, Reliable)
-	void ClientSetPlayerHUDCountInTeam(EBTeam Team, int32 PlayerCount);
+	void ClientSetPlayerHUDCountInTeam(int32 RedPlayerCount, int32 BluePlayerCount);
 
 public:
 	float SingleTripTime = 0.f;

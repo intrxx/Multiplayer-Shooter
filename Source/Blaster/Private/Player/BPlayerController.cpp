@@ -640,7 +640,7 @@ void ABPlayerController::SetLeadingPlayerKills(int32 Kills)
 	}
 }
 
-void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(EBTeam Team, int32 PlayerCount)
+void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(int32 RedPlayerCount, int32 BluePlayerCount)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
@@ -651,19 +651,11 @@ void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(EBTeam Tea
 
 	if(bHUDValid)
 	{
-		const FText PlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), PlayerCount));
-
-		switch(Team)
-		{
-		case EBTeam::EBT_BlueTeam:
-			BlasterHUD->TeamSelect->BlueTeamCounter->SetText(PlayerCountText);
-			break;
-		case EBTeam::EBT_RedTeam:
-			BlasterHUD->TeamSelect->RedTeamCounter->SetText(PlayerCountText);
-			break;
-		default:
-			break;
-		}
+		const FText RedPlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), RedPlayerCount));
+		const FText BluePlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), BluePlayerCount));
+		
+		BlasterHUD->TeamSelect->BlueTeamCounter->SetText(BluePlayerCountText);
+		BlasterHUD->TeamSelect->RedTeamCounter->SetText(RedPlayerCountText);
 	}
 }
 
