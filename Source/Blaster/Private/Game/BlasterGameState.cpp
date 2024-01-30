@@ -2,8 +2,6 @@
 
 
 #include "Game/BlasterGameState.h"
-
-#include "Character/BlasterCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BPlayerState.h"
 

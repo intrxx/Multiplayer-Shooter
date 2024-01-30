@@ -2,6 +2,7 @@
 
 
 #include "HUD/BTeamSelect.h"
+#include "Character/BlasterCharacter.h"
 #include "Components/Button.h"
 #include "Player/BPlayerState.h"
 
@@ -16,6 +17,12 @@ void UBTeamSelect::TeamSelectSetup()
 		InputModeData.SetWidgetToFocus(TakeWidget());
 		PC->SetInputMode(InputModeData);
 		PC->SetShowMouseCursor(true);
+	}
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetOwningPlayerPawn());
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->DisableInput(PC);
 	}
 	
 	if(RedTeamButton && !RedTeamButton->OnClicked.IsBound())
@@ -39,6 +46,12 @@ void UBTeamSelect::TeamSelectTearDown()
 		FInputModeGameOnly InputModeData;
 		PC->SetInputMode(InputModeData);
 		PC->SetShowMouseCursor(false);
+	}
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetOwningPlayerPawn());
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->EnableInput(PC);
 	}
 
 	if(RedTeamButton && RedTeamButton->OnClicked.IsBound())

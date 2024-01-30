@@ -55,6 +55,7 @@ public:
 	void PlaySwapMontage();
 	void PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory);
 	void EquipDefaultWeapon();
+	void AddPlayerInput();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowScopeWidget(bool bShowScope);
@@ -133,7 +134,7 @@ public:
 	bool bFinishedSwapping = false;
 	
 	FOnLeftGame OnLeftGameDelegate;
-
+	
 	UPROPERTY()
 	TArray<FString> LegBoneNames;
 
