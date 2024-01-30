@@ -34,7 +34,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetTeam(EBTeam TeamToSet);
-	
+
 private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;

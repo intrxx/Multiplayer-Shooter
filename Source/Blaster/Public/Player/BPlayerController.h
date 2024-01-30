@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Weapon/BWeapon.h"
+#include "BlasterTypes/BTeams.h"
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
-
 
 class UBTeamSelect;
 class ABPlayerState;
@@ -102,6 +102,9 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientCreateTeamSelectWidget();
+	
+	UFUNCTION(Client, Reliable)
+	void ClientSetPlayerHUDCountInTeam(EBTeam Team, int32 PlayerCount);
 
 public:
 	float SingleTripTime = 0.f;

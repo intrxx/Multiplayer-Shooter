@@ -3,6 +3,7 @@
 
 #include "Game/BlasterGameState.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/BPlayerController.h"
 #include "Player/BPlayerState.h"
 
 
@@ -34,6 +35,29 @@ void ABlasterGameState::UpdateTopScore(ABPlayerState* ScoringPlayer)
 	}
 
 	DisplayTeams();
+}
+
+void ABlasterGameState::UpdatePlayerHUDCountNumber(const EBTeam TeamToSet)
+{
+	for(const auto& PS : PlayerArray)
+	{
+		ABPlayerController* BPC = Cast<ABPlayerController>(PS->GetPlayerController());
+		if(BPC)
+		{
+			switch(TeamToSet)
+			{
+			case EBTeam::EBT_RedTeam:
+				BPC->ClientSetPlayerHUDCountInTeam(TeamToSet, RedTeam.Num());
+				break;
+			case EBTeam::EBT_BlueTeam:
+				BPC->ClientSetPlayerHUDCountInTeam(TeamToSet, BlueTeam.Num());
+				break;
+			default:
+				break;
+			}
+		
+		}
+	}
 }
 
 bool ABlasterGameState::AllPlayersChosenTeam()

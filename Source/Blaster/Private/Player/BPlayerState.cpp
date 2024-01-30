@@ -7,6 +7,7 @@
 #include "Game/BTeamsGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/BPlayerController.h"
 
 
 void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -52,6 +53,8 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 			BlasterGameState->BlueTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_BlueTeam);
 		}
+
+		BlasterGameState->UpdatePlayerHUDCountNumber(TeamToSet);
 
 		/**
 		 *TODO fix the time issues
