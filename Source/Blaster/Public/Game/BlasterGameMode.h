@@ -40,6 +40,7 @@ public:
 	void UpdatePlayerList();
 	void UpdateLeadingPlayer();
 
+	float GetWarmupTimeLeft() const;
 public:
 	UPROPERTY()
 	TArray<TObjectPtr<AController>> LoginPlayerControllers;

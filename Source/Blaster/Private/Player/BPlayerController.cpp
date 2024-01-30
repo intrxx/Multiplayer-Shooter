@@ -707,6 +707,19 @@ void ABPlayerController::SetGameTime()
 	CountDown = SecondLeft;
 }
 
+void ABPlayerController::ClientCreateTeamSelectWidget_Implementation()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if(BlasterHUD)
+	{
+		BlasterHUD->AddTeamSelect();
+		if(BlasterHUD->TeamSelect)
+		{
+			BlasterHUD->TeamSelect->TeamSelectSetup();
+		}
+	}
+}
+
 void ABPlayerController::StartHighPingWarning()
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
@@ -903,10 +916,9 @@ void ABPlayerController::HandleMatchHasStarted()
 			
 			if(bIsTeamsMatch)
 			{
-				BlasterHUD->AddTeamSelect();
 				if(BlasterHUD->TeamSelect)
 				{
-					BlasterHUD->TeamSelect->TeamSelectSetup();
+					BlasterHUD->TeamSelect->TeamSelectTearDown();
 				}
 			}
 		}

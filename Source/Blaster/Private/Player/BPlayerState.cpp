@@ -4,6 +4,7 @@
 #include "Player/BPlayerState.h"
 
 #include "Game/BlasterGameState.h"
+#include "Game/BTeamsGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -51,6 +52,22 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 			BlasterGameState->BlueTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_BlueTeam);
 		}
+
+		/**
+		 *TODO fix the time issues
+		 *
+		if(BlasterGameState->AllPlayersChosenTeam())
+		{
+			ABTeamsGameMode* TeamsGameMode = Cast<ABTeamsGameMode>(UGameplayStatics::GetGameMode(this));
+			if(TeamsGameMode)
+			{
+				if(TeamsGameMode->GetCountdownTime() > 10.f)
+				{
+					TeamsGameMode->WarmupTime = 10.f;
+				}
+			}
+		}
+		*/
 	}
 }
 

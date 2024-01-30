@@ -99,6 +99,9 @@ public:
 	void ReturnFromInGameMenu();
 
 	void BroadcastElimination(ABPlayerState* Attacker, ABPlayerState* Victim);
+	
+	UFUNCTION(Client, Reliable)
+	void ClientCreateTeamSelectWidget();
 
 public:
 	float SingleTripTime = 0.f;

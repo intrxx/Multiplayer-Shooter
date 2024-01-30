@@ -36,6 +36,19 @@ void ABlasterGameState::UpdateTopScore(ABPlayerState* ScoringPlayer)
 	DisplayTeams();
 }
 
+bool ABlasterGameState::AllPlayersChosenTeam()
+{
+	for(const auto& PS : PlayerArray)
+	{
+		ABPlayerState* BPS = Cast<ABPlayerState>(PS);
+		if(BPS && BPS->GetTeam() == EBTeam::EBT_NoTeam)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 void ABlasterGameState::OnRep_RedTeamScore()
 {
 	

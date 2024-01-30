@@ -10,8 +10,15 @@
 void ABTeamsGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
+
+	ABPlayerController* BPC = Cast<ABPlayerController>(NewPlayer);
+	if(BPC)
+	{
+		BPC->ClientCreateTeamSelectWidget();
+	}
 	
 	/*
+	 * Original code
 	ABlasterGameState* BGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 	if(BGameState)
 	{
@@ -70,12 +77,11 @@ void ABTeamsGameMode::OnMatchStateSet()
 void ABTeamsGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-
-	/*
+	
 	ABlasterGameState* BGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 	if(BGameState)
 	{
-		for(auto PS :BGameState->PlayerArray)
+		for(auto PS : BGameState->PlayerArray)
 		{
 			ABPlayerState* BPS = Cast<ABPlayerState>(PS);
 			if(BPS && BPS->GetTeam() == EBTeam::EBT_NoTeam)
@@ -93,5 +99,4 @@ void ABTeamsGameMode::HandleMatchHasStarted()
 			}
 		}
 	}
-	*/
 }

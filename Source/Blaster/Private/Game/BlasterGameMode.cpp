@@ -285,3 +285,12 @@ void ABlasterGameMode::UpdateLeadingPlayer()
 		}
 	}
 }
+
+float ABlasterGameMode::GetWarmupTimeLeft() const
+{
+	if(MatchState == MatchState::WaitingToStart)
+	{
+		return CountdownTime;
+	}
+	return 0.f;
+}

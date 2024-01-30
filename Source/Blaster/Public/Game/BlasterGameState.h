@@ -20,6 +20,7 @@ class BLASTER_API ABlasterGameState : public AGameState
 public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void UpdateTopScore(ABPlayerState* ScoringPlayer);
+	bool AllPlayersChosenTeam();
 	
 public:
 	UPROPERTY(Replicated)
