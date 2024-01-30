@@ -12,6 +12,7 @@
 #include "Components/HorizontalBox.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
+#include "HUD/BTeamSelect.h"
 
 void ABlasterHUD::BeginPlay()
 {
@@ -47,6 +48,16 @@ void ABlasterHUD::AddInventoryWidget()
 		Inventory = CreateWidget<UBInventoryWidget>(PC, InventoryClass);
 		Inventory->AddToViewport();
 		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void ABlasterHUD::AddTeamSelect()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if(PC && TeamSelectClass)
+	{
+		TeamSelect = CreateWidget<UBTeamSelect>(PC, TeamSelectClass);
+		TeamSelect->AddToViewport();
 	}
 }
 
@@ -215,7 +226,7 @@ void ABlasterHUD::AddHUD()
 	AddCharacterOverlay();
 	AddScoreBoard();
 	AddInventoryWidget();
-
+	
 	bHUDAdded = true;
 }
 

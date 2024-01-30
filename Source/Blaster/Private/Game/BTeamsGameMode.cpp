@@ -5,11 +5,13 @@
 #include "Game/BlasterGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BPlayerState.h"
+#include "Player/BPlayerController.h"
 
 void ABTeamsGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	
+	/*
 	ABlasterGameState* BGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 	if(BGameState)
 	{
@@ -28,6 +30,7 @@ void ABTeamsGameMode::PostLogin(APlayerController* NewPlayer)
 			}
 		}
 	}
+	*/
 }
 
 void ABTeamsGameMode::Logout(AController* Exiting)
@@ -49,10 +52,26 @@ void ABTeamsGameMode::Logout(AController* Exiting)
 	}
 }
 
+void ABTeamsGameMode::OnMatchStateSet()
+{
+	AGameMode::OnMatchStateSet();
+
+	for(FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ABPlayerController* BPC = Cast<ABPlayerController>(*It);
+		if(BPC)
+		{
+			BPC->OnMatchStateSet(MatchState);
+			BPC->bIsTeamsMatch = true;
+		}
+	}
+}
+
 void ABTeamsGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 
+	/*
 	ABlasterGameState* BGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 	if(BGameState)
 	{
@@ -74,4 +93,5 @@ void ABTeamsGameMode::HandleMatchHasStarted()
 			}
 		}
 	}
+	*/
 }

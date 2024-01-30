@@ -8,6 +8,7 @@
 #include "BPlayerController.generated.h"
 
 
+class UBTeamSelect;
 class ABPlayerState;
 class UBInputConfig;
 class UBInGameMenu;
@@ -103,6 +104,9 @@ public:
 	float SingleTripTime = 0.f;
 
 	FOnHighPingDelegate OnHighPingDelegate;
+
+	UPROPERTY(Replicated)
+	bool bIsTeamsMatch;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -197,7 +201,7 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
 	FName MatchState;
-
+	
 	UPROPERTY()
 	UBCharacterOverlay* CharacterOverlay;
 	UPROPERTY()

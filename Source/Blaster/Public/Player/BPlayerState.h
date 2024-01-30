@@ -31,6 +31,9 @@ public:
 	EBTeam GetTeam() const {return Team;}
 
 	void SetTeam(EBTeam TeamToSet) {Team = TeamToSet;}
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetTeam(EBTeam TeamToSet);
 	
 private:
 	UPROPERTY()

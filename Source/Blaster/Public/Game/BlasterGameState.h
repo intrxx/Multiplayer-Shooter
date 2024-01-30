@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BlasterTypes/BTeams.h"
 #include "GameFramework/GameState.h"
 #include "BlasterGameState.generated.h"
 
 class ABPlayerState;
+class ABlasterCharacter;
 /**
  * 
  */
@@ -26,7 +28,7 @@ public:
 	/**
 	 * Teams
 	 */
-
+	
 	UPROPERTY()
 	TArray<TObjectPtr<ABPlayerState>> RedTeam;
 	
@@ -47,5 +49,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
+	
+	void DisplayTeams();
+	
 };
 

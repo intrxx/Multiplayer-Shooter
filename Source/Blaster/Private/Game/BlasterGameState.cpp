@@ -2,6 +2,8 @@
 
 
 #include "Game/BlasterGameState.h"
+
+#include "Character/BlasterCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BPlayerState.h"
 
@@ -32,6 +34,8 @@ void ABlasterGameState::UpdateTopScore(ABPlayerState* ScoringPlayer)
 		TopScoringPlayers.Add(ScoringPlayer);
 		TopScore = ScoringPlayer->GetScore();
 	}
+
+	DisplayTeams();
 }
 
 void ABlasterGameState::OnRep_RedTeamScore()
@@ -42,5 +46,24 @@ void ABlasterGameState::OnRep_RedTeamScore()
 void ABlasterGameState::OnRep_BlueTeamScore()
 {
 	
+}
+
+void ABlasterGameState::DisplayTeams()
+{
+	for(const auto& PS : RedTeam)
+	{
+		if(PS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Red Team Member: %s"), *PS->GetName());
+		}
+	}
+
+	for(const auto& PS : BlueTeam)
+	{
+		if(PS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Blue Team Member: %s"), *PS->GetName());
+		}
+	}
 }
 

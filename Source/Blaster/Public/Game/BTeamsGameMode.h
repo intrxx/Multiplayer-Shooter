@@ -16,7 +16,8 @@ class BLASTER_API ABTeamsGameMode : public ABlasterGameMode
 public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
-	
+
 protected:
+	virtual void OnMatchStateSet() override;
 	virtual void HandleMatchHasStarted() override;
 };

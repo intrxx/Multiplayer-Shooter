@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BlasterHUD.generated.h"
 
+class UBTeamSelect;
 class UBKillFeed;
 class UBAnnouncement;
 class UBInventoryWidget;
@@ -71,6 +72,7 @@ public:
 	void RemoveHUD(bool bRemoveOverlay, bool bRemoveScoreboard, bool bRemoveInventory);
 	void AddAnnouncement();
 	void AddKillFeed(const FString& KillerName, const FString& KilledName, UTexture2D* GunImage);
+	void AddTeamSelect();
 	
 	bool IsScoreboardVisible();
 	bool IsInventoryVisible();
@@ -90,6 +92,8 @@ public:
 	TObjectPtr<UBAnnouncement> Announcement;
 	UPROPERTY()
 	TObjectPtr<UBKillFeed> KillFeed;
+	UPROPERTY()
+	UBTeamSelect* TeamSelect;
 	
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
@@ -105,6 +109,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
 	TSubclassOf<UUserWidget> KillFeedClass;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|UI")
+	TSubclassOf<UUserWidget> TeamSelectClass;
 
 	bool bHUDAdded = false;
 

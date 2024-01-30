@@ -21,6 +21,7 @@
 #include "Components/SizeBox.h"
 #include "Game/BlasterGameState.h"
 #include "HUD/BInGameMenu.h"
+#include "HUD/BTeamSelect.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Player/BPlayerState.h"
 #include "Weapon/BGrenade.h"
@@ -232,6 +233,7 @@ void ABPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(ABPlayerController, MatchState);
+	DOREPLIFETIME(ABPlayerController, bIsTeamsMatch);
 }
 
 void ABPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -898,11 +900,21 @@ void ABPlayerController::HandleMatchHasStarted()
 		if(BlasterHUD->bHUDAdded == false)
 		{
 			BlasterHUD->AddHUD();
+			
+			if(bIsTeamsMatch)
+			{
+				BlasterHUD->AddTeamSelect();
+				if(BlasterHUD->TeamSelect)
+				{
+					BlasterHUD->TeamSelect->TeamSelectSetup();
+				}
+			}
 		}
 		if(BlasterHUD->Announcement && BlasterHUD->Announcement->Blink)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Collapsed);
 			BlasterHUD->Announcement->StopAnimation(BlasterHUD->Announcement->Blink);
+			
 			for(FPlayerStats Stats : LocalPlayerStats)
 			{
 				BlasterHUD->Scoreboard->UpdatePlayerList(LocalPlayerStats);

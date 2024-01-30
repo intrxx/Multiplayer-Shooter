@@ -2,6 +2,9 @@
 
 
 #include "Player/BPlayerState.h"
+
+#include "Game/BlasterGameState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -11,6 +14,7 @@ void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(ABPlayerState, Team);
 }
+
 void ABPlayerState::AddToScore(float ScoreToAdd)
 {
 	SetScore(GetScore() + ScoreToAdd);
@@ -30,6 +34,26 @@ void ABPlayerState::AddToAssists(int32 AssistsToAdd)
 {
 	Assists += AssistsToAdd;
 }
+
+void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
+{
+	ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+	if(BlasterGameState)
+	{
+		if(TeamToSet == EBTeam::EBT_RedTeam)
+		{
+			BlasterGameState->RedTeam.AddUnique(this);
+			SetTeam(EBTeam::EBT_RedTeam);
+		}
+
+		if(TeamToSet == EBTeam::EBT_BlueTeam)
+		{
+			BlasterGameState->BlueTeam.AddUnique(this);
+			SetTeam(EBTeam::EBT_BlueTeam);
+		}
+	}
+}
+
 
 
 
