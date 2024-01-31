@@ -26,12 +26,18 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> BlueTeamButton;
-
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> RandomTeamButton;
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> RedTeamCounter;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> BlueTeamCounter;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> RandomCounter;
 
 protected:
 	UFUNCTION()
@@ -39,6 +45,9 @@ protected:
 
 	UFUNCTION()
 	void OnBlueSelectClicked();
+
+	UFUNCTION()
+	void OnRandomSelectClicked();
 
 	UPROPERTY()
 	TObjectPtr<APlayerController> PC;

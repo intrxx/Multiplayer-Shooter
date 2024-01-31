@@ -34,6 +34,11 @@ void UBTeamSelect::TeamSelectSetup()
 	{
 		BlueTeamButton->OnClicked.AddDynamic(this, &ThisClass::OnBlueSelectClicked);
 	}
+
+	if(RandomTeamButton && !RandomTeamButton->OnClicked.IsBound())
+	{
+		RandomTeamButton->OnClicked.AddDynamic(this, &ThisClass::OnRandomSelectClicked);
+	}
 }
 
 void UBTeamSelect::TeamSelectTearDown()
@@ -63,6 +68,11 @@ void UBTeamSelect::TeamSelectTearDown()
 	{
 		BlueTeamButton->OnClicked.RemoveDynamic(this, &ThisClass::OnBlueSelectClicked);
 	}
+
+	if(RandomTeamButton && RandomTeamButton->OnClicked.IsBound())
+	{
+		RandomTeamButton->OnClicked.RemoveDynamic(this, &ThisClass::OnRandomSelectClicked);
+	}
 }
 
 void UBTeamSelect::OnRedSelectClicked()
@@ -90,6 +100,20 @@ void UBTeamSelect::OnBlueSelectClicked()
 	if(BPS->GetTeam() != EBTeam::EBT_BlueTeam)
 	{
 		BPS->ServerSetTeam(EBTeam::EBT_BlueTeam);
+	}
+}
+
+void UBTeamSelect::OnRandomSelectClicked()
+{
+	ABPlayerState* BPS = Cast<ABPlayerState>(GetOwningPlayerState());
+	if(BPS == nullptr)
+	{
+		return;
+	}
+
+	if(BPS->GetTeam() != EBTeam::EBT_ChooseRandomTeam)
+	{
+		BPS->ServerSetTeam(EBTeam::EBT_ChooseRandomTeam);
 	}
 }
 

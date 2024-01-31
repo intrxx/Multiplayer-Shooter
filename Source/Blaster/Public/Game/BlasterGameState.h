@@ -43,6 +43,8 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_BlueTeamScore)
 	float BlueTeamScore = 0.f;
 
+	int32 ChooseRandomTeamPlayerCount = 0.f;
+
 private:
 	float TopScore = 0.f;
 

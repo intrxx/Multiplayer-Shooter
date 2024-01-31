@@ -36,6 +36,9 @@ public:
 	void ServerSetTeam(EBTeam TeamToSet);
 
 private:
+	void RemoveFromOtherTeams(EBTeam ChosenTeam);
+	
+private:
 	UPROPERTY()
 	TObjectPtr<ABlasterCharacter> BlasterCharacter;
 

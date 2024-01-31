@@ -640,22 +640,26 @@ void ABPlayerController::SetLeadingPlayerKills(int32 Kills)
 	}
 }
 
-void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(int32 RedPlayerCount, int32 BluePlayerCount)
+void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(int32 RedPlayerCount, int32 BluePlayerCount ,
+	int32 RandomTeamPlayerCount)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 
 	bool bHUDValid = BlasterHUD &&
 		BlasterHUD->TeamSelect &&
 		BlasterHUD->TeamSelect->BlueTeamCounter &&
-		BlasterHUD->TeamSelect->RedTeamCounter;
+		BlasterHUD->TeamSelect->RedTeamCounter &&
+		BlasterHUD->TeamSelect->RandomCounter;	
 
 	if(bHUDValid)
 	{
 		const FText RedPlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), RedPlayerCount));
 		const FText BluePlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), BluePlayerCount));
+		const FText RandomTeamPlayerCountText = FText::FromString(FString::Printf(TEXT("%d"), RandomTeamPlayerCount));
 		
 		BlasterHUD->TeamSelect->BlueTeamCounter->SetText(BluePlayerCountText);
 		BlasterHUD->TeamSelect->RedTeamCounter->SetText(RedPlayerCountText);
+		BlasterHUD->TeamSelect->RandomCounter->SetText(RandomTeamPlayerCountText);
 	}
 }
 

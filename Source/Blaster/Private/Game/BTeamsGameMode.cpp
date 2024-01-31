@@ -84,7 +84,7 @@ void ABTeamsGameMode::HandleMatchHasStarted()
 		for(auto PS : BGameState->PlayerArray)
 		{
 			ABPlayerState* BPS = Cast<ABPlayerState>(PS);
-			if(BPS && BPS->GetTeam() == EBTeam::EBT_NoTeam)
+			if(BPS && (BPS->GetTeam() == EBTeam::EBT_NoTeam || BPS->GetTeam() == EBTeam::EBT_ChooseRandomTeam))
 			{
 				if(BGameState->BlueTeam.Num() >= BGameState->RedTeam.Num())
 				{

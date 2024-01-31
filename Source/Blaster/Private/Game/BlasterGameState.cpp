@@ -44,7 +44,7 @@ void ABlasterGameState::UpdatePlayerHUDCountNumber()
 		ABPlayerController* BPC = Cast<ABPlayerController>(PS->GetPlayerController());
 		if(BPC)
 		{	
-			BPC->ClientSetPlayerHUDCountInTeam(RedTeam.Num(), BlueTeam.Num());
+			BPC->ClientSetPlayerHUDCountInTeam(RedTeam.Num(), BlueTeam.Num(), ChooseRandomTeamPlayerCount);
 		}
 	}
 }

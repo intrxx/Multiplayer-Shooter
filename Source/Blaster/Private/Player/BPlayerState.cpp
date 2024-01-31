@@ -2,12 +2,9 @@
 
 
 #include "Player/BPlayerState.h"
-
 #include "Game/BlasterGameState.h"
-#include "Game/BTeamsGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-#include "Player/BPlayerController.h"
 
 
 void ABPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -52,10 +49,7 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 				return;
 			}
 			
-			if(BlasterGameState->BlueTeam.Contains(this))
-			{
-				BlasterGameState->BlueTeam.Remove(this);
-			}
+			RemoveFromOtherTeams(EBTeam::EBT_RedTeam);
 			
 			BlasterGameState->RedTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_RedTeam);
@@ -68,13 +62,23 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 				return;
 			}
 			
-			if(BlasterGameState->RedTeam.Contains(this))
-			{
-				BlasterGameState->RedTeam.Remove(this);
-			}
+			RemoveFromOtherTeams(EBTeam::EBT_BlueTeam);
 			
 			BlasterGameState->BlueTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_BlueTeam);
+		}
+
+		if(TeamToSet == EBTeam::EBT_ChooseRandomTeam)
+		{
+			if(BlasterGameState->ChooseRandomTeamPlayerCount == PlayerCount)
+			{
+				return;
+			}
+			
+			RemoveFromOtherTeams(EBTeam::EBT_ChooseRandomTeam);
+			
+			BlasterGameState->ChooseRandomTeamPlayerCount++;
+			SetTeam(EBTeam::EBT_ChooseRandomTeam);
 		}
 
 		BlasterGameState->UpdatePlayerHUDCountNumber();
@@ -94,6 +98,54 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 			}
 		}
 		*/
+	}
+}
+
+void ABPlayerState::RemoveFromOtherTeams(EBTeam ChosenTeam)
+{
+	ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+	if(BlasterGameState == nullptr)
+	{
+		return;
+	}
+	
+	if(ChosenTeam == EBTeam::EBT_BlueTeam)
+	{
+		if(BlasterGameState->RedTeam.Contains(this))
+		{
+			BlasterGameState->RedTeam.Remove(this);
+		}
+
+		if(GetTeam() == EBTeam::EBT_ChooseRandomTeam)
+		{
+			BlasterGameState->ChooseRandomTeamPlayerCount--;
+		}
+	}
+	
+	if(ChosenTeam == EBTeam::EBT_RedTeam)
+	{
+		if(BlasterGameState->BlueTeam.Contains(this))
+		{
+			BlasterGameState->BlueTeam.Remove(this);
+		}
+
+		if(GetTeam() == EBTeam::EBT_ChooseRandomTeam)
+		{
+			BlasterGameState->ChooseRandomTeamPlayerCount--;
+		}
+	}
+
+	if(ChosenTeam == EBTeam::EBT_ChooseRandomTeam)
+	{
+		if(BlasterGameState->BlueTeam.Contains(this))
+		{
+			BlasterGameState->BlueTeam.Remove(this);
+		}
+		
+		if(BlasterGameState->RedTeam.Contains(this))
+		{
+			BlasterGameState->RedTeam.Remove(this);
+		}
 	}
 }
 
