@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BTeamSelect.generated.h"
 
+class UWrapBox;
 class ABlasterCharacter;
 class UTextBlock;
 class UButton;
@@ -39,6 +40,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> RandomCounter;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWrapBox> RedPlayerNameBox;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWrapBox> BluePlayerNameBox;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWrapBox> RandomPlayerNameBox;
+	
 protected:
 	UFUNCTION()
 	void OnRedSelectClicked();

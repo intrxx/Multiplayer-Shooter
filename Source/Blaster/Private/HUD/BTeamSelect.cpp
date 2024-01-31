@@ -87,6 +87,7 @@ void UBTeamSelect::OnRedSelectClicked()
 	{
 		BPS->ServerSetTeam(EBTeam::EBT_RedTeam);
 	}
+	
 }
 
 void UBTeamSelect::OnBlueSelectClicked()

@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
 
+class UBTeamSelectPlayerEntry;
 class UBTeamSelect;
 class ABPlayerState;
 class UBInputConfig;
@@ -106,6 +107,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientSetPlayerHUDCountInTeam(int32 RedPlayerCount, int32 BluePlayerCount, int32 RandomTeamPlayerCount);
 
+	UFUNCTION(Client, Reliable)
+	void ClientSetPlayerNamesInTeamSelect(const TArray<FString>& RedTeamNames, const TArray<FString>& BlueTeamNames, const TArray<FString>& RandomTeamNames);
+
 public:
 	float SingleTripTime = 0.f;
 
@@ -168,6 +172,9 @@ protected:
 	float TimeSyncFrequency = 5.f;
 
 	float TimeSyncRunningTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blaster|UI")
+	TSubclassOf<UBTeamSelectPlayerEntry> TeamSelectPlayerEntryClass;
 
 private:
 	UFUNCTION()

@@ -19,12 +19,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BCombatComponent.h"
 #include "Components/SizeBox.h"
+#include "Components/WrapBox.h"
 #include "Game/BlasterGameState.h"
 #include "HUD/BInGameMenu.h"
 #include "HUD/BTeamSelect.h"
 #include "Input/BlasterEnhancedInputComponent.h"
 #include "Player/BPlayerState.h"
 #include "Weapon/BGrenade.h"
+#include "HUD/BTeamSelectPlayerEntry.h"
 
 void ABPlayerController::BeginPlay()
 {
@@ -660,6 +662,44 @@ void ABPlayerController::ClientSetPlayerHUDCountInTeam_Implementation(int32 RedP
 		BlasterHUD->TeamSelect->BlueTeamCounter->SetText(BluePlayerCountText);
 		BlasterHUD->TeamSelect->RedTeamCounter->SetText(RedPlayerCountText);
 		BlasterHUD->TeamSelect->RandomCounter->SetText(RandomTeamPlayerCountText);
+	}
+}
+
+void ABPlayerController::ClientSetPlayerNamesInTeamSelect_Implementation(const TArray<FString>& RedTeamNames,
+	const TArray<FString>& BlueTeamNames, const TArray<FString>& RandomTeamNames)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->TeamSelect &&
+		BlasterHUD->TeamSelect->BluePlayerNameBox &&
+		BlasterHUD->TeamSelect->RedPlayerNameBox;
+
+	if(bHUDValid)
+	{
+		BlasterHUD->TeamSelect->RedPlayerNameBox->ClearChildren();
+		for(const FString& Name : RedTeamNames)
+		{
+			UBTeamSelectPlayerEntry* PlayerEntry = CreateWidget<UBTeamSelectPlayerEntry>(this, TeamSelectPlayerEntryClass);
+			BlasterHUD->TeamSelect->RedPlayerNameBox->AddChild(PlayerEntry);
+			PlayerEntry->SetName(Name);
+		}
+		
+		BlasterHUD->TeamSelect->BluePlayerNameBox->ClearChildren();
+		for(const FString& Name : BlueTeamNames)
+		{
+			UBTeamSelectPlayerEntry* PlayerEntry = CreateWidget<UBTeamSelectPlayerEntry>(this, TeamSelectPlayerEntryClass);
+			BlasterHUD->TeamSelect->BluePlayerNameBox->AddChild(PlayerEntry);
+			PlayerEntry->SetName(Name);
+		}
+		
+		BlasterHUD->TeamSelect->RandomPlayerNameBox->ClearChildren();
+		for(const FString& Name : RandomTeamNames)
+		{
+			UBTeamSelectPlayerEntry* PlayerEntry = CreateWidget<UBTeamSelectPlayerEntry>(this, TeamSelectPlayerEntryClass);
+			BlasterHUD->TeamSelect->RandomPlayerNameBox->AddChild(PlayerEntry);
+			PlayerEntry->SetName(Name);
+		}
 	}
 }
 

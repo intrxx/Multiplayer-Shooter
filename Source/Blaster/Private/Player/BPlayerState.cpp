@@ -70,18 +70,18 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 
 		if(TeamToSet == EBTeam::EBT_ChooseRandomTeam)
 		{
-			if(BlasterGameState->ChooseRandomTeamPlayerCount == PlayerCount)
+			if(BlasterGameState->RandomTeam.Num() == PlayerCount)
 			{
 				return;
 			}
 			
 			RemoveFromOtherTeams(EBTeam::EBT_ChooseRandomTeam);
 			
-			BlasterGameState->ChooseRandomTeamPlayerCount++;
+			BlasterGameState->RandomTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_ChooseRandomTeam);
 		}
 
-		BlasterGameState->UpdatePlayerHUDCountNumber();
+		BlasterGameState->UpdateHUDTeamSelect();
 
 		/**
 		 *TODO fix the time issues
@@ -116,9 +116,9 @@ void ABPlayerState::RemoveFromOtherTeams(EBTeam ChosenTeam)
 			BlasterGameState->RedTeam.Remove(this);
 		}
 
-		if(GetTeam() == EBTeam::EBT_ChooseRandomTeam)
+		if(BlasterGameState->RandomTeam.Contains(this))
 		{
-			BlasterGameState->ChooseRandomTeamPlayerCount--;
+			BlasterGameState->RandomTeam.Remove(this);
 		}
 	}
 	
@@ -129,9 +129,9 @@ void ABPlayerState::RemoveFromOtherTeams(EBTeam ChosenTeam)
 			BlasterGameState->BlueTeam.Remove(this);
 		}
 
-		if(GetTeam() == EBTeam::EBT_ChooseRandomTeam)
+		if(BlasterGameState->RandomTeam.Contains(this))
 		{
-			BlasterGameState->ChooseRandomTeamPlayerCount--;
+			BlasterGameState->RandomTeam.Remove(this);
 		}
 	}
 

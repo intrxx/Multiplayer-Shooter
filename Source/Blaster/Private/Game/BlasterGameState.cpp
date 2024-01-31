@@ -37,14 +37,32 @@ void ABlasterGameState::UpdateTopScore(ABPlayerState* ScoringPlayer)
 	DisplayTeams();
 }
 
-void ABlasterGameState::UpdatePlayerHUDCountNumber()
+void ABlasterGameState::UpdateHUDTeamSelect()
 {
+	TArray<FString> RedNames;
+	for(const auto& Player : RedTeam)
+	{
+		RedNames.AddUnique(Player->GetPlayerName());
+	}
+	TArray<FString> BlueNames;
+	for(const auto& Player : BlueTeam)
+	{
+		BlueNames.AddUnique(Player->GetPlayerName());
+	}
+	TArray<FString> RandomNames;
+	for(const auto& Player : RandomTeam)
+	{
+		RandomNames.AddUnique(Player->GetPlayerName());
+	}
+	
+	
 	for(const auto& PS : PlayerArray)
 	{
 		ABPlayerController* BPC = Cast<ABPlayerController>(PS->GetPlayerController());
 		if(BPC)
 		{	
-			BPC->ClientSetPlayerHUDCountInTeam(RedTeam.Num(), BlueTeam.Num(), ChooseRandomTeamPlayerCount);
+			BPC->ClientSetPlayerHUDCountInTeam(RedTeam.Num(), BlueTeam.Num(), RandomTeam.Num());
+			BPC->ClientSetPlayerNamesInTeamSelect(RedNames, BlueNames, RandomNames);
 		}
 	}
 }

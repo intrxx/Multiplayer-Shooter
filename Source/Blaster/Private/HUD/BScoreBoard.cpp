@@ -2,7 +2,6 @@
 
 
 #include "HUD/BScoreBoard.h"
-#include "HUD/BlasterHUD.h"
 #include "Components/VerticalBox.h"
 #include "HUD/BScoreboardPlayerEntry.h"
 

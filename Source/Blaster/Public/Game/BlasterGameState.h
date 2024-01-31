@@ -20,7 +20,7 @@ class BLASTER_API ABlasterGameState : public AGameState
 public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void UpdateTopScore(ABPlayerState* ScoringPlayer);
-	void UpdatePlayerHUDCountNumber();
+	void UpdateHUDTeamSelect();
 	bool AllPlayersChosenTeam();
 
 public:
@@ -36,14 +36,15 @@ public:
 	
 	UPROPERTY()
 	TArray<TObjectPtr<ABPlayerState>> BlueTeam;
-
+	
+	UPROPERTY()
+	TArray<TObjectPtr<ABPlayerState>> RandomTeam;
+	
 	UPROPERTY(ReplicatedUsing = OnRep_RedTeamScore)
 	float RedTeamScore = 0.f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_BlueTeamScore)
 	float BlueTeamScore = 0.f;
-
-	int32 ChooseRandomTeamPlayerCount = 0.f;
 
 private:
 	float TopScore = 0.f;
