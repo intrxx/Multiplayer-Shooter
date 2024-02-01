@@ -1073,6 +1073,10 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation(bool bPlayerLeftGame
 	// Disable Collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if(AttachedGrenade)
+	{
+		AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 	
 	// Spawn Death Bot
 	if(DeathBotEffect)
@@ -1202,6 +1206,11 @@ void ABlasterCharacter::HideCharacterIfCameraClose()
 		{
 			CombatComp->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
 		}
+
+		if(CombatComp && CombatComp->SecondaryWeapon && CombatComp->SecondaryWeapon->GetWeaponMesh())
+		{
+			CombatComp->SecondaryWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
 	}
 	else
 	{
@@ -1209,6 +1218,11 @@ void ABlasterCharacter::HideCharacterIfCameraClose()
 		if(CombatComp && CombatComp->EquippedWeapon && CombatComp->EquippedWeapon->GetWeaponMesh())
 		{
 			CombatComp->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+
+		if(CombatComp && CombatComp->SecondaryWeapon && CombatComp->SecondaryWeapon->GetWeaponMesh())
+		{
+			CombatComp->SecondaryWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
 }
