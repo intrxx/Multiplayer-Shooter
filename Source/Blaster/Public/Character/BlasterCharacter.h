@@ -13,6 +13,7 @@
 #include "BlasterTypes/BTeams.h"
 #include "BlasterCharacter.generated.h"
 
+class ABlasterGameMode;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UBoxComponent;
@@ -269,6 +270,8 @@ private:
 	TObjectPtr<ABlasterHUD> BlasterHUD;
 	UPROPERTY()
 	TObjectPtr<ABPlayerState> BlasterPS;
+	UPROPERTY()
+	TObjectPtr<ABlasterGameMode> BlasterGameMode;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;

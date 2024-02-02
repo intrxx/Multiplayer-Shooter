@@ -153,6 +153,11 @@ void ABPlayerState::RemoveFromOtherTeams(EBTeam ChosenTeam)
 
 void ABPlayerState::OnRep_Team()
 {
+	BlasterCharacter = BlasterCharacter == nullptr ? Cast<ABlasterCharacter>(GetPawn()) : BlasterCharacter;
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->MulticastSetTeamMaterialsColor(GetTeam());
+	}
 }
 
 

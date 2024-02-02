@@ -59,6 +59,30 @@ void ABTeamsGameMode::Logout(AController* Exiting)
 	}
 }
 
+float ABTeamsGameMode::CalculateDamage(AController* Source, AController* Target, float BaseDamage)
+{
+	ABPlayerState* SourcePS = Source->GetPlayerState<ABPlayerState>();
+	ABPlayerState* TargetPS = Target->GetPlayerState<ABPlayerState>();
+
+	if(SourcePS == nullptr || TargetPS == nullptr)
+	{
+		return BaseDamage;
+	}
+	
+	if(SourcePS == TargetPS)
+	{
+		return BaseDamage;
+	}
+
+	if(SourcePS->GetTeam() == TargetPS->GetTeam())
+	{
+		return FMath::RoundToInt(BaseDamage / 4.f);
+	}
+
+	return BaseDamage;
+}
+
+
 void ABTeamsGameMode::OnMatchStateSet()
 {
 	AGameMode::OnMatchStateSet();

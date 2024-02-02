@@ -813,7 +813,7 @@ void ABlasterCharacter::Destroyed()
 		DeathBotEffectComp->DestroyComponent();
 	}
 
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	BlasterGameMode = BlasterGameMode == nullptr ?  GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	bool bMatchNotInProgress = BlasterGameMode && BlasterGameMode->GetMatchState() != MatchState::InProgress;
 	
 	if(CombatComp && CombatComp->EquippedWeapon && bMatchNotInProgress)
@@ -956,7 +956,7 @@ void ABlasterCharacter::PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeC
 
 void ABlasterCharacter::EquipDefaultWeapon()
 {
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+	BlasterGameMode = BlasterGameMode == nullptr ?  GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 
 	UWorld* World = GetWorld();
 	
@@ -992,12 +992,13 @@ void ABlasterCharacter::PlayHitReactMontage()
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                       AController* InstigatorController, AActor* DamageCauser)
 {
-	if(bDead)
+	BlasterGameMode = BlasterGameMode == nullptr ?  GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
+	if(bDead || BlasterGameMode == nullptr )
 	{
 		return;
 	}
 
-	float DamageToHealth = Damage;
+	float DamageToHealth = BlasterGameMode->CalculateDamage(InstigatorController, Controller, Damage);
 	
 	if(Shield > 0)
 	{
@@ -1025,14 +1026,10 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 
 	if(Health == 0.f)
 	{
-		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
-		if(BlasterGameMode)
-		{
-			BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
-			ABPlayerController* AttackerController = Cast<ABPlayerController>(InstigatorController);
+		BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+		ABPlayerController* AttackerController = Cast<ABPlayerController>(InstigatorController);
 			
-			BlasterGameMode->PlayerEliminated(this, BlasterPC, AttackerController);
-		}
+		BlasterGameMode->PlayerEliminated(this, BlasterPC, AttackerController);
 	}
 }
 
@@ -1213,7 +1210,7 @@ void ABlasterCharacter::CreateDeathDynamicMaterialInstances()
 
 void ABlasterCharacter::RespawnTimerFinished()
 {
-	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	BlasterGameMode = BlasterGameMode == nullptr ?  GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	if(BlasterGameMode && !bLeftGame)
 	{
 		BlasterGameMode->RequestRespawn(this, Controller);
@@ -1304,7 +1301,7 @@ void ABlasterCharacter::ServerEquip_Implementation()
 
 void ABlasterCharacter::ServerLeaveGame_Implementation()
 {
-	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	BlasterGameMode = BlasterGameMode == nullptr ?  GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	ABPlayerState* BPS = GetPlayerState<ABPlayerState>();
 	if(BlasterGameMode && BPS)
 	{

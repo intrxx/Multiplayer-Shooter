@@ -36,6 +36,9 @@ public:
 	virtual void RequestRespawn(ABlasterCharacter* CharacterToRespawn, AController* TargetBPC);
 
 	float GetCountdownTime() const {return CountdownTime;}
+
+	// This function really just tell us if we hit a friendly player or not
+	virtual float CalculateDamage(AController* Source, AController* Target, float BaseDamage);
 	
 	void UpdatePlayerList();
 	void UpdateLeadingPlayer();

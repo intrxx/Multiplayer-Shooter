@@ -17,6 +17,8 @@ public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
+	virtual float CalculateDamage(AController* Source, AController* Target, float BaseDamage) override;
+
 protected:
 	virtual void OnMatchStateSet() override;
 	virtual void HandleMatchHasStarted() override;
