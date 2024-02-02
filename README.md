@@ -12,4 +12,4 @@ This is wraped in 3 main gamemodes:
 
 When it comes to networking this project is utilizing:
 - **Client Side Prediction** - for example: updating the hud, reloading, aiming.
-- **Server Side Rewind** - for every time of weapon (excluding explosive weapons like Rocket Launcher although projectile predicting is also done with Assault Rifle).
+- **Server Side Rewind** - for every type of weapon (excluding explosive weapons like Rocket Launcher although projectile predicting is also done with Assault Rifle).
