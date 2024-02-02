@@ -2,6 +2,8 @@
 
 
 #include "Player/BPlayerState.h"
+
+#include "Character/BlasterCharacter.h"
 #include "Game/BlasterGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -147,6 +149,10 @@ void ABPlayerState::RemoveFromOtherTeams(EBTeam ChosenTeam)
 			BlasterGameState->RedTeam.Remove(this);
 		}
 	}
+}
+
+void ABPlayerState::OnRep_Team()
+{
 }
 
 

@@ -10,6 +10,7 @@
 #include "BlasterTypes/BTurningInPlace.h"
 #include "BlasterTypes/BWeaponTypes.h"
 #include "Components/TimelineComponent.h"
+#include "BlasterTypes/BTeams.h"
 #include "BlasterCharacter.generated.h"
 
 class UNiagaraComponent;
@@ -55,7 +56,6 @@ public:
 	void PlaySwapMontage();
 	void PlayThrowGrenadeMontage(const EBGrenadeCategory GrenadeCategory);
 	void EquipDefaultWeapon();
-	void AddPlayerInput();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowScopeWidget(bool bShowScope);
@@ -83,6 +83,9 @@ public:
 	bool IsLocallyReloading();
 	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
 	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetTeamMaterialsColor(const EBTeam Team);
 	
 	/**
 	 * Attributes Getters / Setters
@@ -100,6 +103,7 @@ public:
 	/**
 	 *
 	 */
+	
 	bool IsWeaponEquipped();
 	bool IsAiming();
 	
@@ -388,15 +392,73 @@ private:
 	TObjectPtr<UMaterialInstanceDynamic> DissolveDynamicMaterialInstance_Head;
 
 	// Material instance set on the Blueprint, used with the dynamic material instance
-	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body1;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Body2;
 
-	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Dissolve")
+	UPROPERTY(VisibleAnywhere, Category = "Blaster|Death|Dissolve")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance_Head;
 
+	/**
+	 * Team Colors
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red|Dissolve")
+	TObjectPtr<UMaterialInstance> RedDissolveMaterialInstance_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red|Dissolve")
+	TObjectPtr<UMaterialInstance> RedDissolveMaterialInstance_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red|Dissolve")
+	TObjectPtr<UMaterialInstance> RedDissolveMaterialInstance_Head;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red")
+	TObjectPtr<UMaterialInstance> RedMaterial_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red")
+	TObjectPtr<UMaterialInstance> RedMaterial_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Red")
+	TObjectPtr<UMaterialInstance> RedMaterial_Head;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue|Dissolve")
+	TObjectPtr<UMaterialInstance> BlueDissolveMaterialInstance_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue|Dissolve")
+	TObjectPtr<UMaterialInstance> BlueDissolveMaterialInstance_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue|Dissolve")
+	TObjectPtr<UMaterialInstance> BlueDissolveMaterialInstance_Head;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue")
+	TObjectPtr<UMaterialInstance> BlueMaterial_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue")
+	TObjectPtr<UMaterialInstance> BlueMaterial_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|Blue")
+	TObjectPtr<UMaterialInstance> BlueMaterial_Head;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam|Dissolve")
+	TObjectPtr<UMaterialInstance> NoTeamDissolveMaterialInstance_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam|Dissolve")
+	TObjectPtr<UMaterialInstance> NoTeamDissolveMaterialInstance_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam|Dissolve")
+	TObjectPtr<UMaterialInstance> NoTeamDissolveMaterialInstance_Head;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam")
+	TObjectPtr<UMaterialInstance> NoTeamMaterial_Body1;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam")
+	TObjectPtr<UMaterialInstance> NoTeamMaterial_Body2;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Death|NoTeam")
+	TObjectPtr<UMaterialInstance> NoTeamMaterial_Head;
+	
 	/**
 	 * Death Bot
 	 */

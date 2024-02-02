@@ -308,6 +308,7 @@ void ABlasterCharacter::PollInit()
 		if(BlasterPS)
 		{
 			BlasterPS->AddToScore(0.f);
+			MulticastSetTeamMaterialsColor(BlasterPS->GetTeam());
 			
 			ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(GetWorld()));
 			if(BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(BlasterPS))
@@ -725,6 +726,72 @@ bool ABlasterCharacter::IsLocallyReloading()
 	}
 
 	return CombatComp->bLocallyReloading;
+}
+
+void ABlasterCharacter::MulticastSetTeamMaterialsColor_Implementation(const EBTeam Team)
+{
+	if(GetMesh() == nullptr)
+	{
+		return;
+	}
+
+	const bool bAreNoTeamValid = NoTeamMaterial_Body1 && NoTeamMaterial_Body2 && NoTeamMaterial_Head &&
+						NoTeamDissolveMaterialInstance_Body1 && NoTeamDissolveMaterialInstance_Body2 &&
+						NoTeamDissolveMaterialInstance_Head;
+	const bool bAreBlueTeamValid = BlueMaterial_Body1 && BlueMaterial_Body2 && BlueMaterial_Head &&
+						BlueDissolveMaterialInstance_Body1 && BlueDissolveMaterialInstance_Body2 &&
+						BlueDissolveMaterialInstance_Head;
+	const bool bAreRedTeamValid = RedMaterial_Body1 && RedMaterial_Body2 && RedMaterial_Head &&
+						RedDissolveMaterialInstance_Body1 && RedDissolveMaterialInstance_Body2 &&
+						RedDissolveMaterialInstance_Head;
+	
+	switch (Team)
+	{
+	case EBTeam::EBT_BlueTeam:
+		if(bAreBlueTeamValid)
+		{
+			GetMesh()->SetMaterial(0, BlueMaterial_Body1);
+			GetMesh()->SetMaterial(1, BlueMaterial_Head);
+			GetMesh()->SetMaterial(2, BlueMaterial_Body2);
+			DissolveMaterialInstance_Body1 = BlueDissolveMaterialInstance_Body1;
+			DissolveMaterialInstance_Body2 = BlueDissolveMaterialInstance_Body2;
+			DissolveMaterialInstance_Head = BlueDissolveMaterialInstance_Head;
+		}
+		break;
+	case EBTeam::EBT_RedTeam:
+		if(bAreRedTeamValid)
+		{
+			GetMesh()->SetMaterial(0, RedMaterial_Body1);
+			GetMesh()->SetMaterial(1, RedMaterial_Head);
+			GetMesh()->SetMaterial(2, RedMaterial_Body2);
+			DissolveMaterialInstance_Body1 = RedDissolveMaterialInstance_Body1;
+			DissolveMaterialInstance_Body2 = RedDissolveMaterialInstance_Body2;
+			DissolveMaterialInstance_Head = RedDissolveMaterialInstance_Head;
+		}
+		break;
+	case EBTeam::EBT_NoTeam:
+		if(bAreNoTeamValid)
+		{
+			GetMesh()->SetMaterial(0, NoTeamMaterial_Body1);
+			GetMesh()->SetMaterial(1, NoTeamMaterial_Head);
+			GetMesh()->SetMaterial(2, NoTeamMaterial_Body2);
+			DissolveMaterialInstance_Body1 = NoTeamDissolveMaterialInstance_Body1;
+			DissolveMaterialInstance_Body2 = NoTeamDissolveMaterialInstance_Body2;
+			DissolveMaterialInstance_Head = NoTeamDissolveMaterialInstance_Head;
+		}
+		break;
+	default:
+		if(bAreNoTeamValid)
+		{
+			GetMesh()->SetMaterial(0, NoTeamMaterial_Body1);
+			GetMesh()->SetMaterial(1, NoTeamMaterial_Head);
+			GetMesh()->SetMaterial(2, NoTeamMaterial_Body2);
+			DissolveMaterialInstance_Body1 = NoTeamDissolveMaterialInstance_Body1;
+			DissolveMaterialInstance_Body2 = NoTeamDissolveMaterialInstance_Body2;
+			DissolveMaterialInstance_Head = NoTeamDissolveMaterialInstance_Head;
+		}
+	break;
+	}
 }
 
 bool ABlasterCharacter::IsWeaponEquipped()

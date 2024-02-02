@@ -45,8 +45,11 @@ private:
 	UPROPERTY()
 	TObjectPtr<ABPlayerController> BlasterPC;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	EBTeam Team = EBTeam::EBT_NoTeam;
+
+	UFUNCTION()
+	void OnRep_Team();
 	
 	int32 Deaths;
 	int32 Kills;
