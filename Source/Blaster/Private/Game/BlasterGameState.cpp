@@ -80,24 +80,44 @@ bool ABlasterGameState::AllPlayersChosenTeam()
 	return true;
 }
 
-void ABlasterGameState::RedTeamScores()
+void ABlasterGameState::RedTeamScores(float ScoreMagnitude)
 {
-	++RedTeamScore;
+	RedTeamScore += ScoreMagnitude;
+
+	ABPlayerController* BPC = Cast<ABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if(BPC)
+	{
+		BPC->SetHUDRedTeamScore(RedTeamScore);
+	}
 }
 
-void ABlasterGameState::BlueTeamScores()
+void ABlasterGameState::BlueTeamScores(float ScoreMagnitude)
 {
-	++BlueTeamScore;
+	BlueTeamScore += ScoreMagnitude;
+
+	ABPlayerController* BPC = Cast<ABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if(BPC)
+	{
+		BPC->SetHUDBlueTeamScore(BlueTeamScore);
+	}
 }
 
 void ABlasterGameState::OnRep_RedTeamScore()
 {
-	
+	ABPlayerController* BPC = Cast<ABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if(BPC)
+	{
+		BPC->SetHUDRedTeamScore(RedTeamScore);
+	}
 }
 
 void ABlasterGameState::OnRep_BlueTeamScore()
 {
-	
+	ABPlayerController* BPC = Cast<ABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if(BPC)
+	{
+		BPC->SetHUDBlueTeamScore(BlueTeamScore);
+	}
 }
 
 void ABlasterGameState::DisplayTeams()

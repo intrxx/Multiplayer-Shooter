@@ -23,8 +23,8 @@ public:
 	void UpdateHUDTeamSelect();
 	bool AllPlayersChosenTeam();
 
-	void RedTeamScores();
-	void BlueTeamScores();
+	void RedTeamScores(float ScoreMagnitude);
+	void BlueTeamScores(float ScoreMagnitude);
 
 public:
 	UPROPERTY(Replicated)
@@ -50,8 +50,6 @@ public:
 	float BlueTeamScore = 0.f;
 
 private:
-	float TopScore = 0.f;
-
 	UFUNCTION()
 	void OnRep_RedTeamScore();
 
@@ -60,5 +58,7 @@ private:
 	
 	void DisplayTeams();
 	
+private:
+	float TopScore = 0.f;
 };
 

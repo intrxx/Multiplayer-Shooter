@@ -60,6 +60,43 @@ void ABTeamsGameMode::Logout(AController* Exiting)
 	}
 }
 
+void ABTeamsGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC,
+	ABPlayerController* AttackerBPC)
+{
+	Super::PlayerEliminated(ElimmedCharacter, TargetBPC, AttackerBPC);
+
+	ABlasterGameState* BGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+	ABPlayerState* AttackerPlayerState = AttackerBPC ? Cast<ABPlayerState>(AttackerBPC->PlayerState) : nullptr;
+	ABPlayerState* TargetPlayerState = TargetBPC ? Cast<ABPlayerState>(TargetBPC->PlayerState) : nullptr;
+	if(BGameState && AttackerPlayerState && TargetPlayerState)
+	{
+		if(AttackerPlayerState->GetTeam() != TargetPlayerState->GetTeam())
+		{
+			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_BlueTeam)
+			{
+				BGameState->BlueTeamScores(1);
+			}
+
+			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_RedTeam)
+			{
+				BGameState->RedTeamScores(1);
+			}
+		}
+		else
+		{
+			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_BlueTeam)
+			{
+				BGameState->BlueTeamScores(-1);
+			}
+
+			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_RedTeam)
+			{
+				BGameState->RedTeamScores(-1);
+			}
+		}	
+	}
+}
+
 float ABTeamsGameMode::CalculateDamage(AController* Source, AController* Target, float BaseDamage)
 {
 	ABPlayerState* SourcePS = Source->GetPlayerState<ABPlayerState>();
