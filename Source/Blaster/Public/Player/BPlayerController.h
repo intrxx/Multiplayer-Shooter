@@ -82,6 +82,11 @@ public:
 	void SetLeadingPlayerBoxVisible(bool bIsVisible);
 	void SetLeadingPlayerName(const FString& PlayerName);
 	void SetLeadingPlayerKills(int32 Kills);
+	void HideTeamScores();
+	void InitTeamScores();
+	void SetHUDRedTeamScore(int32 RedScore);
+	void SetHUDBlueTeamScore(int32 BlueScore);
+	
 	
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();

@@ -117,5 +117,20 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USizeBox> LeadingPlayerBox;
+
+	/**
+	 * Team Scores
+	 */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> RedTeamBox;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> BlueTeamBox;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> RedTeamScoreText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> BlueTeamScoreText;
 	
 };

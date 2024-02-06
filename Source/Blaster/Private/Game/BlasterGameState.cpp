@@ -80,6 +80,16 @@ bool ABlasterGameState::AllPlayersChosenTeam()
 	return true;
 }
 
+void ABlasterGameState::RedTeamScores()
+{
+	++RedTeamScore;
+}
+
+void ABlasterGameState::BlueTeamScores()
+{
+	++BlueTeamScore;
+}
+
 void ABlasterGameState::OnRep_RedTeamScore()
 {
 	

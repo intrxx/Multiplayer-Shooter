@@ -23,6 +23,9 @@ public:
 	void UpdateHUDTeamSelect();
 	bool AllPlayersChosenTeam();
 
+	void RedTeamScores();
+	void BlueTeamScores();
+
 public:
 	UPROPERTY(Replicated)
 	TArray<TObjectPtr<ABPlayerState>> TopScoringPlayers;
