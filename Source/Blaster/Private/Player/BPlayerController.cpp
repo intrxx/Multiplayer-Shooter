@@ -18,6 +18,7 @@
 #include "HUD/BAnnouncement.h"
 #include "Kismet/GameplayStatics.h"
 #include "BlasterComponents/BCombatComponent.h"
+#include "BlasterTypes/BMatchResultText.h"
 #include "Components/SizeBox.h"
 #include "Components/WrapBox.h"
 #include "Game/BlasterGameState.h"
@@ -1094,36 +1095,14 @@ void ABPlayerController::HandleCooldown()
 			if(BlasterGameState && PS)
 			{
 				TArray<ABPlayerState*> TopPlayers = BlasterGameState->TopScoringPlayers;
-				FString WinnerInfo;
-				
-				if(TopPlayers.IsEmpty())
-				{
-					WinnerInfo = FString("Not a soul was killed, how disappointing");
-				}
-				else if(TopPlayers.Num() == 1 && TopPlayers[0] == PS)
-				{
-					WinnerInfo = FString("You are the winner, good job soldier");
-				}
-				else if(TopPlayers.Num() == 1)
-				{
-					WinnerInfo = FString::Printf(TEXT("Winner is: \n%s \n shame on the others"),
-						*TopPlayers[0]->GetPlayerName());
-				}
-				else if(TopPlayers.Num() > 1)
-				{
-					WinnerInfo = FString("Players equally cool: \n");
-					for(auto TiedPlayer : TopPlayers)
-					{
-						WinnerInfo.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
-					}
-				}
+				FString WinnerInfo = bIsTeamsMatch ? GetTeamsInfoText(BlasterGameState) : GetInfoText(TopPlayers);
 				
 				BlasterHUD->Announcement->InfoText->SetVisibility(ESlateVisibility::Visible);
 				BlasterHUD->Announcement->InfoText->SetText(FText::FromString(WinnerInfo));
 			}
 		}
 	}
-
+	
 	if(GEngine)
 	{
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GEngine->GetFirstGamePlayer(GetWorld()));
@@ -1145,6 +1124,73 @@ void ABPlayerController::HandleCooldown()
 			}
 		}
 	}
+}
+
+FString ABPlayerController::GetInfoText(const TArray<ABPlayerState*>& Players)
+{
+	ABPlayerState* PS = GetPlayerState<ABPlayerState>();
+	if(PS == nullptr)
+	{
+		return FString();
+	}
+	
+	FString EndText;
+	if(Players.IsEmpty())
+	{
+		EndText = MatchResultText::NoneKilled;
+	}
+	else if(Players.Num() == 1 && Players[0] == PS)
+	{
+		EndText = MatchResultText::ThisPlayerWon;
+	}
+	else if(Players.Num() == 1)
+	{
+		EndText = FString::Printf(TEXT("Winner is: \n%s \n shame on the others"),
+			*Players[0]->GetPlayerName());
+	}
+	else if(Players.Num() > 1)
+	{
+		EndText = MatchResultText::PlayersTied;
+		EndText.Append(FString("\n"));
+		for(auto TiedPlayer : Players)
+		{
+			EndText.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+		}
+	}
+
+	return EndText;
+}
+
+FString ABPlayerController::GetTeamsInfoText(ABlasterGameState* BlasterGameState)
+{
+	if(BlasterGameState == nullptr)
+	{
+		return FString();
+	}
+
+	FString EndText;
+
+	const float RedTeamScore = BlasterGameState->RedTeamScore;
+	const float BlueTeamScore = BlasterGameState->BlueTeamScore;
+	
+	if(RedTeamScore == 0.f && BlueTeamScore == 0.f)
+	{
+		EndText = MatchResultText::NoneKilled;
+	}
+	else if(RedTeamScore == BlueTeamScore)
+	{
+		EndText = MatchResultText::TeamTied;
+	}
+	else if(RedTeamScore > BlueTeamScore)
+	{
+		EndText = MatchResultText::RedTeamWins;
+	}
+	else if(BlueTeamScore > RedTeamScore)
+	{
+		EndText = MatchResultText::BlueTeamWins;
+	}
+	
+	return EndText;
 }
 
 void ABPlayerController::ReturnFromInGameMenu()

@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BPlayerController.generated.h"
 
+class ABlasterGameState;
 class UBTeamSelectPlayerEntry;
 class UBTeamSelect;
 class ABPlayerState;
@@ -168,6 +169,9 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientKillFeedEntry(ABPlayerState* Attacker, ABPlayerState* Victim);
+
+	FString GetInfoText(const TArray<ABPlayerState*>& TopPlayers);
+	FString GetTeamsInfoText(ABlasterGameState* BlasterGameState);
 	
 protected:
 	/** Difference between client and server time */
