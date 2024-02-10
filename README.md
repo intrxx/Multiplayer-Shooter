@@ -8,7 +8,8 @@ and features like: scoreboard, inventory(WIP), grenades, ammo/weapon pickups, po
 This is wraped in 3 main gamemodes: 
 - Free For All Deathmatch,
 - Team's Deathmatch,
-- CSGO like teams match with bomb (WIP).
+- Capture the flag
+and planning on doing CSGO like teams match with bomb.
 
 When it comes to networking this project is utilizing:
 - **Client Side Prediction** - for example: updating the hud, reloading, aiming.
