@@ -91,6 +91,7 @@ public:
 	void MulticastSetTeamMaterialsColor(const EBTeam Team);
 
 	void SetHoldingTheFlag(bool bIsHolding);
+	void SetSpawnPoint();
 	
 	/**
 	 * Attributes Getters / Setters
@@ -261,6 +262,8 @@ protected:
 	void PlayHitReactMontage();
 
 	void RotateInPlace(float DeltaTime);
+
+	void OnPlayerStateInitialized();
 	
 
 	UFUNCTION()

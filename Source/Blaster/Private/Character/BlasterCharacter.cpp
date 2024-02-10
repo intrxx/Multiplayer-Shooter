@@ -31,7 +31,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Game/BlasterGameState.h"
-#include "Weapon/BFlag.h"
+#include "PlayerStart/BTeamPlayerStart.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -316,8 +316,7 @@ void ABlasterCharacter::PollInit()
 		BlasterPS = GetPlayerState<ABPlayerState>();
 		if(BlasterPS)
 		{
-			BlasterPS->AddToScore(0.f);
-			MulticastSetTeamMaterialsColor(BlasterPS->GetTeam());
+			OnPlayerStateInitialized();
 			
 			ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(GetWorld()));
 			if(BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(BlasterPS))
@@ -326,6 +325,13 @@ void ABlasterCharacter::PollInit()
 			}
 		}
 	}
+}
+
+void ABlasterCharacter::OnPlayerStateInitialized()
+{
+	BlasterPS->AddToScore(0.f);
+	MulticastSetTeamMaterialsColor(BlasterPS->GetTeam());
+	SetSpawnPoint();
 }
 
 void ABlasterCharacter::AimOffset(float DeltaTime)
@@ -771,6 +777,31 @@ void ABlasterCharacter::SetHoldingTheFlag(bool bIsHolding)
 	if(CombatComp)
 	{
 		CombatComp->bHoldingTheFlag = bIsHolding;
+	}
+}
+
+void ABlasterCharacter::SetSpawnPoint()
+{
+	if(HasAuthority() && BlasterPS->GetTeam() != EBTeam::EBT_NoTeam)
+	{
+		TArray<AActor*> PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(this, ABTeamPlayerStart::StaticClass(), PlayerStarts);
+
+		TArray<ABTeamPlayerStart*> TeamPlayerStarts;
+		for(const auto Start : PlayerStarts)
+		{
+			ABTeamPlayerStart* TeamStart = Cast<ABTeamPlayerStart>(Start);
+			if(TeamStart && TeamStart->Team == BlasterPS->GetTeam())
+			{
+				TeamPlayerStarts.Add(TeamStart);
+			}
+		}
+
+		if(TeamPlayerStarts.Num() > 0)
+		{
+			const ABTeamPlayerStart* ChosenPlayerStart = TeamPlayerStarts[FMath::RandRange(0, TeamPlayerStarts.Num() - 1)];
+			SetActorLocationAndRotation(ChosenPlayerStart->GetActorLocation(), ChosenPlayerStart->GetActorRotation());
+		}
 	}
 }
 
