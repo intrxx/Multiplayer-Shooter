@@ -164,6 +164,9 @@ private:
 	UFUNCTION()
 	void OnRep_Aiming();
 
+	UFUNCTION()
+	void OnRep_HoldingTheFlag();
+
 	void UpdateAmmoValues();
 	void UpdateShotgunAmmoValues();
 	void UpdateGrenadesValues(const EBGrenadeCategory GrenadeCategory);
@@ -311,6 +314,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Grenades")
 	TSubclassOf<ABGrenade> FlashGrenadeClass;
 
+	UPROPERTY(ReplicatedUsing = OnRep_HoldingTheFlag)
 	bool bHoldingTheFlag = false;
 };
 

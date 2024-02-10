@@ -74,25 +74,31 @@ void ABTeamsGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPl
 		{
 			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_BlueTeam)
 			{
-				BGameState->BlueTeamScores(1);
+				BGameState->BlueTeamScores(1.f);
 			}
 
 			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_RedTeam)
 			{
-				BGameState->RedTeamScores(1);
+				BGameState->RedTeamScores(1.f);
 			}
 		}
 		else
 		{
 			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_BlueTeam)
 			{
-				BGameState->BlueTeamScores(-1);
+				BGameState->BlueTeamScores(-1.f);
 			}
 
 			if(AttackerPlayerState->GetTeam() == EBTeam::EBT_RedTeam)
 			{
-				BGameState->RedTeamScores(-1);
+				BGameState->RedTeamScores(-1.f);
 			}
+
+			// I subtract 2 because we add 1 in the base class, this is awful
+			// One thing that could be done is to have the overrides take care of score and clear it of the base class 
+			AttackerPlayerState->AddToScore(-2.f);
+			AttackerPlayerState->AddToKills(-2.f);
+			UpdatePlayerList();
 		}	
 	}
 }

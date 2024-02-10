@@ -278,6 +278,14 @@ void ABlasterCharacter::Tick(float DeltaTime)
 
 void ABlasterCharacter::RotateInPlace(float DeltaTime)
 {
+	if(CombatComp && CombatComp->bHoldingTheFlag)
+	{
+		bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
+		return;
+	}
+	
 	if(bDisableGameplay)
 	{
 		bUseControllerRotationYaw = false;

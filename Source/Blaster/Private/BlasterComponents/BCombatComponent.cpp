@@ -32,6 +32,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UBCombatComponent, bAiming);
 	DOREPLIFETIME(UBCombatComponent, CombatState);
 	DOREPLIFETIME(UBCombatComponent, GrenadeTypeThrowing);
+	DOREPLIFETIME(UBCombatComponent, bHoldingTheFlag);
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedTacticalGrenades, COND_OwnerOnly)
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedLethalGrenades, COND_OwnerOnly)
 	DOREPLIFETIME_CONDITION(UBCombatComponent, CarriedAmmo, COND_OwnerOnly);
@@ -310,17 +311,28 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 		return;
 	}
 
-	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	if(WeaponToEquip->GetWeaponType() == EBWeaponType::EWT_Flag)
 	{
-		AttachSecondaryWeapon(WeaponToEquip);
+		BlasterCharacter->Crouch();
+		bHoldingTheFlag = true;
+		AttachActorToHand(WeaponToEquip, FName("FlagSocket"));
+		WeaponToEquip->SetWeaponState(EBWeaponState::EWS_Equipped);
+		WeaponToEquip->SetOwner(BlasterCharacter);
 	}
 	else
 	{
-		AttachPrimaryWeapon(WeaponToEquip);
-	}
+		if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+		{
+			AttachSecondaryWeapon(WeaponToEquip);
+		}
+		else
+		{
+			AttachPrimaryWeapon(WeaponToEquip);
+		}
 	
-	BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-	BlasterCharacter->bUseControllerRotationYaw = true;
+		BlasterCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		BlasterCharacter->bUseControllerRotationYaw = true;
+	}
 }
 
 void UBCombatComponent::SwapWeapon()
@@ -794,6 +806,14 @@ void UBCombatComponent::OnRep_Aiming()
 	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
 	{
 		bAiming = bAimButtonPressed;
+	}
+}
+
+void UBCombatComponent::OnRep_HoldingTheFlag()
+{
+	if(bHoldingTheFlag && BlasterCharacter && BlasterCharacter->IsLocallyControlled())
+	{
+		BlasterCharacter->Crouch();
 	}
 }
 

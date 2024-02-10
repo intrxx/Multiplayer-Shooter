@@ -13,4 +13,7 @@ ABFlag::ABFlag()
 
 	GetWeaponSphereComp()->SetupAttachment(FlagMeshComp);
 	GetPickupWidget()->SetupAttachment(FlagMeshComp);
+
+	FlagMeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	FlagMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
