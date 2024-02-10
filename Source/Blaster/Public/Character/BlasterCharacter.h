@@ -130,6 +130,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLostTheLead();
 
+	void SwitchToFlagMappingContext(bool bHoldTheFlag);
+
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -155,6 +157,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UInputMappingContext> InventoryMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
+	TObjectPtr<UInputMappingContext> HoldingTheFlagMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blaster|Input")
 	TObjectPtr<UInputMappingContext> CooldownStateMappingContext;

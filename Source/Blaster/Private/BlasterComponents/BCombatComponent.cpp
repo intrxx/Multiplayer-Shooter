@@ -318,6 +318,10 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 		AttachActorToHand(WeaponToEquip, FName("FlagSocket"));
 		WeaponToEquip->SetWeaponState(EBWeaponState::EWS_Equipped);
 		WeaponToEquip->SetOwner(BlasterCharacter);
+		if(BlasterCharacter->IsLocallyControlled())
+		{
+			BlasterCharacter->SwitchToFlagMappingContext(true);
+		}
 	}
 	else
 	{
@@ -811,9 +815,13 @@ void UBCombatComponent::OnRep_Aiming()
 
 void UBCombatComponent::OnRep_HoldingTheFlag()
 {
-	if(bHoldingTheFlag && BlasterCharacter && BlasterCharacter->IsLocallyControlled())
+	if(BlasterCharacter && BlasterCharacter->IsLocallyControlled())
 	{
-		BlasterCharacter->Crouch();
+		if(bHoldingTheFlag)
+		{
+			BlasterCharacter->Crouch();
+		}
+		BlasterCharacter->SwitchToFlagMappingContext(bHoldingTheFlag);
 	}
 }
 

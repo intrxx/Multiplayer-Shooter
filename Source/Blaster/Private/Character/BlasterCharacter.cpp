@@ -238,8 +238,8 @@ void ABlasterCharacter::BeginPlay()
 			
 			Subsystem->AddMappingContext(InventoryMappingContext, 1);
 			GameplayMappingContexts.Add(InventoryMappingContext);
-
-			Subsystem->AddMappingContext(CooldownStateMappingContext, 2);
+			
+			Subsystem->AddMappingContext(CooldownStateMappingContext, 3);
 		}
 	}
 	
@@ -1099,6 +1099,32 @@ void ABlasterCharacter::UpdateHUDAmmo()
 	}
 }
 
+void ABlasterCharacter::SwitchToFlagMappingContext(bool bHoldTheFlag)
+{
+	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
+	if(BlasterPC)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(BlasterPC->GetHUD()) : BlasterHUD;
+		if(BlasterHUD)
+		{
+			UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(BlasterPC->GetLocalPlayer());
+			if(InputSubsystem)
+			{
+				if(bHoldTheFlag)
+				{
+					InputSubsystem->RemoveMappingContext(DefaultMappingContext);
+					InputSubsystem->AddMappingContext(HoldingTheFlagMappingContext, 0.f);
+				}
+				else
+				{
+					InputSubsystem->RemoveMappingContext(HoldingTheFlagMappingContext);
+					InputSubsystem->AddMappingContext(DefaultMappingContext, 0.f);
+				}
+			}
+		}
+	}
+}
+
 void ABlasterCharacter::HandleDeath(bool bPlayerLeftGame)
 {
 	// Drop or destroy all held weapons
@@ -1125,10 +1151,17 @@ void ABlasterCharacter::MulticastHandleDeath_Implementation(bool bPlayerLeftGame
 		
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(BlasterPC->GetLocalPlayer()))
 		{
-			if(DefaultMappingContext && InventoryMappingContext)
+			if(DefaultMappingContext)
 			{
 				Subsystem->RemoveMappingContext(DefaultMappingContext);
+			}
+			if(InventoryMappingContext)
+			{
 				Subsystem->RemoveMappingContext(InventoryMappingContext);
+			}
+			if(HoldingTheFlagMappingContext)
+			{
+				Subsystem->RemoveMappingContext(HoldingTheFlagMappingContext);
 			}
 		}
 	}
