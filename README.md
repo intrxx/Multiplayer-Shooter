@@ -9,6 +9,7 @@ This is wraped in 3 main gamemodes:
 - Free For All Deathmatch,
 - Team's Deathmatch,
 - Capture the flag
+  
 and planning on doing CSGO like teams match with bomb.
 
 When it comes to networking this project is utilizing:
