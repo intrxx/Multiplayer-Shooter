@@ -8,7 +8,7 @@ and features like: scoreboard, inventory(WIP), grenades, ammo/weapon pickups, po
 This is wraped in 3 main gamemodes: 
 - Free For All Deathmatch,
 - Team's Deathmatch,
-- Capture the flag
+- Capture the flag,
   
 and planning on doing CSGO like teams match with bomb.
 
