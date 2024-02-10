@@ -475,6 +475,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		&ThisClass::ToggleInventory);
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_SwapToPrimaryWeapon, ETriggerEvent::Triggered, this,
 		&ThisClass::SwapButtonPressed);
+	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_DropTheFlag, ETriggerEvent::Triggered, this,
+		&ThisClass::DropFlagButtonPressed);
 	
 	BlasterInputComponent->BindNativeAction(InputConfig, GameplayTags.Input_Aim, ETriggerEvent::Started, this,
 		&ThisClass::AimButtonPressed);
@@ -688,6 +690,15 @@ void ABlasterCharacter::SwapButtonPressed()
 				bFinishedSwapping = false;
 			}
 		}
+	}
+}
+
+void ABlasterCharacter::DropFlagButtonPressed()
+{
+	if(CombatComp && CombatComp->TheFlag)
+	{
+		//TODO Implement Manual Flag Dropping
+		//CombatComp->TheFlag->Dropped();
 	}
 }
 
@@ -1137,6 +1148,10 @@ void ABlasterCharacter::HandleDeath(bool bPlayerLeftGame)
 		if(CombatComp->SecondaryWeapon)
 		{
 			DropOrDestroyWeapon(CombatComp->SecondaryWeapon);
+		}
+		if(CombatComp->TheFlag)
+		{
+			CombatComp->TheFlag->Dropped();
 		}
 	}
 	MulticastHandleDeath(bPlayerLeftGame);

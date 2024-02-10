@@ -57,7 +57,7 @@ public:
 	
 	virtual void Fire(const FVector& HitTarget);
 	virtual void ChangeFiringMode();
-	void Dropped();
+	virtual void Dropped();
 	void AddAmmo(int32 AmmoToAdd);
 
 	bool CheckLegsForHit(const FHitResult& HitResult, const TArray<FString>& BoneNames);

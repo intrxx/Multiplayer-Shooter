@@ -166,6 +166,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_HoldingTheFlag();
+	UFUNCTION()
+	void OnRep_Flag();
 
 	void UpdateAmmoValues();
 	void UpdateShotgunAmmoValues();
@@ -190,6 +192,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
 	TObjectPtr<ABWeapon> SecondaryWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Flag)
+	TObjectPtr<ABWeapon> TheFlag;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedLethalGrenade)
 	TObjectPtr<ABGrenade> EquippedLethalGrenade;

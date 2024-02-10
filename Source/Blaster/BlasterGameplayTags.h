@@ -28,6 +28,7 @@ public:
 	FGameplayTag Input_ToggleInventory;
 	FGameplayTag Input_SwapToPrimaryWeapon;
 	FGameplayTag Input_ToggleInGameMenu;
+	FGameplayTag Input_DropTheFlag;
 
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);

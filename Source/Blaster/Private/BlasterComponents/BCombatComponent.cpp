@@ -27,6 +27,7 @@ void UBCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(UBCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UBCombatComponent, SecondaryWeapon);
+	DOREPLIFETIME(UBCombatComponent, TheFlag);
 	DOREPLIFETIME(UBCombatComponent, EquippedLethalGrenade);
 	DOREPLIFETIME(UBCombatComponent, EquippedTacticalGrenade);
 	DOREPLIFETIME(UBCombatComponent, bAiming);
@@ -315,13 +316,14 @@ void UBCombatComponent::EquipWeapon(ABWeapon* WeaponToEquip)
 	{
 		BlasterCharacter->Crouch();
 		bHoldingTheFlag = true;
-		AttachActorToHand(WeaponToEquip, FName("FlagSocket"));
 		WeaponToEquip->SetWeaponState(EBWeaponState::EWS_Equipped);
+		AttachActorToHand(WeaponToEquip, FName("FlagSocket"));
 		WeaponToEquip->SetOwner(BlasterCharacter);
 		if(BlasterCharacter->IsLocallyControlled())
 		{
 			BlasterCharacter->SwitchToFlagMappingContext(true);
 		}
+		TheFlag = WeaponToEquip;
 	}
 	else
 	{
@@ -411,6 +413,15 @@ void UBCombatComponent::OnRep_EquippedWeapon()
 
 		EquippedWeapon->SetHUDAmmo();
 		EquippedWeapon->SetHUDAmmoImage();
+	}
+}
+
+void UBCombatComponent::OnRep_Flag()
+{
+	if(TheFlag && BlasterCharacter)
+	{
+		TheFlag->SetWeaponState(EBWeaponState::EWS_Equipped);
+		AttachActorToHand(TheFlag, FName("FlagSocket"));
 	}
 }
 

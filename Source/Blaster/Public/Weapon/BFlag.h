@@ -17,6 +17,12 @@ class BLASTER_API ABFlag : public ABWeapon
 public:
 	ABFlag();
 
+	virtual void Dropped() override;
+
+protected:
+	virtual void HandleWeaponEquipped() override;
+	virtual void HandleWeaponDropped() override;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Flag")
 	TObjectPtr<UStaticMeshComponent> FlagMeshComp;

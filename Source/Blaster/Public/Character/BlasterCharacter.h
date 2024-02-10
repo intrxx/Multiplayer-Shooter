@@ -245,6 +245,7 @@ protected:
 	void LethalGrenadeButtonPressed();
 	void TacticalGrenadeButtonPressed();
 	void SwapButtonPressed();
+	void DropFlagButtonPressed();
 	
 	void DropOrDestroyWeapon(ABWeapon* Weapon);
 	
