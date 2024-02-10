@@ -34,7 +34,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
 	bool bIsAccelerating;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Combat", meta = (AllowPrivateAccess = true))
 	bool bWeaponEquipped;
 
 	TObjectPtr<ABWeapon> EquippedWeapon;
@@ -83,6 +83,9 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Movement", meta = (AllowPrivateAccess = true))
 	bool bTransformRightHand;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Blaster|Character|Combat", meta = (AllowPrivateAccess = true))
+	bool bHoldingTheFlag;
 	
 	
 	FRotator CharacterRotationLastFrame;

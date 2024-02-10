@@ -76,6 +76,7 @@ public:
 	
 	USphereComponent* GetWeaponSphereComp() const {return  SphereComp;}
 	USkeletalMeshComponent* GetWeaponMesh() const {return  WeaponMeshComp;}
+	UWidgetComponent* GetPickupWidget() const {return PickUpWidgetComp;}
 	float GetZoomedFOV() const {return ZoomedFOV;}
 	float GetZoomInterpSpeed() const {return ZoomedInterpSpeed;}
 	float GetShootingError() const {return FiringCrosshairErrorValue;}

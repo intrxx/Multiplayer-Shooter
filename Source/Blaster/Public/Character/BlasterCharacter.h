@@ -81,9 +81,10 @@ public:
 	bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	bool IsDead() const {return bDead;}
 	bool GetDisableGameplay() const {return bDisableGameplay;}
-	bool IsLocallyReloading();
+	bool IsLocallyReloading() const;
 	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
 	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
+	bool IsHoldingTheFlag() const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSetTeamMaterialsColor(const EBTeam Team);
@@ -261,7 +262,28 @@ protected:
 
 	// Poll for any relevant classes and initialize HUD
 	void PollInit();
+	
+private:
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
 
+	UFUNCTION()
+	void OnRep_Health(float LastHealth);
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerEquip();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSwapButtonPressed();
+	
+	void HideCharacterIfCameraClose();
+	void RespawnTimerFinished();
+
+	UFUNCTION()
+	void UpdateDissolveMaterial(float DissolveValue);
+	void StartDissolve();
 
 private:
 	UPROPERTY()
@@ -507,27 +529,5 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> CrownComponent;
-	
-private:
-	UFUNCTION()
-	void OnRep_OverlappingWeapon(ABWeapon* LastWeapon);
-
-	UFUNCTION()
-	void OnRep_Health(float LastHealth);
-	UFUNCTION()
-	void OnRep_Shield(float LastShield);
-	
-	UFUNCTION(Server, Reliable)
-	void ServerEquip();
-
-	UFUNCTION(Server, Reliable)
-	void ServerSwapButtonPressed();
-	
-	void HideCharacterIfCameraClose();
-	void RespawnTimerFinished();
-
-	UFUNCTION()
-	void UpdateDissolveMaterial(float DissolveValue);
-	void StartDissolve();
 };
 

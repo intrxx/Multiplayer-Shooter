@@ -718,14 +718,22 @@ FVector ABlasterCharacter::GetHitTarget() const
 	return CombatComp->HitTarget;
 }
 
-bool ABlasterCharacter::IsLocallyReloading()
+bool ABlasterCharacter::IsLocallyReloading() const
 {
 	if(CombatComp == nullptr)
 	{
 		return false;
 	}
-
 	return CombatComp->bLocallyReloading;
+}
+
+bool ABlasterCharacter::IsHoldingTheFlag() const
+{
+	if(CombatComp == nullptr)
+	{
+		return false;
+	}
+	return CombatComp->bHoldingTheFlag;
 }
 
 void ABlasterCharacter::MulticastSetTeamMaterialsColor_Implementation(const EBTeam Team)

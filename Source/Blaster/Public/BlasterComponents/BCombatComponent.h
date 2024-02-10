@@ -134,6 +134,39 @@ protected:
 	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
 
 	void AddDefaultGrenades();
+
+private:
+	void Fire();
+	void FireProjectileWeapon();
+	void FireHitScanWeapon();
+	void FireShotgun();
+	
+	void StartFireTimer();
+	void FireTimerFinished();
+	void ShrinkCrosshairWhileShooting();
+	void PlayScopeSounds(bool bIsAiming);
+
+	bool CanFire();
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+	void InitializeCarriedAmmo();
+
+	UFUNCTION()
+	void OnRep_CarriedLethalGrenades();
+	UFUNCTION()
+	void OnRep_CarriedTacticalGrenades();
+	void InitializeCarriedGrenades();
+
+	UFUNCTION()
+	void OnRep_CombatState();
+	
+	UFUNCTION()
+	void OnRep_Aiming();
+
+	void UpdateAmmoValues();
+	void UpdateShotgunAmmoValues();
+	void UpdateGrenadesValues(const EBGrenadeCategory GrenadeCategory);
 	
 private:
 	UPROPERTY()
@@ -277,38 +310,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Blaster|Grenades")
 	TSubclassOf<ABGrenade> FlashGrenadeClass;
-	
-private:
-	void Fire();
-	void FireProjectileWeapon();
-	void FireHitScanWeapon();
-	void FireShotgun();
-	
-	void StartFireTimer();
-	void FireTimerFinished();
-	void ShrinkCrosshairWhileShooting();
-	void PlayScopeSounds(bool bIsAiming);
 
-	bool CanFire();
-
-	UFUNCTION()
-	void OnRep_CarriedAmmo();
-	void InitializeCarriedAmmo();
-
-	UFUNCTION()
-	void OnRep_CarriedLethalGrenades();
-	UFUNCTION()
-	void OnRep_CarriedTacticalGrenades();
-	void InitializeCarriedGrenades();
-
-	UFUNCTION()
-	void OnRep_CombatState();
-	
-	UFUNCTION()
-	void OnRep_Aiming();
-
-	void UpdateAmmoValues();
-	void UpdateShotgunAmmoValues();
-	void UpdateGrenadesValues(const EBGrenadeCategory GrenadeCategory);
+	bool bHoldingTheFlag = false;
 };
 
