@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Player/BPlayerController.h"
+#include "Character/BlasterCharacter.h"
 
 ABFlag::ABFlag()
 {
@@ -29,6 +30,11 @@ void ABFlag::Dropped()
 	if(BlasterControllerOwner)
 	{
 		BlasterControllerOwner->SetHUDWeaponTypeText(EBWeaponType::EWT_MAX);
+	}
+
+	if(BlasterCharacterOwner)
+	{
+		BlasterCharacterOwner->SetHoldingTheFlag(false);
 	}
 	
 	SetOwner(nullptr);

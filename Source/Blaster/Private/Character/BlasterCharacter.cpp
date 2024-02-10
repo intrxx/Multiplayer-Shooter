@@ -31,6 +31,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Game/BlasterGameState.h"
+#include "Weapon/BFlag.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -697,7 +698,7 @@ void ABlasterCharacter::DropFlagButtonPressed()
 {
 	if(CombatComp && CombatComp->TheFlag)
 	{
-		//TODO Implement Manual Flag Dropping
+		//TODO Implement manually dropping the flag
 		//CombatComp->TheFlag->Dropped();
 	}
 }
@@ -753,6 +754,24 @@ bool ABlasterCharacter::IsHoldingTheFlag() const
 		return false;
 	}
 	return CombatComp->bHoldingTheFlag;
+}
+
+EBTeam ABlasterCharacter::GetTeam()
+{
+	BlasterPS = BlasterPS == nullptr ? GetPlayerState<ABPlayerState>() : BlasterPS;
+	if(BlasterPS == nullptr)
+	{
+		return EBTeam::EBT_NoTeam;
+	}
+	return BlasterPS->GetTeam();
+}
+
+void ABlasterCharacter::SetHoldingTheFlag(bool bIsHolding)
+{
+	if(CombatComp)
+	{
+		CombatComp->bHoldingTheFlag = bIsHolding;
+	}
 }
 
 void ABlasterCharacter::MulticastSetTeamMaterialsColor_Implementation(const EBTeam Team)

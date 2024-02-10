@@ -85,9 +85,12 @@ public:
 	UAnimMontage* GetReloadMontage() const {return ReloadWeaponMontage;}
 	UStaticMeshComponent* GetAttachedGrenade() const {return AttachedGrenade;}
 	bool IsHoldingTheFlag() const;
+	EBTeam GetTeam();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSetTeamMaterialsColor(const EBTeam Team);
+
+	void SetHoldingTheFlag(bool bIsHolding);
 	
 	/**
 	 * Attributes Getters / Setters

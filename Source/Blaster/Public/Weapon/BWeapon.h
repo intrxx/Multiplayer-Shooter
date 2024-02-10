@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BlasterTypes/BWeaponTypes.h"
 #include "BlasterTypes/BFiringMode.h"
+#include "BlasterTypes/BTeams.h"
 #include "BWeapon.generated.h"
 
 class USoundCue;
@@ -214,6 +215,9 @@ private:
 private:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
 	EBWeaponType WeaponType;
+
+	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")
+	EBTeam Team;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Blaster|Weapon")
 	TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
