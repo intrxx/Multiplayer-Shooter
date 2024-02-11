@@ -20,6 +20,13 @@ ABFlag::ABFlag()
 	FlagMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ABFlag::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitialTransform = GetActorTransform();
+}
+
 void ABFlag::Dropped()
 {
 	SetWeaponState(EBWeaponState::EWS_Dropped);
@@ -32,10 +39,40 @@ void ABFlag::Dropped()
 		BlasterControllerOwner->SetHUDWeaponTypeText(EBWeaponType::EWT_MAX);
 	}
 
-	if(BlasterCharacterOwner)
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetOwner());
+	if(BlasterCharacter)
 	{
-		BlasterCharacterOwner->SetHoldingTheFlag(false);
+		BlasterCharacter->SetHoldingTheFlag(false);
 	}
+	
+	SetOwner(nullptr);
+	BlasterCharacterOwner = nullptr;
+	BlasterControllerOwner = nullptr;
+}
+
+void ABFlag::ResetFlag()
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetOwner());
+	if(BlasterCharacter)
+	{
+		BlasterCharacter->SetHoldingTheFlag(false);
+		BlasterCharacter->SetOverlappingWeapon(nullptr);
+		BlasterCharacter->UnCrouch();
+		BlasterCharacter->SwitchToFlagMappingContext(false);
+	}
+
+	if(!HasAuthority())
+	{
+		return;
+	}
+	
+	SetActorTransform(InitialTransform);
+	SetWeaponState(EBWeaponState::EWS_Initial);
+	GetWeaponSphereComp()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetWeaponSphereComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
+	const FDetachmentTransformRules TransformRules(EDetachmentRule::KeepWorld, true);
+	FlagMeshComp->DetachFromComponent(TransformRules);
 	
 	SetOwner(nullptr);
 	BlasterCharacterOwner = nullptr;
@@ -48,7 +85,8 @@ void ABFlag::HandleWeaponEquipped()
 	GetWeaponSphereComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FlagMeshComp->SetSimulatePhysics(false);
 	FlagMeshComp->SetEnableGravity(false);
-	FlagMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FlagMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	FlagMeshComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 }
 
 void ABFlag::HandleWeaponDropped()
@@ -64,3 +102,4 @@ void ABFlag::HandleWeaponDropped()
 	FlagMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	FlagMeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
+

@@ -91,6 +91,8 @@ public:
 	float GetDamage() const {return Damage;}
 	float GetHeadShotDamage() const {return HeadShotDamage;}
 	float GetLegsShotDamage() const {return LegsShotDamage;}
+	EBTeam GetTeam() const  {return Team;}
+	
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Blaster|Weapon")

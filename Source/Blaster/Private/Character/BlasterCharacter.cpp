@@ -286,6 +286,12 @@ void ABlasterCharacter::RotateInPlace(float DeltaTime)
 		TurningInPlace = EBTurningInPlace::ETIP_NotTurning;
 		return;
 	}
+
+	if(CombatComp && CombatComp->EquippedWeapon)
+	{
+		bUseControllerRotationYaw = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
 	
 	if(bDisableGameplay)
 	{
@@ -630,6 +636,8 @@ void ABlasterCharacter::ToggleScoreBoard()
 
 void ABlasterCharacter::ToggleInventory()
 {
+	/*
+	 * TODO Work in progress 
 	BlasterPC = BlasterPC == nullptr ? Cast<ABPlayerController>(Controller) : BlasterPC;
 	if(BlasterPC)
 	{
@@ -656,6 +664,7 @@ void ABlasterCharacter::ToggleInventory()
 			BlasterHUD->ToggleInventory(BlasterHUD->IsInventoryVisible());
 		}
 	}
+	*/
 }
 
 void ABlasterCharacter::LethalGrenadeButtonPressed()
@@ -774,10 +783,11 @@ EBTeam ABlasterCharacter::GetTeam()
 
 void ABlasterCharacter::SetHoldingTheFlag(bool bIsHolding)
 {
-	if(CombatComp)
+	if(CombatComp == nullptr)
 	{
-		CombatComp->bHoldingTheFlag = bIsHolding;
+		return;
 	}
+	CombatComp->bHoldingTheFlag = bIsHolding;
 }
 
 void ABlasterCharacter::SetSpawnPoint()

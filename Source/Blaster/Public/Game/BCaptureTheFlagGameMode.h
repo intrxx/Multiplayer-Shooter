@@ -6,6 +6,8 @@
 #include "Game/BTeamsGameMode.h"
 #include "BCaptureTheFlagGameMode.generated.h"
 
+class ABFlagZone;
+class ABFlag;
 /**
  * 
  */
@@ -16,4 +18,6 @@ class BLASTER_API ABCaptureTheFlagGameMode : public ABTeamsGameMode
 
 public:
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPlayerController* TargetBPC, ABPlayerController* AttackerBPC) override;
+
+	void FlagCaptured(const ABFlag* Flag, const ABFlagZone* FlagZone);
 };
