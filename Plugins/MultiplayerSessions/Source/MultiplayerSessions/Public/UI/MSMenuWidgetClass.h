@@ -24,7 +24,8 @@ class MULTIPLAYERSESSIONS_API UMSMenuWidgetClass : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup(int32 NumOfPublicConnections = 4, FString TypeOfMatch = FString(TEXT("FreeForAll")), FString LobbyPath  = FString(TEXT("/Game/TopDown/Maps/Lobby")));
+	void MenuSetup(int32 NumOfPublicConnections = 4, FString TypeOfMatch = FString(TEXT("FreeForAll")),
+		FString LobbyPath  = FString(TEXT("/Game/TopDown/Maps/Lobby")));
 
 public:
 	UPROPERTY(EditDefaultsOnly)

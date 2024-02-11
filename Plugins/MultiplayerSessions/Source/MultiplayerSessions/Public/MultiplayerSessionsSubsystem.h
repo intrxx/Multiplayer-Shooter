@@ -46,7 +46,9 @@ public:
 
 	FMultiplayerSystemOnFindSessionComplete MultiplayerSystemOnFindSessionComplete;
 	FMultiplayerSystemOnJoinSessionComplete MultiplayerSystemOnJoinSessionComplete;
-	
+
+	int32 DesiredNumPublicConnections{};
+	FString DesiredMatchType{};
 protected:
 
 	/*
