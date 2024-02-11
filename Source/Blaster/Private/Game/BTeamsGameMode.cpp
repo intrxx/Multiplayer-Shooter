@@ -93,12 +93,6 @@ void ABTeamsGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABPl
 			{
 				BGameState->RedTeamScores(-1.f);
 			}
-
-			// I subtract 2 because we add 1 in the base class, this is awful
-			// One thing that could be done is to have the overrides take care of score and clear it of the base class 
-			AttackerPlayerState->AddToScore(-2.f);
-			AttackerPlayerState->AddToKills(-2.f);
-			UpdatePlayerList();
 		}	
 	}
 }
@@ -158,11 +152,13 @@ void ABTeamsGameMode::HandleMatchHasStarted()
 				{
 					BGameState->RedTeam.AddUnique(BPS);
 					BPS->SetTeam(EBTeam::EBT_RedTeam);
+					BPS->bHasTeam = true;
 				}
 				else
 				{
 					BGameState->BlueTeam.AddUnique(BPS);
 					BPS->SetTeam(EBTeam::EBT_BlueTeam);
+					BPS->bHasTeam = true;
 				}
 			}
 		}

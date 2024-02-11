@@ -35,6 +35,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetTeam(EBTeam TeamToSet);
 
+	bool bHasTeam = false;
+
 private:
 	void RemoveFromOtherTeams(EBTeam ChosenTeam);
 	

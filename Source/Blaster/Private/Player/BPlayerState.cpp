@@ -55,6 +55,7 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 			
 			BlasterGameState->RedTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_RedTeam);
+			bHasTeam = true;
 		}
 
 		if(TeamToSet == EBTeam::EBT_BlueTeam)
@@ -68,6 +69,7 @@ void ABPlayerState::ServerSetTeam_Implementation(EBTeam TeamToSet)
 			
 			BlasterGameState->BlueTeam.AddUnique(this);
 			SetTeam(EBTeam::EBT_BlueTeam);
+			bHasTeam = true;
 		}
 
 		if(TeamToSet == EBTeam::EBT_ChooseRandomTeam)

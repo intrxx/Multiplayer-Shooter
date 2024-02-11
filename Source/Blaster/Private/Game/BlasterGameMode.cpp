@@ -87,9 +87,17 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABP
 		{
 			PlayersInTheLead.Add(LeadPlayer);
 		}
-		
-		AttackerPS->AddToScore(KillScoreAward);
-		AttackerPS->AddToKills(1.f);
+
+		if(AttackerPS->bHasTeam && AttackerPS->GetTeam() == TargetPS->GetTeam())
+		{
+			AttackerPS->AddToScore(-KillScoreAward);
+			AttackerPS->AddToKills(-1.f);
+		}
+		else
+		{
+			AttackerPS->AddToScore(KillScoreAward);
+			AttackerPS->AddToKills(1.f);
+		}
 		
 		UpdatePlayerList();
 		BlasterGameState->UpdateTopScore(AttackerPS);
