@@ -15,3 +15,4 @@ and planning on doing CSGO like teams match with bomb.
 When it comes to networking this project is utilizing:
 - **Client Side Prediction** - for example: updating the hud, reloading, aiming.
 - **Server Side Rewind** - for every type of weapon (excluding explosive weapons like Rocket Launcher although projectile predicting is also done with Assault Rifle).
+- **Validation** - for ammo changes etc.
