@@ -16,3 +16,5 @@ When it comes to networking this project is utilizing:
 - **Client Side Prediction** - for example: updating the hud, reloading, aiming.
 - **Server Side Rewind** - for every type of weapon (excluding explosive weapons like Rocket Launcher although projectile predicting is also done with Assault Rifle).
 - **Validation** - for ammo changes etc.
+
+[Most recent build](https://mega.nz/file/t7ZyjarI#72W-QkyIVcGDVVShwTAObFp2gU53rFnZH_AUxDsi0U8)
